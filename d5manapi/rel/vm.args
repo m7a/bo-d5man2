@@ -1,3 +1,4 @@
+-noshell
 -name d5manapi@127.0.0.1
 -setcookie d5manapi
 -heart

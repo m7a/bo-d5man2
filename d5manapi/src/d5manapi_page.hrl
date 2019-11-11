@@ -1,0 +1,1 @@
+-record(page, {file, name, section=0, lang, tags=[], redirect}).

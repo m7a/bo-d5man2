@@ -1,0 +1,163 @@
+-module(d5manapi_db).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2, code_change/3]).
+-behaviour(gen_server).
+-include_lib("d5manapi_page.hrl").
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INTIALIZATION PROCEDURES %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% http://erlang.org/doc/man/file.html list_dir 
+init(RootList) ->
+	% id := page(section)
+	ets:new(page_metadata,  [set, named_table]), % id -> #page
+	ets:new(index_names,    [bag, named_table]), % name -> idlist
+	lists:foreach(fun(Root) ->
+		case file:list_dir(Root) of
+		{error, Emsg} ->
+			io:fwrite(["[ERROR] Could not scan ", Root, ": ",
+						atom_to_list(Emsg), "~n"]);
+		{ok, Entries} ->
+			Dirs = lists:filter(fun(E) ->
+				filelib:is_dir([Root, "/", E])
+			end, Entries),
+			case lists:all(fun(Str) ->is_number(catch
+					list_to_integer(Str)) end, Dirs) of
+			true  -> proc_root_d5man(Root, Dirs);
+			false -> proc_root_repos(Root, Dirs)
+			end
+		end
+	end, RootList),
+	{ok, RootList}.
+
+proc_root_d5man(Root, Sections) ->
+	proc_filtered_files_as_documents(Root, Sections, fun(File) ->
+		lists:suffix(".yml", File) or lists:suffix(".md", File)
+	end).
+
+proc_filtered_files_as_documents(Root, Dirs, Filter) ->
+	lists:foreach(fun(Repo) ->
+		Subdir = [Root, "/", Repo],
+		case file:list_dir(Subdir) of
+		{error, Emsg} ->
+			io:fwrite(["[ERROR] Could not scan subdir ", Subdir,
+				": ", atom_to_list(Emsg), "~n"]);
+		{ok, Repofiles} ->
+			lists:foreach(fun(File) ->
+				proc_document([Subdir, "/", File])
+			end, lists:filter(Filter, Repofiles))
+		end
+	end, Dirs).
+
+proc_root_repos(Root, Repos) ->
+	proc_filtered_files_as_documents(Root, Repos, fun(File) ->
+		(File =:= "README.md") or (File =:= "manpage.md")
+	end).
+
+% DocFile absolute path but made of nested lists
+proc_document(DocFile) ->
+	try yamerl_constr:file(DocFile) of
+		DocumentList ->
+			lists:foreach(fun(DocMeta) ->
+				Rec = document_metadata_to_record(
+						#page{file=DocFile}, DocMeta),
+				Id = iolist_to_binary([Rec#page.name,
+					<<"(">>,
+					integer_to_binary(Rec#page.section),
+					<<")">>]),
+				ets:insert(page_metadata, {Id, Rec}),
+				ets:insert(index_names, {Rec#page.name, Id})
+			end,
+			% droplast: do not process document content part
+			lists:droplast(DocumentList))
+	catch
+		Etype:Emsg -> io:fwrite(["[ERROR] Failed to process ", DocFile,
+						": ", atom_to_list(Etype), ":",
+						atom_to_list(Emsg), "~n"])
+	end.
+
+document_metadata_to_record(InRecord, DocumentMetadata) ->
+	lists:foldl(fun(Entry, R) ->
+		case Entry of
+		{"section",Sec}    -> R#page{section=Sec};
+		{"name",Name}      -> R#page{name=list_to_binary(Name)};
+		{"tags",TagsStr}   -> R#page{tags=lists:map(
+					fun list_to_binary/1,
+					string:split(TagsStr, " ", all))};
+		{"redirect",Redir} -> R#page{redirect=Redir};
+		{_Field,_Val}      -> R % silently ignore other fields
+		end
+	end, InRecord, DocumentMetadata).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DATABASE QUERYING %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+handle_call({query, Limit, Query}, _From, Context) ->
+	EmptyFilter = fun(_Record) -> true end,
+	case lists:flatten(string:split(Query, " ", all)) of
+	[] ->
+		{reply, query_full_table_scan([], Limit, EmptyFilter), Context};
+	QueryParts ->
+		[QueryBegin|QueryTail] = QueryParts,
+		{ResultFilter, QConsider} = case is_number(catch
+					binary_to_integer(QueryBegin)) of
+			true ->  CmpNum = binary_to_integer(QueryBegin),
+				 {fun(Record)  -> Record#page.section =:=
+							CmpNum end, QueryTail};
+			false -> {EmptyFilter, QueryParts}
+		end,
+		{reply, case QConsider of
+			[H|[]] -> case ets:lookup(index_names,
+							iolist_to_binary(H)) of
+				  [] -> query_full_table_scan(QConsider, Limit,
+								ResultFilter);
+				  Matched -> lists:filter(ResultFilter,
+						lists:map(fun({_K, V}) ->
+						[{_Val, PageMeta}] =
+						ets:lookup(page_metadata, V),
+						PageMeta end,
+						Matched))
+				  end;
+			_QConsider -> query_full_table_scan(QConsider, Limit,
+								ResultFilter)
+		end, Context}
+	end;
+handle_call(_Call, _From, Context) ->
+	{reply, 0, Context}.
+
+query_full_table_scan(QConsider, Limit, ResultFilter) ->
+	query_full_table_scan_sub(QConsider, Limit, 0, ResultFilter,
+						ets:first(page_metadata), []).
+
+query_full_table_scan_sub(_QConsider, _Limit, _Have, _ResultFilter,
+				'$end_of_table', Accumulator) -> Accumulator;
+query_full_table_scan_sub(QConsider, Limit, Have, ResultFilter, PageID,
+								Accumulator) ->
+	[{_PageID, PageRec}] = ets:lookup(page_metadata, PageID),
+	{HaveNew, AccNew} = case ResultFilter(PageRec) andalso
+					page_matches(QConsider, PageRec) of
+				true  -> {Have + 1, [PageRec|Accumulator]};
+				false -> {Have,     Accumulator}
+			    end,
+	case ((Limit =:= 0) or (HaveNew < Limit)) of
+	true  -> query_full_table_scan_sub(QConsider, Limit, HaveNew,
+			ResultFilter, ets:next(page_metadata, PageID), AccNew);
+	false -> AccNew
+	end.
+
+page_matches(QConsider, PageRec) ->
+	page_matches_all_q(QConsider, [PageRec#page.name|PageRec#page.tags]).
+
+page_matches_all_q([], _CheckList)   -> true;
+page_matches_all_q([H|T], CheckList) -> page_matches_qsingle(H, CheckList)
+				andalso page_matches_all_q(T, CheckList).
+
+page_matches_qsingle(_QSingle, [])   -> false;
+page_matches_qsingle(QSingle, [H|T]) -> binary:longest_common_prefix([QSingle,
+					H]) =:= byte_size(QSingle) orelse
+					page_matches_qsingle(QSingle, T).
+
+handle_cast(_Cast, Context) -> {noreply, Context}.
+handle_info(_Message, Context) -> {noreply, Context}.
+code_change(_OldVersion, Context, _Extra) -> {ok, Context}.

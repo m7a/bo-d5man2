@@ -1,0 +1,5 @@
+mdvl-d5man2 (1.0.0) stable; urgency=medium
+
+  * Package created with MDPC 2
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Mon, 11 Nov 2019 23:12:21 +0100

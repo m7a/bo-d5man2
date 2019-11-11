@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="build">
+
+	<target name="build">
+		<setpermissions mode="755" failonerror="false">
+			<file file=".erlang.mk/relx"/>
+		</setpermissions>
+		<exec executable="make" failonerror="true"/>
+	</target>
+
+	<target name="clean">
+		<exec executable="make" failonerror="true">
+			<arg value="clean"/>
+		</exec>
+	</target>
+
+	<target name="dist-clean" depends="clean">
+		<delete dir="_rel"/>
+		<delete dir="ebin"/>
+	</target>
+
+</project>

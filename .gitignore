@@ -1,4 +1,2 @@
-d5manapi/_rel
-d5manapi/ebin
 d5manapi/deps
 d5manapi/.erlang.mk

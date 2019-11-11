@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="build">
+
+<!-- APPLICATION METADATA -->
+<property name="mdpc.name"       value="mdvl-d5man2"/>
+<property name="mdpc.section"    value="misc"/>
+<property name="mdpc.descrs"     value="D5Man 2"/>
+<property name="mdpc.arch"       value="all"/>
+<property name="mdpc.descrl">
+ Ma_Sys.ma D5Man is a locally run knowledge base consisting of
+ d5manapi -- a server to provide access to metadata
+ d5mantui -- a client to interactively send queries to the server
+ and auxiliary components (TBD).
+</property>
+
+<property name="mdpc.file.install">
+d5manapi/_rel/d5manapi_release/bin /usr/share/mdvl-d5man2/d5manapi
+d5manapi/_rel/d5manapi_release/lib /usr/share/mdvl-d5man2/d5manapi
+d5manapi/_rel/d5manapi_release/releases /usr/share/mdvl-d5man2/d5manapi
+d5mantui/d5mantui.jar /usr/share/java
+</property>
+
+<!-- TODO DECLARE LICENSE THING PROPERLY -->
+
+<!-- PART OF TPL HERE FOR USE IN BUILD -->
+<property environment="env"/>
+<condition property="masysma.internal.includepath.rel" value="${env.MDVL_CI_PHOENIX_ROOT}" else=".."><isset property="env.MDVL_CI_PHOENIX_ROOT"/></condition>
+<property name="masysma.internal.includepath" location="${masysma.internal.includepath.rel}"/>
+
+<!-- SPECIFIC BUILD TODO THIS IS RECURSIVE ANT SHOULD BE SUPPORTED IN TEMPLATE! -->
+<target name="build">
+	<ant dir="d5manapi"/>
+	<ant dir="d5mantui" target="jar"/>
+</target>
+
+<target name="clean">
+	<ant dir="d5manapi" target="clean"/>
+	<ant dir="d5mantui" target="clean"/>
+</target>
+
+<target name="dist-clean" depends="clean">
+	<ant dir="d5manapi" target="dist-clean"/>
+	<ant dir="d5mantui" target="dist-clean"/>
+</target>
+
+<!-- CI INTEGRATION -->
+<target name="package_triggered" depends="package">
+	<property name="masysma.ci.trigger" value="newver"/>
+</target>
+
+<!-- TPL IMPORT (PARTIALLY GIVEN ABOVE) -->
+<property name="masysma.internal.loadpath" value="${masysma.internal.includepath}/co-build/ant-build-template.xml"/>
+<condition property="masysma.internal.load" value="file://${masysma.internal.loadpath}" else="https://raw.githubusercontent.com/m7a/co-build/master/ant-build-template.xml"><resourceexists><file file="${masysma.internal.loadpath}"/></resourceexists></condition>
+<import><url url="${masysma.internal.load}"/></import>
+
+</project>

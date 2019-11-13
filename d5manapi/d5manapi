@@ -1,0 +1,10 @@
+#!/bin/sh -e
+
+command=foreground
+[ $# = 0 ] || command="$1"
+shift
+addconf=
+[ ! -f "$HOME/.mdvl/d5man/d5manapi.config" ] || \
+			addconf="-config \"$HOME/.mdvl/d5man/d5manapi.config\""
+exec /usr/share/mdvl-d5man2/d5manapi/bin/d5manapi_release \
+						"$command" $addconf "$@"

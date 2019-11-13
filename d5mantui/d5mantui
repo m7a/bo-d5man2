@@ -1,0 +1,3 @@
+#!/bin/sh -e
+exec java -cp /usr/share/java/jexer.jar:/usr/share/java/d5mantui.jar \
+							ma.d5man.tui.Main "$@"

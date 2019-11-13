@@ -3,6 +3,8 @@
 -export([start/2, stop/1]).
 
 start(_Type, _Args) ->
+	%{ok, UserHome} = init:get_argument(home),
+	%UserConf = [UserHome, ".mdvl/d5man/d5manapi.erl"]
 	application:start(yamerl),
 	gen_server:start_link({local, d5manapi_db}, d5manapi_db,
 							get_conf(db_roots), []),

@@ -2,10 +2,10 @@
 <project default="build">
 
 <!-- APPLICATION METADATA -->
-<property name="mdpc.name"       value="mdvl-d5man2"/>
-<property name="mdpc.section"    value="misc"/>
-<property name="mdpc.descrs"     value="D5Man 2"/>
-<property name="mdpc.arch"       value="all"/>
+<property name="mdpc.name"    value="mdvl-d5man2"/>
+<property name="mdpc.section" value="misc"/>
+<property name="mdpc.descrs"  value="D5Man 2"/>
+<property name="mdpc.arch"    value="all"/>
 <property name="mdpc.descrl">
  Ma_Sys.ma D5Man is a locally run knowledge base consisting of
  d5manapi -- a server to provide access to metadata
@@ -17,7 +17,9 @@
 d5manapi/_rel/d5manapi_release/bin /usr/share/mdvl-d5man2/d5manapi
 d5manapi/_rel/d5manapi_release/lib /usr/share/mdvl-d5man2/d5manapi
 d5manapi/_rel/d5manapi_release/releases /usr/share/mdvl-d5man2/d5manapi
+d5manapi/d5manapi /usr/bin
 d5mantui/d5mantui.jar /usr/share/java
+d5mantui/d5mantui /usr/bin
 </property>
 
 <property name="mdpc.copyright.file"><![CDATA[

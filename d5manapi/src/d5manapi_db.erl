@@ -54,6 +54,8 @@ proc_root_repos(Root, Repos) ->
 		(File =:= "README.md") or (File =:= "manpage.md")
 	end).
 
+% TODO CSTAT BEFORE CONTINUING TO WORK ON THE QUERYING DETAILS, HERE IS A SERUIOUS ISSUE / FAILS TO PROCESS README.md. Process the file in line-wise streaming mode https://hexdocs.pm/yamerl/yamerl_constr.html and consider stopping upon the first line with uppercase letter (should be a good heuristics to cancel D5Man processing pretty early!)
+
 % DocFile absolute path but made of nested lists
 proc_document(DocFile) ->
 	try yamerl_constr:file(DocFile) of
@@ -71,9 +73,11 @@ proc_document(DocFile) ->
 			% droplast: do not process document content part
 			lists:droplast(DocumentList))
 	catch
-		Etype:Emsg -> io:fwrite(["[ERROR] Failed to process ", DocFile,
+		Etype:Emsg:StackTrace ->
+			io:fwrite(["[ERROR] Failed to process ", DocFile,
 						": ", atom_to_list(Etype), ":",
-						atom_to_list(Emsg), "~n"])
+						atom_to_list(Emsg), "\n"]),
+			erlang:display(StackTrace)
 	end.
 
 document_metadata_to_record(InRecord, DocumentMetadata) ->
@@ -100,28 +104,33 @@ handle_call({query, Limit, Query}, _From, Context) ->
 		{reply, query_full_table_scan([], Limit, EmptyFilter), Context};
 	QueryParts ->
 		[QueryBegin|QueryTail] = QueryParts,
-		{ResultFilter, QConsider} = case is_number(catch
-					binary_to_integer(QueryBegin)) of
-			true ->  CmpNum = binary_to_integer(QueryBegin),
-				 {fun(Record)  -> Record#page.section =:=
-							CmpNum end, QueryTail};
-			false -> {EmptyFilter, QueryParts}
-		end,
-		{reply, case QConsider of
-			[H|[]] -> case ets:lookup(index_names,
-							iolist_to_binary(H)) of
-				  [] -> query_full_table_scan(QConsider, Limit,
-								ResultFilter);
-				  Matched -> lists:filter(ResultFilter,
-						lists:map(fun({_K, V}) ->
-						[{_Val, PageMeta}] =
-						ets:lookup(page_metadata, V),
-						PageMeta end,
-						Matched))
-				  end;
-			_QConsider -> query_full_table_scan(QConsider, Limit,
-								ResultFilter)
-		end, Context}
+		case binary:first(QueryBegin) of
+		$# ->
+			{reply, [], Context};
+		_Other ->
+			{ResultFilter, QConsider} = case is_number(catch
+						binary_to_integer(QueryBegin)) of
+				true ->  CmpNum = binary_to_integer(QueryBegin),
+					 {fun(Record)  -> Record#page.section =:=
+								CmpNum end, QueryTail};
+				false -> {EmptyFilter, QueryParts}
+			end,
+			{reply, case QConsider of
+				[H|[]] -> case ets:lookup(index_names,
+								iolist_to_binary(H)) of
+					  [] -> query_full_table_scan(QConsider, Limit,
+									ResultFilter);
+					  Matched -> lists:filter(ResultFilter,
+							lists:map(fun({_K, V}) ->
+							[{_Val, PageMeta}] =
+							ets:lookup(page_metadata, V),
+							PageMeta end,
+							Matched))
+					  end;
+				_QConsider -> query_full_table_scan(QConsider, Limit,
+									ResultFilter)
+			end, Context}
+		end
 	end;
 handle_call(_Call, _From, Context) ->
 	{reply, 0, Context}.

@@ -1,6 +1,6 @@
 -module(d5manapi_app).
 -behaviour(application).
--export([start/2, stop/1]).
+-export([start/2, stop/1, mimetype/1]).
 
 start(_Type, _Args) ->
 	%{ok, UserHome} = init:get_argument(home),
@@ -21,13 +21,36 @@ start(_Type, _Args) ->
 						d5manapi_handler_query, []}
 				] ++ maps:fold(fun(K, V, Tail) ->
 					[{"/" ++ atom_to_list(K) ++ "/[...]",
-					cowboy_static, {dir, V}}|Tail]
+					cowboy_static,
+					{dir, V,
+					[{mimetypes, ?MODULE, mimetype}]}}|
+					Tail]
 				end, [], get_conf(fs))
 			}])},
 			middlewares => [cowboy_router, cowboy_handler]
 		}
 	),
 	d5manapi_sup:start_link().
+
+mimetype(Path) ->
+	case filename:extension(Path) of
+	<<".css">>   -> {<<"text">>, <<"css">>, []};
+	<<".gif">>   -> {<<"image">>, <<"gif">>, []};
+	<<".png">>   -> {<<"image">>, <<"png">>, []};
+	<<".js">>    -> {<<"application">>, <<"javascript">>, []};
+	<<".xhtml">> -> {<<"application">>, <<"xhtml+xml">>, []};
+
+	B when (B =:= <<".txt">>) or (B =:= <<".csv">>) or (B =:= <<".md">>) ->
+			{<<"text">>, <<"plain">>, []};
+
+	B when (B =:= <<".jpg">>) or (B =:= <<".jpeg">>) ->
+			{<<"image">>, <<"jpeg">>, []};
+
+	B when (B =:= <<".html">>) or (B =:= <<".htm">>) ->
+			{<<"text">>, <<"html">>, []};
+
+	_            -> {<<"application">>, <<"octet-stream">>, []}
+	end.
 
 get_conf(Key) ->
 	{ok, Val} = application:get_env(d5manapi, Key),

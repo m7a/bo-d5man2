@@ -10,6 +10,7 @@
 % http://erlang.org/doc/man/file.html list_dir 
 init(RootList) ->
 	% id := page(section)
+	io:fwrite("[INFO ] Reading DB...~n"),
 	ets:new(page_metadata,  [set, named_table]), % id -> #page
 	ets:new(index_names,    [bag, named_table]), % name -> idlist
 	lists:foreach(fun(Root) ->
@@ -28,6 +29,8 @@ init(RootList) ->
 			end
 		end
 	end, RootList),
+	% TODO z add statistics on how long it took to load the DB
+	io:fwrite("[INFO ] DB load complete~n"),
 	{ok, RootList}.
 
 proc_root_d5man(Root, Sections) ->
@@ -54,11 +57,9 @@ proc_root_repos(Root, Repos) ->
 		(File =:= "README.md") or (File =:= "manpage.md")
 	end).
 
-% TODO CSTAT BEFORE CONTINUING TO WORK ON THE QUERYING DETAILS, HERE IS A SERUIOUS ISSUE / FAILS TO PROCESS README.md. Process the file in line-wise streaming mode https://hexdocs.pm/yamerl/yamerl_constr.html and consider stopping upon the first line with uppercase letter (should be a good heuristics to cancel D5Man processing pretty early!)
-
 % DocFile absolute path but made of nested lists
 proc_document(DocFile) ->
-	try yamerl_constr:file(DocFile) of
+	try yaml_from_pandoc_md(DocFile) of
 		DocumentList ->
 			lists:foreach(fun(DocMeta) ->
 				Rec = document_metadata_to_record(
@@ -71,6 +72,7 @@ proc_document(DocFile) ->
 				ets:insert(index_names, {Rec#page.name, Id})
 			end,
 			% droplast: do not process document content part
+			% (which is often null)
 			lists:droplast(DocumentList))
 	catch
 		Etype:Emsg:StackTrace ->
@@ -80,16 +82,49 @@ proc_document(DocFile) ->
 			erlang:display(StackTrace)
 	end.
 
+% https://www.rosettacode.org/wiki/Read_a_file_line_by_line#Erlang
+% https://hexdocs.pm/yamerl/yamerl_constr.html
+yaml_from_pandoc_md(DocFile) ->
+	{ok, IO} = file:open(DocFile, [read]),
+	stream_file_to_yamerl(io:get_line(IO, ''), IO, yamerl_constr:new(
+				{file, "<stdin>"}, [{detailed_constr, false}])).
+
+stream_file_to_yamerl(eof, IO, Stream) ->
+	file:close(IO),
+	yamerl_constr:last_chunk(Stream, <<>>);
+stream_file_to_yamerl(Line, IO, Stream) ->
+	case Line of
+	"" ->
+		% process normally
+		{continue, StreamNew} = yamerl_constr:next_chunk(Stream, Line),
+		stream_file_to_yamerl(io:get_line(IO, ''), IO, StreamNew);
+	[H|_T] ->
+		% Current heuristics to terminate processing is the first line
+		% encountered beginning with an uppercase letter. Note that
+		% this heuristics is quite incomplete and might need future
+		% revision.
+		if (H >= $A) and (H =< $Z) ->
+			% terminate here
+			stream_file_to_yamerl(eof, IO, Stream);
+		true ->
+			% process normally
+			{continue, StreamNew} = yamerl_constr:next_chunk(Stream,
+									Line),
+			stream_file_to_yamerl(io:get_line(IO, ''), IO,
+								StreamNew)
+		end
+	% other cases should not exist...
+	end.
+
 document_metadata_to_record(InRecord, DocumentMetadata) ->
 	lists:foldl(fun(Entry, R) ->
 		case Entry of
-		{"section",Sec}    -> R#page{section=Sec};
-		{"name",Name}      -> R#page{name=list_to_binary(Name)};
-		{"tags",TagsStr}   -> R#page{tags=lists:map(
-					fun list_to_binary/1,
-					string:split(TagsStr, " ", all))};
-		{"redirect",Redir} -> R#page{redirect=Redir};
-		{_Field,_Val}      -> R % silently ignore other fields
+		{"section",Sec}            -> R#page{section=Sec};
+		{"x-masysma-name",Name}    -> R#page{name=list_to_binary(Name)};
+		{"keywords",TagList}       -> R#page{tags=lists:map(fun
+						list_to_binary/1, TagList)};
+		{"x-masysma-redirect",Red} -> R#page{redirect=Red};
+		{_Field,_Val}              -> R % silently ignore other fields
 		end
 	end, InRecord, DocumentMetadata).
 
@@ -97,6 +132,7 @@ document_metadata_to_record(InRecord, DocumentMetadata) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DATABASE QUERYING %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% TODO CSTAT THIS FUNCTION IS VERY LONG. CLEAN IT UP A BIT!
 handle_call({query, Limit, Query}, _From, Context) ->
 	EmptyFilter = fun(_Record) -> true end,
 	case lists:flatten(string:split(Query, " ", all)) of
@@ -104,9 +140,35 @@ handle_call({query, Limit, Query}, _From, Context) ->
 		{reply, query_full_table_scan([], Limit, EmptyFilter), Context};
 	QueryParts ->
 		[QueryBegin|QueryTail] = QueryParts,
+		erlang:display(Query),
 		case binary:first(QueryBegin) of
-		$# ->
-			{reply, [], Context};
+		$: ->
+			[_Ignore|[Cmd|Args]] = string:split(Query, ":", all),
+			case Cmd of
+			<<"google">> ->
+				% let's build a Google search string.
+				QPart = case Args of
+					[<<"img">>|Q] ->
+						% build image search string
+						[cow_uri:urlencode(
+						iolist_to_binary(Q)),
+						<<"&site=imghp&tbm=isch">>];
+					Q2 ->
+						% build general search string
+						[cow_uri:urlencode(
+						iolist_to_binary(Q2))]
+					end,
+				URL = [<<"https://www.google.com/search?q=">>|
+									QPart],
+				{reply, [#page{
+					name=[<<"ial/google">>],
+					section=21,
+					tags=[<<"ial">>, <<"google">>],
+					redirect=URL
+				}], Context};
+			_Other ->
+				{reply, [], Context}
+			end;
 		_Other ->
 			{ResultFilter, QConsider} = case is_number(catch
 						binary_to_integer(QueryBegin)) of

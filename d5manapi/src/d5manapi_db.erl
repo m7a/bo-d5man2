@@ -132,70 +132,68 @@ document_metadata_to_record(InRecord, DocumentMetadata) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DATABASE QUERYING %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO CSTAT THIS FUNCTION IS VERY LONG. CLEAN IT UP A BIT!
 handle_call({query, Limit, Query}, _From, Context) ->
 	EmptyFilter = fun(_Record) -> true end,
 	case lists:flatten(string:split(Query, " ", all)) of
-	[] ->
-		{reply, query_full_table_scan([], Limit, EmptyFilter), Context};
+	[] ->   {reply, query_full_table_scan([], Limit, EmptyFilter), Context};
 	QueryParts ->
-		[QueryBegin|QueryTail] = QueryParts,
-		erlang:display(Query),
+		[QueryBegin|_QueryTail] = QueryParts,
 		case binary:first(QueryBegin) of
-		$: ->
-			[_Ignore|[Cmd|Args]] = string:split(Query, ":", all),
-			case Cmd of
-			<<"google">> ->
-				% let's build a Google search string.
-				QPart = case Args of
-					[<<"img">>|Q] ->
-						% build image search string
-						[cow_uri:urlencode(
-						iolist_to_binary(Q)),
-						<<"&site=imghp&tbm=isch">>];
-					Q2 ->
-						% build general search string
-						[cow_uri:urlencode(
-						iolist_to_binary(Q2))]
-					end,
-				URL = [<<"https://www.google.com/search?q=">>|
-									QPart],
-				{reply, [#page{
-					name=[<<"ial/google">>],
-					section=21,
-					tags=[<<"ial">>, <<"google">>],
-					redirect=URL
-				}], Context};
-			_Other ->
-				{reply, [], Context}
-			end;
-		_Other ->
-			{ResultFilter, QConsider} = case is_number(catch
-						binary_to_integer(QueryBegin)) of
-				true ->  CmpNum = binary_to_integer(QueryBegin),
-					 {fun(Record)  -> Record#page.section =:=
-								CmpNum end, QueryTail};
-				false -> {EmptyFilter, QueryParts}
-			end,
-			{reply, case QConsider of
-				[H|[]] -> case ets:lookup(index_names,
-								iolist_to_binary(H)) of
-					  [] -> query_full_table_scan(QConsider, Limit,
-									ResultFilter);
-					  Matched -> lists:filter(ResultFilter,
-							lists:map(fun({_K, V}) ->
-							[{_Val, PageMeta}] =
-							ets:lookup(page_metadata, V),
-							PageMeta end,
-							Matched))
-					  end;
-				_QConsider -> query_full_table_scan(QConsider, Limit,
-									ResultFilter)
-			end, Context}
+		$:     -> respond_to_google_query(Query, Context);
+		_Other -> respond_to_normal_query(QueryParts, EmptyFilter,
+								Limit, Context)
 		end
 	end;
 handle_call(_Call, _From, Context) ->
 	{reply, 0, Context}.
+
+% Catches all : queries but returns empty for everything but the two old
+%	:google:<term>
+%	:google:img:<term>
+% commands.
+respond_to_google_query(Query, Context) ->
+	[_Ignore|[Cmd|Args]] = string:split(Query, ":", all),
+	case Cmd of
+	<<"google">> ->
+		% let's build a Google search string.
+		QPart = case Args of
+			% build image search string
+			[<<"img">>|Q] -> [cow_uri:urlencode(iolist_to_binary(Q)
+						), <<"&site=imghp&tbm=isch">>];
+			% build general search string
+			Q2 -> [cow_uri:urlencode(iolist_to_binary(Q2))]
+		end,
+		URL = [<<"https://www.google.com/search?q=">>|QPart],
+		{reply, [#page{name=[<<"ial/google">>],section=21,
+			tags=[<<"ial">>,<<"google">>],redirect=URL}], Context};
+	_Other ->
+		{reply, [], Context}
+	end.
+
+respond_to_normal_query(QueryParts=[QueryBegin|QueryTail], EmptyFilter, Limit,
+								Context) ->
+	{ResultFilter, QConsider} = case is_number(catch binary_to_integer(
+								QueryBegin)) of
+		true ->  CmpNum = binary_to_integer(QueryBegin),
+			 {fun(Record)  -> Record#page.section =:= CmpNum end,
+								QueryTail};
+		false -> {EmptyFilter, QueryParts}
+	end,
+	{reply, case QConsider of
+		[H|[]] -> case ets:lookup(index_names, iolist_to_binary(H)) of
+			  [] -> query_full_table_scan(QConsider, Limit,
+								ResultFilter);
+			  Matched -> lists:filter(ResultFilter, lists:map(
+					fun({_K, V}) ->
+						[{_Val, PageMeta}] = ets:lookup(
+							page_metadata, V),
+						PageMeta
+					end,
+					Matched))
+			  end;
+		_QConsider -> query_full_table_scan(QConsider, Limit,
+								ResultFilter)
+	end, Context}.
 
 query_full_table_scan(QConsider, Limit, ResultFilter) ->
 	query_full_table_scan_sub(QConsider, Limit, 0, ResultFilter,

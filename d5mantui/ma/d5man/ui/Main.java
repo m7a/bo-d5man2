@@ -5,6 +5,13 @@ import java.io.IOException;
 import java.net.URL;
 import jexer.TExceptionDialog;
 
+// TODO NEXT FEATURES
+// [ ] Colorscheme like old D5Man (red, white, black)
+// [ ] Use async gui update and process query in background.
+//     Need to cancel unnecessary/superseded queries and await
+//     finaly query result prior to processing enter.
+// [ ] Find system lib, do not provide a symlink but a description that one
+//     can add lib there for windows world...
 public class Main {
 
 	public static void main(String[] args) {

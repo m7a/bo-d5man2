@@ -62,6 +62,8 @@ proc_document(DocFile) ->
 	try yaml_from_pandoc_md(DocFile) of
 		DocumentList ->
 			lists:foreach(fun(DocMeta) ->
+				% for debugging:
+				%erlang:display(DocMeta),
 				Rec = document_metadata_to_record(
 						#page{file=DocFile}, DocMeta),
 				Id = iolist_to_binary([Rec#page.name,

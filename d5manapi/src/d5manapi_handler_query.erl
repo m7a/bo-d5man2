@@ -43,5 +43,15 @@ query_xml(Req, Opts) ->
 getkv(K, V) ->
 	case V of
 	undefined -> <<>>;
-	_         -> [<<"\t\t\t<kv k=\"">>, K, <<"\" v=\"">>, V, <<"\"/>\n">>]
+	_         -> [<<"\t\t\t<kv k=\"">>, K, <<"\" v=\"">>,
+						quote_xml(V), <<"\"/>\n">>]
 	end.
+
+% https://stackoverflow.com/questions/3339014
+quote_xml(Str) -> lists:map(fun quote_xml_char/1,
+				lists:flatten(io_lib:format("~s", [Str]))).
+quote_xml_char($<) -> <<"&lt;">>;
+quote_xml_char($>) -> <<"&gt;">>;
+quote_xml_char($&) -> <<"&amp;">>;
+quote_xml_char($") -> <<"&quot;">>;
+quote_xml_char(C)  -> C.

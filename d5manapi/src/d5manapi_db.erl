@@ -8,7 +8,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % http://erlang.org/doc/man/file.html list_dir 
-init(RootList) ->
+init([URLPrefix, RootList]) ->
 	% id := page(section)
 	io:fwrite("[INFO ] Reading DB...~n"),
 	ets:new(page_metadata,  [set, named_table]), % id -> #page
@@ -24,8 +24,8 @@ init(RootList) ->
 			end, Entries),
 			case lists:all(fun(Str) ->is_number(catch
 					list_to_integer(Str)) end, Dirs) of
-			true  -> proc_root_d5man(Root, Dirs);
-			false -> proc_root_repos(Root, Dirs)
+			true  -> proc_root_d5man(URLPrefix, Root, Dirs);
+			false -> proc_root_repos(URLPrefix, Root, Dirs)
 			end
 		end
 	end, RootList),
@@ -33,12 +33,12 @@ init(RootList) ->
 	io:fwrite("[INFO ] DB load complete~n"),
 	{ok, RootList}.
 
-proc_root_d5man(Root, Sections) ->
-	proc_filtered_files_as_documents(Root, Sections, fun(File) ->
+proc_root_d5man(URLPrefix, Root, Sections) ->
+	proc_filtered_files_as_documents(URLPrefix, Root, Sections, fun(File) ->
 		lists:suffix(".yml", File) or lists:suffix(".md", File)
 	end).
 
-proc_filtered_files_as_documents(Root, Dirs, Filter) ->
+proc_filtered_files_as_documents(URLPrefix, Root, Dirs, Filter) ->
 	lists:foreach(fun(Repo) ->
 		Subdir = [Root, "/", Repo],
 		case file:list_dir(Subdir) of
@@ -47,24 +47,24 @@ proc_filtered_files_as_documents(Root, Dirs, Filter) ->
 				": ", atom_to_list(Emsg), "~n"]);
 		{ok, Repofiles} ->
 			lists:foreach(fun(File) ->
-				proc_document([Subdir, "/", File])
+				proc_document(URLPrefix, [Subdir, "/", File])
 			end, lists:filter(Filter, Repofiles))
 		end
 	end, Dirs).
 
-proc_root_repos(Root, Repos) ->
-	proc_filtered_files_as_documents(Root, Repos, fun(File) ->
+proc_root_repos(URLPrefix, Root, Repos) ->
+	proc_filtered_files_as_documents(URLPrefix, Root, Repos, fun(File) ->
 		(File =:= "README.md") or (File =:= "manpage.md")
 	end).
 
 % DocFile absolute path but made of nested lists
-proc_document(DocFile) ->
+proc_document(URLPrefix, DocFile) ->
 	try yaml_from_pandoc_md(DocFile) of
 		DocumentList ->
 			lists:foreach(fun(DocMeta) ->
 				% for debugging:
 				%erlang:display(DocMeta),
-				Rec = document_metadata_to_record(
+				Rec = document_metadata_to_record(URLPrefix,
 						#page{file=DocFile}, DocMeta),
 				Id = iolist_to_binary([Rec#page.name,
 					<<"(">>,
@@ -118,15 +118,33 @@ stream_file_to_yamerl(Line, IO, Stream) ->
 	% other cases should not exist...
 	end.
 
-document_metadata_to_record(InRecord, DocumentMetadata) ->
+document_metadata_to_record(URLPrefix, InRecord, DocumentMetadata) ->
 	lists:foldl(fun(Entry, R) ->
 		case Entry of
-		{"section",Sec}            -> R#page{section=Sec};
-		{"x-masysma-name",Name}    -> R#page{name=list_to_binary(Name)};
-		{"keywords",TagList}       -> R#page{tags=lists:map(fun
-						list_to_binary/1, TagList)};
-		{"x-masysma-redirect",Red} -> R#page{redirect=Red};
-		{_Field,_Val}              -> R % silently ignore other fields
+		{"section",Sec} ->
+			R#page{section=Sec};
+		{"x-masysma-name",Name} ->
+			R#page{name=list_to_binary(Name)};
+		{"keywords",TagList} ->
+			R#page{tags=lists:map(fun list_to_binary/1, TagList)};
+		{"x-masysma-redirect",Red} ->
+			R#page{redirect=case URLPrefix of
+				noredir ->
+					Red;
+				_URLPrefix ->
+					[URLPrefix,
+					% get directory name. Do not use
+					% section for this because it might not
+					% be available yet!
+					filename:basename(
+						filename:dirname(R#page.file)),
+					"/",
+					filename:basename(R#page.file,
+					filename:extension(R#page.file)),
+					"_att/", Red]
+			end};
+		{_Field,_Val} ->
+			R % silently ignore other fields
 		end
 	end, InRecord, DocumentMetadata).
 

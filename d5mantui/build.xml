@@ -4,6 +4,12 @@
 <property name="masysma.target" value="d5mantui"/> 
 <property name="masysma.main"   value="ma.d5man.ui.Main"/>
 
+<!--
+	TODO DETERMINE BUILD CLASSPATH BY THE FOLLOWING RULE
+	if /usr/share/java/jexer.jar exists, use it
+	if not, retrieve repository bp-jexer, compile it and use the resulting jar
+-->
+
 <target name="run" depends="build">
 	<exec executable="/bin/sh" failonerror="true">
 		<arg value="-ec"/>

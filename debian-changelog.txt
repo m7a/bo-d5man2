@@ -1,3 +1,15 @@
+mdvl-d5man2 (1.0.2) stable; urgency=medium
+
+  * Add log directory to build because it might be required to be present.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Sat, 23 Nov 2019 21:39:03 +0100
+
+mdvl-d5man2 (1.0.1) stable; urgency=medium
+
+  * Fix start scripts.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Sat, 23 Nov 2019 21:33:16 +0100
+
 mdvl-d5man2 (1.0.0) stable; urgency=medium
 
   * Package created with MDPC 2

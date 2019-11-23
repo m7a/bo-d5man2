@@ -6,6 +6,8 @@
 			<file file=".erlang.mk/relx"/>
 		</setpermissions>
 		<exec executable="make" failonerror="true"/>
+		<!-- emulate as if it had been started once -->
+		<mkdir dir="_rel/d5manapi_release/log"/>
 	</target>
 
 	<target name="clean">

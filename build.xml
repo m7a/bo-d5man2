@@ -16,6 +16,7 @@
 <property name="mdpc.file.install">
 d5manapi/_rel/d5manapi_release/bin /usr/share/mdvl-d5man2/d5manapi
 d5manapi/_rel/d5manapi_release/lib /usr/share/mdvl-d5man2/d5manapi
+d5manapi/_rel/d5manapi_release/log /usr/share/mdvl-d5man2/d5manapi
 d5manapi/_rel/d5manapi_release/releases /usr/share/mdvl-d5man2/d5manapi
 d5manapi/d5manapi /usr/bin
 d5mantui/d5mantui.jar /usr/share/java

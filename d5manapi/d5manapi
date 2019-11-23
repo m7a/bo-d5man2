@@ -1,8 +1,10 @@
 #!/bin/sh -e
 
 command=foreground
-[ $# = 0 ] || command="$1"
-shift
+if ! [ $# = 0 ]; then
+	command="$1"
+	shift
+fi
 addconf=
 [ ! -f "$HOME/.mdvl/d5man/d5manapi.config" ] || \
 			addconf="-config \"$HOME/.mdvl/d5man/d5manapi.config\""

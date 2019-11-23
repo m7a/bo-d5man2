@@ -4,25 +4,48 @@
 <property name="masysma.target" value="d5mantui"/> 
 <property name="masysma.main"   value="ma.d5man.ui.Main"/>
 
-<!--
-	TODO DETERMINE BUILD CLASSPATH BY THE FOLLOWING RULE
-	if /usr/share/java/jexer.jar exists, use it
-	if not, retrieve repository bp-jexer, compile it and use the resulting jar
--->
-
-<target name="run" depends="build">
-	<exec executable="/bin/sh" failonerror="true">
-		<arg value="-ec"/>
-		<arg value="java -cp lib/jexer.jar:. ${masysma.main} &lt; /dev/tty &gt; /dev/tty 2&gt; /dev/tty"/>
-	</exec>
-</target>
-
-<!-- CONSTANT TPL IMPORT -->
+<!-- CONTANT TPL IMPORT PART 1 -->
 <property environment="env"/>
 <condition property="masysma.internal.includepath.rel" value="${env.MDVL_CI_PHOENIX_ROOT}" else="../.."><isset property="env.MDVL_CI_PHOENIX_ROOT"/></condition>
 <property name="masysma.internal.includepath" location="${masysma.internal.includepath.rel}"/>
+<!-- END CONSTANT -->
+
+<!-- automatically detect and use jexer.jar -->
+<target name="check_jexer_jar">
+	<available file="/usr/share/java/jexer.jar"
+						property="jexer.jar.present"/>
+</target>
+<target name="use_jexer_jar" depends="check_jexer_jar" if="jexer.jar.present">
+	<path id="masysma.classpath">
+		<fileset dir="/usr/share/java" includes="jexer.jar"/>
+	</path>
+</target>
+<target name="build_jexer_jar" depends="check_jexer_jar"
+						unless="jexer.jar.present">
+	<masysma_require_repo masysmarepoid="bp-jexer"/>
+	<!-- TODO z WARNING: This fails on a concurrently built bp-jexer -->
+	<ant dir="${masysma.internal.includepath}/bp-jexer"/>
+	<copy todir="lib" file="${masysma.internal.includepath}/bp-jexer/build/build/jar/jexer.jar"/>
+	<ant dir="${masysma.internal.includepath}/bp-jexer" target="dist-clean"/>
+</target>
+<target name="establish_jar" extensionOf="masysma_hook_java_predep"
+				depends="use_jexer_jar,build_jexer_jar"/>
+
+<!--
+	not platform independent (requires Linux with Jexer installed),
+	but only used for testing purposes
+-->
+<target name="run" depends="build">
+	<exec executable="/bin/sh" failonerror="true">
+		<arg value="-ec"/>
+		<arg value="java -cp /usr/share/java/jexer.jar:. ${masysma.main} &lt; /dev/tty &gt; /dev/tty 2&gt; /dev/tty"/>
+	</exec>
+</target>
+
+<!-- CONSTANT TPL IMPORT PART 2 -->
 <property name="masysma.internal.loadpath" value="${masysma.internal.includepath}/co-build/ant-build-template.xml"/>
 <condition property="masysma.internal.load" value="file://${masysma.internal.loadpath}" else="https://raw.githubusercontent.com/m7a/co-build/master/ant-build-template.xml"><resourceexists><file file="${masysma.internal.loadpath}"/></resourceexists></condition>
 <import><url url="${masysma.internal.load}"/></import>
+<!-- END CONSTANT -->
 
 </project>

@@ -7,6 +7,6 @@ if ! [ $# = 0 ]; then
 fi
 addconf=
 [ ! -f "$HOME/.mdvl/d5man/d5manapi.config" ] || \
-			addconf="-config \"$HOME/.mdvl/d5man/d5manapi.config\""
+				addconf="-config $HOME/.mdvl/d5man/d5manapi"
 exec /usr/share/mdvl-d5man2/d5manapi/bin/d5manapi_release \
 						"$command" $addconf "$@"

@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.3) stable; urgency=medium
+
+  * Fix start script for d5manapi when using non-standard configuration.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Sat, 23 Nov 2019 22:58:10 +0100
+
 mdvl-d5man2 (1.0.2) stable; urgency=medium
 
   * Add log directory to build because it might be required to be present.

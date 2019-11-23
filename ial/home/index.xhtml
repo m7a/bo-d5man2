@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+			"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Ma_Sys.ma IAL 1.5.0</title>
+<link rel="stylesheet" href="ial15.css"/>
+</head>
+<body>
+
+<!-- Left bar: IAL Fixed Content Area -->
+<div id="leftmost">
+	<h1>IAL 1.5.0</h1>
+	<!-- auto-filled by query results for the respective id -->
+	<h2>Toplevel</h2>
+	<ul id="ial_toplevel"><li>ial_toplevel</li></ul>
+	<h2>Fixed</h2>
+	<ul id="ial_fixed_content"><li>ial_fixed_content</li></ul>
+</div>
+
+<!-- Middle area: Logo, search, notes -->
+<div id="middle">
+	<div id="logo" onclick="ial15_focus_input();">
+		<img src="logo_v2.svg" alt="Ma_Sys.ma Logo"/>
+	</div>
+	<div id="search_in">
+		<form method="post" action="#" onsubmit="return ial15_open();">
+			<input type="text" id="ial15_query_in_perm"
+				onkeyup="return ial15_keypress(event);"
+			/><input type="text" id="ial15_query_in"
+				onkeyup="return ial15_keypress(event);"/>
+		</form>
+	</div>
+	<div id="search_out">
+		<ul id="ial15_search_results_out">
+			<li>...</li>
+		</ul>
+	</div>
+	<div id="smallprint">
+		Ma_Sys.ma Information and Links, Copyright (c)
+		2010, 2011, 2012, 2013, 2017, 2019 Ma_Sys.ma.
+		For further info send an e-mail to
+		<a href="mailto:Ma_Sys.ma@web.de">Ma_Sys.ma@web.de</a>
+	</div>
+</div>
+
+<!-- Right area: Local links area -->
+<div id="locall">
+	Local area
+</div>
+
+<script type="text/javascript" src="ial15.js"></script>
+</body>
+</html>

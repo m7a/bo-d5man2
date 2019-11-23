@@ -18,13 +18,13 @@ d5manapi/_rel/d5manapi_release/bin /usr/share/mdvl-d5man2/d5manapi
 d5manapi/_rel/d5manapi_release/lib /usr/share/mdvl-d5man2/d5manapi
 d5manapi/_rel/d5manapi_release/log /usr/share/mdvl-d5man2/d5manapi
 d5manapi/_rel/d5manapi_release/releases /usr/share/mdvl-d5man2/d5manapi
-d5manapi/d5manapi /usr/bin
+d5manapi/aux/d5manapi /usr/bin
 d5mantui/d5mantui.jar /usr/share/java
 d5mantui/d5mantui /usr/bin
 </property>
 
 <property name="mdpc.copyright.file"><![CDATA[
-Files: README.txt build.xml ial/* d5mantui/* debian/* d5manapi/d5manapi d5manapi/rel/* d5manapi/src/* d5manapi/ebin/* d5manapi/relx.config d5manapi/build.xml d5manapi/Makefile d5manapi/_rel/d5manapi_release/releases/* d5manapi/_rel/d5manapi_release/lib/d5manapi-2.0.0/* d5manapi/_rel/d5manapi_release/bin/* d5manapi/_rel/d5manapi_release/d5manapi_release-1.tar.gz
+Files: README.txt build.xml ial/* d5mantui/* debian/* d5manapi/aux/* d5manapi/rel/* d5manapi/src/* d5manapi/ebin/* d5manapi/relx.config d5manapi/build.xml d5manapi/Makefile d5manapi/_rel/d5manapi_release/releases/* d5manapi/_rel/d5manapi_release/lib/d5manapi-2.0.0/* d5manapi/_rel/d5manapi_release/bin/* d5manapi/_rel/d5manapi_release/d5manapi_release-1.tar.gz
 Copyright: Copyright (c) 2019 Ma_Sys.ma <Ma_Sys.ma@web.de>
 License: GPL-3
  This program is free software: you can redistribute it and/or modify

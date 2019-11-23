@@ -1,0 +1,12 @@
+[Unit]
+Description=Ma_Sys.ma D5Man API Service
+
+# provide this file under ~/.config/systemd/user to manage d5manapi
+# through $ systemd --user (sysus)
+# check output: # journalctl _SYSTEMD_USER_UNIT=d5manapi.service
+
+[Service]
+ExecStart=/usr/bin/d5manapi
+
+[Install]
+WantedBy=default.target

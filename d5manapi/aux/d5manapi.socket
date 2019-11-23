@@ -1,0 +1,9 @@
+[Unit]
+Description=D5Man API Socket
+PartOf=d5manapi.service
+
+[Socket]
+ListenStream=127.0.0.1:7450
+
+[Install]
+WantedBy=sockets.target

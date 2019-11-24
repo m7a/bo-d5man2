@@ -88,7 +88,6 @@ function ial15_set_links(dout, doc, gen_current) {
 				rec["file"].lastIndexOf('.')) + "_att/" +
 				rec["redirect"];
 
-
 		// generate HTML
 		var entry = document.createElement("li");
 		if(i == 0 && gen_current)

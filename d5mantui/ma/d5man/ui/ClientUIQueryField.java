@@ -10,7 +10,7 @@ class ClientUIQueryField extends TField {
 	private final ClientUIWindow clientUI;
 
 	ClientUIQueryField(ClientUIWindow parent, String qInitial) {
-		super(parent, 0, 2, 48, false, qInitial);
+		super(parent, 6, 0, 43, false, qInitial);
 		clientUI = parent;
 	}
 

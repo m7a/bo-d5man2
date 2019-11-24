@@ -11,7 +11,7 @@ class Application extends TApplication {
 
 	Application() throws UnsupportedEncodingException {
 		super(BackendType.XTERM);
-
+		Theme.set(getTheme());
 		TMenu file = addMenu("&File");
 		file.addItem(ID_EXIT, "E&xit");
 	}

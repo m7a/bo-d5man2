@@ -154,7 +154,7 @@ document_metadata_to_record(URLPrefix, InRecord, DocumentMetadata) ->
 
 handle_call({query, Limit, Query}, _From, Context) ->
 	EmptyFilter = fun(_Record) -> true end,
-	case lists:flatten(string:split(Query, " ", all)) of
+	case lists:flatten(string:split(string:trim(Query), " ", all)) of
 	[] ->   {reply, query_full_table_scan([], Limit, EmptyFilter), Context};
 	QueryParts ->
 		[QueryBegin|_QueryTail] = QueryParts,

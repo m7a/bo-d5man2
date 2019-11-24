@@ -69,18 +69,19 @@ input {
 #search_out, input {
 	border: 1px solid #808080;
 }
-a:link {
+a:link, a:visited {
 	color: #ff0000;
 }
 #middle {
 	border-left: 1px solid #ff0000;
 	border-right: 1px solid #ff0000;
 }
-#search_out a:link {
+#search_out a:link, #search_out a:visited {
 	color: #ffffff;
 	text-decoration: none;
 }
-#ial15_entry_current, #ial15_entry_current a:link {
+#ial15_entry_current, #ial15_entry_current a:link,
+#ial15_entry_current a:visited {
 	color: #000000;
 	background-color: #ffffff;
 }

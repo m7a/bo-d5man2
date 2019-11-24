@@ -28,9 +28,8 @@ class ClientUIWindow extends TWindow {
 		this.pageOpener = pageOpener;
 		addLabel("Query", 0, 0);
 		queryInput = new ClientUIQueryField(this, qInitial);
-		addLabel("Results", 0, 4);
 		queryResults = addList(Arrays.asList(new String[] { "..." }),
-								0, 6, 48, 14);
+								0, 2, 48, 16);
 		maximize();
 		activate();
 		queryInput.activate();
@@ -41,9 +40,9 @@ class ClientUIWindow extends TWindow {
 	@Override
 	public void onResize(TResizeEvent ev) {
 		super.onResize(ev);
-		queryInput.setWidth(ev.getWidth() - 2);
+		queryInput.setWidth(ev.getWidth() - 9);
 		queryResults.setWidth(ev.getWidth() - 2);
-		queryResults.setHeight(ev.getHeight() - 8);
+		queryResults.setHeight(ev.getHeight() - 5);
 		queryResults.reflowData();
 	}
 

@@ -4,7 +4,7 @@
 <property name="masysma.target" value="d5mantui"/> 
 <property name="masysma.main"   value="ma.d5man.ui.Main"/>
 
-<!-- CONTANT TPL IMPORT PART 1 -->
+<!-- CONSTANT TPL IMPORT PART 1 -->
 <property environment="env"/>
 <condition property="masysma.internal.includepath.rel" value="${env.MDVL_CI_PHOENIX_ROOT}" else="../.."><isset property="env.MDVL_CI_PHOENIX_ROOT"/></condition>
 <property name="masysma.internal.includepath" location="${masysma.internal.includepath.rel}"/>

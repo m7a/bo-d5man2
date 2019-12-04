@@ -1,0 +1,32 @@
+#!/bin/sh -e
+# Ma_Sys.ma D5Man PDF Export 2.0.0, Copyright (c) 2019 Ma_Sys.ma.
+# For further info send an e-mail to Ma_Sys.ma@web.de.
+
+# This file is a shell script intended to be reasonably simple to provide
+# equivalent functionality in Windows Batch. Once that becomes unfeasible,
+# switch to Perl.
+
+if [ $# = 0 ] || [ "$1" = "--help" ]; then
+	echo USAGE $0 INPUT.d5i
+	echo
+	echo Produces OUTPUT.d5i.pdf
+fi
+
+# Design decision: Do not use any external/special filters as to enhance
+# compatibility. We can still use our own template though, because it may
+# fall-back to not using one without large issues. It would have been nice to
+# avoid a template altogether, but variables and conditional behaviour depending
+# on them is only available with proper template and not from within -B/-H etc.
+exec pandoc \
+	-t latex \
+	-f markdown+compact_definition_lists+tex_math_single_backslash \
+	-V papersize=a4 \
+	-V classoption=DIV10 \
+	-V fontsize=12pt \
+	-V documentclass=scrartcl \
+	-V fontfamily=kpfonts \
+	-V x-masysma-logo=/usr/share/mdvl-d5man2/tplpdf/logo_v2 \
+	-V x-masysma-icon=/usr/share/mdvl-d5man2/tplpdf/masysmaicon \
+	--template=/usr/share/mdvl-d5man2/tplpdf/masysma_d5man.tex \
+	-o "$1.pdf" \
+	"$1"

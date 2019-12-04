@@ -8,8 +8,9 @@
 <property name="mdpc.arch"    value="all"/>
 <property name="mdpc.descrl">
  Ma_Sys.ma D5Man is a locally run knowledge base consisting of
- d5manapi -- a server to provide access to metadata
- d5mantui -- a client to interactively send queries to the server
+ d5manapi       -- a server to provide access to metadata
+ d5mantui       -- a client to interactively send queries to the server
+ d5manexportpdf -- a script to convert D5Man pages to PDF
  and auxiliary components (TBD).
 </property>
 
@@ -21,6 +22,8 @@ d5manapi/_rel/d5manapi_release/releases /usr/share/mdvl-d5man2/d5manapi
 d5manapi/aux/d5manapi /usr/bin
 d5mantui/d5mantui.jar /usr/share/java
 d5mantui/d5mantui /usr/bin
+d5manexportpdf/d5manexportpdf /usr/bin
+d5manexportpdf/tplpdf /usr/share/mdvl-d5man2
 </property>
 
 <property name="mdpc.copyright.file"><![CDATA[

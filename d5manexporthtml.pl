@@ -6,41 +6,66 @@ use strict;
 use warnings FATAL => 'all';
 use autodie;
 
-use File::stat; # switch stat from numeric to OO
+use File::stat; # switch stat's array to name-accessable structure.
 require File::Basename;
 require YAML::Tiny; # libyaml-tiny-perl
+require Getopt::Std;
+require File::Copy::Recursive; # libfile-copy-recursive-perl
 #use Data::Dumper 'Dumper'; # debug only
 
-my @exportsections = qw(11 31 32 33 34 37 38 39);
+# -- getopt conf --
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+$Getopt::Std::STANDARD_HELP_VERSION = 1; # avoid only used once warning
 
-if($#ARGV lt 1) {
-	print("USAGE d5manexport DESTDIR ROOT... -- [PANDOCOPTIONS...]\n");
+sub VERSION_MESSAGE {
+	open my $s0fil, "<:encoding(UTF-8)", $0;
+	while(<$s0fil>) {
+		next if /^#!/;
+		last unless /^# /;
+		print substr $_, 2;
+	}
+	close $s0fil;
+}
+
+sub HELP_MESSAGE {
+	print "\nUSAGE d5manexport -o DESTDIR -i ROOT[,ROOT...] ".
+			"-s SECTION[,SECTION...] -u URLPREFIX [-m PDF2SVG] ".
+			"[-- PANDOCOPTIONS...]\n";
+}
+
+# -- read arguments --
+my %options;
+Getopt::Std::getopts("o:i:s:u:m:", \%options);
+
+if(not exists $options{o}) {
+	print STDERR "Argument -o is required and needs to specify DESTDIR.\n";
+	exit(1);
+}
+if(not exists $options{i}) {
+	print STDERR "Argument -i is needed and needs to specify at ".
+							"least one ROOT.\n";
 	exit(1);
 }
 
+my $urlprefix      = $options{u} // "&masysma_url_prefix;";
+my $exportsecstr   = $options{s} // "11,31,32,33,34,37,38,39";
+my $pdf2svg        = $options{m} // "/usr/bin/pdf2svg";
+my @exportsections = split /[, ]/, $exportsecstr;
 my %exportmap;
 undef @exportmap{@exportsections};
 
-# -- read arguments --
-my $destdir = $ARGV[0];
-shift @ARGV;
+my @roots   = split /,/, $options{i};
+my $destdir = $options{o};
 
-my @roots;
 my @pandocopts;
-while(((scalar @ARGV) ne 0) and ($ARGV[0] ne "--")) {
-	push @roots, $ARGV[0];
+while(((scalar @ARGV) ne 0)) {
+	push @pandocopts, $ARGV[0];
 	shift @ARGV;
 }
-if((scalar @ARGV) ne 0) {
-	shift @ARGV; # assert that it is --
-	while(((scalar @ARGV) ne 0)) {
-		push @pandocopts, $ARGV[0];
-		shift @ARGV;
-	}
-}
 
+# -- create output dir + open sitemap file --
 mkdir($destdir) if(not -d $destdir);
-open my $stream_sitemap, '>:encoding(UTF-8)', $destdir."/sitemap.tpl.xml";
+open my $stream_sitemap, '>:encoding(UTF-8)', $destdir."/sitemap.xml";
 print $stream_sitemap <<~"EOF";
 	<?xml version="1.0" encoding="UTF-8"?>
 	<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -76,6 +101,7 @@ for my $root (@roots) {
 		my @params = (
 			"-s",
 			"-t", "html4",
+			"--default-image-extension=svg",
 			"-f", "markdown+compact_definition_lists+".
 						"tex_math_single_backslash",
 			"-o", $secdestdir."/".$namepart.".xhtml",
@@ -85,6 +111,25 @@ for my $root (@roots) {
 
 		# -- call export --
 		system("pandoc", @params);
+
+		# -- copy attachments --
+		my $attdirnam = $namepart."_att";
+		my $attachments = File::Basename::dirname($filepath).
+								"/".$attdirnam;
+		my $attachdest = $secdestdir."/".$attdirnam;
+		if(-d $attachments) {
+			File::Copy::Recursive::dircopy($attachments,
+								$attachdest);
+			# -- convert pdfs without associated svg --
+			while(glob("'$secdestdir/*.pdf'")) {
+				my $attf = $_;
+				my $attnam = File::Basename::basename($attf,
+								qr"\..[^.]*$");
+				my $attsvg = "$secdestdir/$attnam.svg";
+				next if (-f $attsvg);
+				system($pdf2svg, $attf, $attsvg);
+			}
+		}
 
 		# -- append to sitemap --
 		my ($tS, $tM, $tH, $td, $tm, $tY) = gmtime($mtime);
@@ -99,7 +144,7 @@ for my $root (@roots) {
 				$yaml->{"x-masysma-web-changefreq"}: "monthly";
 		print $stream_sitemap <<~"EOF";
 			<url>
-			<loc>&masysma_url_prefix;/$section/$namepart.xhtml</loc>
+			<loc>$urlprefix/$section/$namepart.xhtml</loc>
 			<lastmod>$date_fmt</lastmod>
 			<priority>$web_priority</priority>
 			<changefreq>$web_changefreq</changefreq>

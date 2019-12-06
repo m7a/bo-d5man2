@@ -31,6 +31,9 @@ class PageOpener implements Consumer<APIPageRecord> {
 	}
 
 	private void openPageRecord(APIPageRecord rec) throws IOException {
+		parent.getScreen().clear();
+		parent.exit();
+
 		if(rec.redirect != null) {
 			// This has a redirect, means it is to be viewn in the
 			// browser. Need to decide if this request is a relative
@@ -47,18 +50,28 @@ class PageOpener implements Consumer<APIPageRecord> {
 				("file://" + (rec.file.getParent().resolve(
 				fn.substring(0, extpos) + "_att").resolve(
 				rec.redirect)).toAbsolutePath().toString());
-			parent.getScreen().clear();
-			parent.exit();
 			Runtime.getRuntime().exec(new String[] { commandBrowser,
 								urlToCall });
 		} else {
-			parent.exit();
+			// Found no way of waiting for parent.exit's screen
+			// cleaning to terminate. Thus wait a short while in
+			// the hope that it will have finished...
+			try {
+				Thread.sleep(100);
+			} catch(InterruptedException ex) {
+				ex.printStackTrace();
+			}
 			// https://stackoverflow.com/questions/29733038
 			ProcessBuilder proc = new ProcessBuilder(new String[] {
 				commandEditor, rec.file.toString()
 			});
 			proc.inheritIO();
-			proc.start();
+			try {
+				proc.start().waitFor();
+			} catch(InterruptedException ex) {
+				ex.printStackTrace();
+				System.exit(1);
+			}
 		}
 	}
 

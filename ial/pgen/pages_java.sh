@@ -22,6 +22,7 @@ MDVL_CI_PHOENIX_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 # $3+ add tags
 classes_to_yml() {
 	api_prefix="$1"
+	prefix_unesc="$(echo "$api_prefix" | tr -d '\\')"
 	name="$2"
 	shift 2
 	addtags="$*"
@@ -29,7 +30,7 @@ classes_to_yml() {
 section: 21
 x-masysma-name: java/$name
 keywords: ["java", $addtags"ial_toplevel"]
-x-masysma-redirect: ${api_prefix}index.html
+x-masysma-redirect: ${prefix_unesc}index.html
 ---
 EOF
 	grep -E '^<li>.*title=".*$' | \

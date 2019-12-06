@@ -7,11 +7,11 @@
 <property name="mdpc.descrs"  value="D5Man 2"/>
 <property name="mdpc.arch"    value="all"/>
 <property name="mdpc.descrl">
- Ma_Sys.ma D5Man is a locally run knowledge base consisting of
- d5manapi       -- a server to provide access to metadata
- d5mantui       -- a client to interactively send queries to the server
- d5manexportpdf -- a script to convert D5Man pages to PDF
- and auxiliary components (TBD).
+ Ma_Sys.ma D5Man is a locally run knowledge base consisting of:
+ d5manapi        -- a server to provide metadata access
+ d5mantui        -- a client to interactively query the server
+ d5manexportpdf  -- a script to export D5Man pages to PDF
+ d5manexporthtml -- a script to export D5Man trees to HTML pages
 </property>
 
 <property name="mdpc.file.install">
@@ -24,12 +24,11 @@ d5mantui/d5mantui.jar /usr/share/java
 d5mantui/d5mantui /usr/bin
 d5manexportpdf/d5manexportpdf /usr/bin
 d5manexportpdf/tplpdf /usr/share/mdvl-d5man2
+d5manexporthtml /usr/bin
 </property>
 
 <property name="mdpc.copyright.file"><![CDATA[
-Files: README.txt build.xml ial/* d5mantui/* debian/* d5manapi/aux/* d5manapi/rel/* d5manapi/src/* d5manapi/ebin/* d5manapi/relx.config d5manapi/build.xml d5manapi/Makefile d5manapi/_rel/d5manapi_release/releases/* d5manapi/_rel/d5manapi_release/lib/d5manapi-2.0.0/* d5manapi/_rel/d5manapi_release/bin/* d5manapi/_rel/d5manapi_release/d5manapi_release-1.tar.gz
-Copyright: Copyright (c) 2019 Ma_Sys.ma <Ma_Sys.ma@web.de>
-License: GPL-3
+License: GPL-3+
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
@@ -41,10 +40,8 @@ License: GPL-3
  GNU General Public License for more details.
  .
  You should have received a copy of the GNU General Public License
- along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
- .
- On Debian systems, the full text of the GNU General Public License version 3
- can be found in the file /usr/share/common-licenses/GPL-3
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+License-Reference: /usr/share/common-licenses/GPL-3
 
 License: Expat
  Permission to use, copy, modify, and/or distribute this software for any
@@ -58,6 +55,16 @@ License: Expat
  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Files: README.txt build.xml d5manexporthtml.pl ial/* d5manexportpdf/d5manexportpdf d5manexportpdf/tplpdf/*.pdf d5mantui/* debian/* d5manapi/aux/* d5manapi/rel/* d5manapi/src/* d5manapi/ebin/* d5manapi/relx.config d5manapi/build.xml d5manapi/Makefile d5manapi/_rel/d5manapi_release/releases/* d5manapi/_rel/d5manapi_release/lib/d5manapi-2.0.0/* d5manapi/_rel/d5manapi_release/bin/* d5manapi/_rel/d5manapi_release/d5manapi_release-1.tar.gz
+Copyright: Copyright (c) 2019 Ma_Sys.ma <Ma_Sys.ma@web.de>
+License: GPL-3+
+
+Files: d5manexportpdf/tplpdf/masysma_d5man.tex
+Copyright:
+ Copyright (c) 2014--2017, John MacFarlane
+ Copyright (c) 2019 Ma_Sys.ma <Ma_Sys.ma@web.de>
+License: GPL-3+
 
 Files: d5manapi/erlang.mk d5manapi/.erlang.mk/*
 Copyright: Copyright (c) 2013-2016, Loïc Hoguin <essen@ninenines.eu>
@@ -113,6 +120,7 @@ License: BSD-2-Clause
 <target name="build">
 	<ant dir="d5manapi"/>
 	<ant dir="d5mantui" target="jar"/>
+	<copy file="d5manexporthtml.pl" tofile="d5manexporthtml"/>
 </target>
 
 <target name="clean">
@@ -123,6 +131,7 @@ License: BSD-2-Clause
 <target name="dist-clean" depends="clean">
 	<ant dir="d5manapi" target="dist-clean"/>
 	<ant dir="d5mantui" target="dist-clean"/>
+	<delete file="d5manexporthtml"/>
 </target>
 
 <!-- CI INTEGRATION -->

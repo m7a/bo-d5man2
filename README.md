@@ -141,6 +141,8 @@ from the rich syntax described in the Pandoc documentation is presented in order
 to obtain a sensible subset. Of course, there is no technical restriction for
 sticking to this subset.
 
+D5Man's text format is expected to always be read and written in UTF-8 encoding.
+
 ## Metadata
 
 A D5Man 2 Document begins with a header of following form:
@@ -218,15 +220,77 @@ follows:
 
 ## Attachments
 
-_TODO ASTAT_
+By convention, images included in the document are stored in a directory
+called the same as the page's name with (`/` replaced by `_`) and a suffix
+`_att` (instead of `.md`).
+
+For instance, this `README.md` has name `d5man2` thus the attachments would
+be stored in a directory `d5man2_att` next to the file. For page `d5man/legacy`,
+attachments go to `d5man_legacy_att` etc.
+
+Additionally, images which are supplied in vector formats (SVG or PDF) are
+included by their file name _without extension_. This allows the LaTeX
+export to use a PDF file and the XHTML export to use a SVG file without
+changing the source file. Finally, D5Man's XHTML export also instantiates
+a simple automatic conversion from PDF to SVG in order to avoid that redundant
+vector images need to be stored in the attachments directory.
+
+Unlike legacy D5Man, an explicit list of all files attached is no longer needed
+to be declared in the documents themselves.
 
 ## Top-Level Structure
 
-## Special Blocks
+_TODO ASTAT_
+
+## Tables
+
+## Code
 
 ## Inline Formatting
 
-Metadta, Sections, etc.
+Code
+:   By using backtick-quotation, inline code can be expressed
+    (`` ` ``code`` ` `` displays `code`). Escaping backticks inline requires
+    them to be sourrounded by more backticks and space. See
+    [stackoverflow.com/82718](https://meta.stackexchange.com/questions/82718/)
+    for details.
+Emphasis
+:   Like the legacy D5Man format, Markdown supports emphasis by surrounding the
+    text to be emphasized with underscores e.g. `_emphasized_` yields
+    _emphasized_.
+Superset and subset
+:   Putting something in an index works by adding tilde symbols (`~`) around
+    the part to be lowered, e.g. `H~2~O` for H~2~O. Elevating parts of a
+    word is possible by surrounding it with hat symbols (`^`) e.g.
+    `10^2^` for 10^2^
+Links
+:   Links to URLs or other pages are of format `[shortcut name](URL)`
+    e.g. `[Example Page](http://www.example.com/)` gives
+    [Example Page](http://www.example.com/).
+    If a link is given by URL only, it is given in angled-brackets like this:
+    `<http://www.example.com>` gives <http://www.example.com>.
+    To link to another D5Man page, its XHTML name needs to be given:
+    `[d5man/legacy(32)](d5man_legacy.xhtml)` gives
+    [d5man/legacy(32)](d5man_legacy.xhtml). By convention, the link to another
+    page is labelled by that page's name followed by its section in parentheses.
+    To link to pages in other sections, one needs to prefix `../SECTION` to
+    the link's target due to the D5Man directory structure being organized in
+    sections (even if it was originally a Program-Root structure, D5Man export
+    always generates files as if they were part of a Document-Root structure).
+    Note that unlike in legacy D5Man, links are expected to only work for the
+    XHTML export. Navigating the hypertext directly inside the editor is no
+    longer a supported use case.
+Math
+:   Inline Math is only supported for the PDF exports and can be expressed by
+    LaTeX' single-dollar notation, e.g. `$\binom{1}{1}$` becomes
+    $\binom{1}{1}$.
+
+For qotation and symbols, legacy D5Man used some automatic replacement
+logic. With the new version, this feature is no longer available, thus the use
+of UTF-8 symbols is suggested. On some Linux systems, quotation is easily
+available by [ALTGR]-[V] (`„`), [ALTGR]-[B] (`“`) and [ALTGR]-[N] (`”`).
+
+Forced and half spaces are not available as of now.
 
 Compiling and Installing D5Man 2
 ================================

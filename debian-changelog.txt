@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.5) stable; urgency=medium
+
+  * Fix bug in d5mantui which caused VIM to be started but closed shortly
+    afterwards.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Fri, 20 Dec 2019 00:41:02 +0100
+
 mdvl-d5man2 (1.0.4) stable; urgency=medium
 
   * Implement colorscheme to be similar to the old D5Man.

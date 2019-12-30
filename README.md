@@ -114,7 +114,7 @@ set of advantages:
 
  * _Terminal-only workflow_ possible. This allows for good integration into
    an environment where most applications in use are also running in terminals.
- * Full control over _individual files_: D5Man does not ever write to the files
+ * Full control over _individual files_: D5Man does not write to the documents
    below the “roots”. This is the sole responsibility of the text editor.
    Additionally, pages exist as dedicated files allowing existing backup
    procedures to be effective for saving D5Man files as well.
@@ -240,13 +240,77 @@ to be declared in the documents themselves.
 
 ## Top-Level Structure
 
-_TODO ASTAT_
+Documents consist of the leading metadata block (see _Metadata_) followed by
+a D5Man document which consists of headings, lists, tables, code and paragraphs.
+
+## Headings
+
+D5Man proposes three levels of headings.
+The top-level headings are underlined by equals signs.
+The second-level headings are prefixed by `## ` (hash-hash-space).
+The third-level headings are prefixed by `### ` (hash-hash-hash-space).
+The following code shows all the heading styles.
+
+~~~{.markdown}
+Top-Level Heading
+=================
+
+Top-Level (e.g. introductory) content.
+
+## Second-Level Heading
+
+Second-Level Content
+
+### Third-Level Heading aka. List Title
+
+Inner Content / End of example.
+~~~
+
+## Lists
+
+D5Man has numbered, unnumbered and definition lists. Legacy D5Man also
+proposed _pro and contra_-style lists which are as of now not retained in
+D5Man 2. Unnumberd list items are prefixed by an asterisk (`*`),
+numbered lists are prefixed by the item's number followed by a dot
+(`1.`, `2.`, etc.) and description lists' contents are prefixed by a
+`:` at the beginning of the first line of the description list's content.
+Note that for description lists, the offset from the left has to be exactly
+four characters wide (`:   ` / colon-space-space-space on the first line;
+`    ` space-space-space-space on the second line onwards). Here are
+examples for the respective list types.
+
+~~~{.markdown}
+Description List
+:   This is the term being described.
+    This is the second line of the term being described.
+Second Description List Item
+:   Another item to be described.
+
+ 1. First Item of a numbered list:
+    This item has an additional line in source code.
+ 2. Second
+ 3. Third
+ 4. Fourth
+
+ * Item 1 of the unnumberd list has
+   two lines in source code.
+ * Item 2 has a single line.
+    * Nested Item a
+    * Nested Item b
+ * Item 3
+~~~
 
 ## Tables
 
+_TODO ASTAT_
+
 ## Code
 
-## Inline Formatting
+## Paragraphs and Inline Formatting
+
+Paragraphs are just regular text separated by two newlines. Throughout the
+document's text, it is possible to use _inline formatting_ to place emphasis,
+links etc. It is described in the following.
 
 Code
 :   By using backtick-quotation, inline code can be expressed
@@ -291,6 +355,10 @@ of UTF-8 symbols is suggested. On some Linux systems, quotation is easily
 available by [ALTGR]-[V] (`„`), [ALTGR]-[B] (`“`) and [ALTGR]-[N] (`”`).
 
 Forced and half spaces are not available as of now.
+
+## Images
+
+_TODO_
 
 Compiling and Installing D5Man 2
 ================================

@@ -56,7 +56,7 @@ License: Expat
  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-Files: README.txt build.xml d5manexporthtml.pl ial/* d5manexportpdf/d5manexportpdf d5manexportpdf/tplpdf/*.pdf d5mantui/* debian/* d5manapi/aux/* d5manapi/rel/* d5manapi/src/* d5manapi/ebin/* d5manapi/relx.config d5manapi/build.xml d5manapi/Makefile d5manapi/_rel/d5manapi_release/releases/* d5manapi/_rel/d5manapi_release/lib/d5manapi-2.0.0/* d5manapi/_rel/d5manapi_release/bin/* d5manapi/_rel/d5manapi_release/d5manapi_release-1.tar.gz
+Files: README.md build.xml d5manexporthtml.pl ial/* d5manexportpdf/d5manexportpdf d5manexportpdf/tplpdf/*.pdf d5mantui/* debian/* d5manapi/aux/* d5manapi/rel/* d5manapi/src/* d5manapi/ebin/* d5manapi/relx.config d5manapi/build.xml d5manapi/Makefile d5manapi/_rel/d5manapi_release/releases/* d5manapi/_rel/d5manapi_release/lib/d5manapi-2.0.0/* d5manapi/_rel/d5manapi_release/bin/* d5manapi/_rel/d5manapi_release/d5manapi_release-1.tar.gz
 Copyright: Copyright (c) 2019 Ma_Sys.ma <Ma_Sys.ma@web.de>
 License: GPL-3+
 

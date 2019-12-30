@@ -10,6 +10,7 @@ if [ $# = 0 ] || [ "$1" = "--help" ]; then
 	echo USAGE $0 INPUT.d5i
 	echo
 	echo Produces OUTPUT.d5i.pdf
+	exit 0
 fi
 
 # Design decision: Do not use any external/special filters as to enhance

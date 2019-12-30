@@ -9,11 +9,11 @@ import jexer.TExceptionDialog;
 
 class PageOpener implements Consumer<APIPageRecord> {
 
-	private final TApplication parent;
+	private final Application parent;
 	private final String commandEditor;
 	private final String commandBrowser;
 
-	PageOpener(TApplication parent, String commandEditor,
+	PageOpener(Application parent, String commandEditor,
 							String commandBrowser) {
 		super();
 		this.parent = parent;
@@ -31,8 +31,7 @@ class PageOpener implements Consumer<APIPageRecord> {
 	}
 
 	private void openPageRecord(APIPageRecord rec) throws IOException {
-		parent.getScreen().clear();
-		parent.exit();
+		parent.shutdown();
 
 		if(rec.redirect != null) {
 			// This has a redirect, means it is to be viewn in the
@@ -53,14 +52,6 @@ class PageOpener implements Consumer<APIPageRecord> {
 			Runtime.getRuntime().exec(new String[] { commandBrowser,
 								urlToCall });
 		} else {
-			// Found no way of waiting for parent.exit's screen
-			// cleaning to terminate. Thus wait a short while in
-			// the hope that it will have finished...
-			try {
-				Thread.sleep(100);
-			} catch(InterruptedException ex) {
-				ex.printStackTrace();
-			}
 			// https://stackoverflow.com/questions/29733038
 			ProcessBuilder proc = new ProcessBuilder(new String[] {
 				commandEditor, rec.file.toString()

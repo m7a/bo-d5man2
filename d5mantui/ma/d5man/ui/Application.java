@@ -11,6 +11,7 @@ class Application extends TApplication {
 
 	Application() throws UnsupportedEncodingException {
 		super(BackendType.XTERM);
+		setFocusFollowsMouse(false);
 		Theme.set(getTheme());
 		TMenu file = addMenu("&File");
 		file.addItem(ID_EXIT, "E&xit");
@@ -20,11 +21,24 @@ class Application extends TApplication {
 	protected boolean onMenu(TMenuEvent menu) {
 		switch(menu.getId()) {
 		case ID_EXIT:
-			exit();
+			shutdown();
 			return true;
 		default:
 			return false;
 		}
+	}
+
+	void shutdown() {
+		getScreen().clear();
+		restoreConsole();
+		exit();
+		do {
+			try {
+				Thread.sleep(30);
+			} catch(InterruptedException ex) {
+				ex.printStackTrace();
+			}
+		} while(isRunning());
 	}
 
 }

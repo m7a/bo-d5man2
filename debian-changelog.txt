@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.6) stable; urgency=medium
+
+  * Attempt to fix issues with mouse pointers and inability to paste from
+    X11 clipboard.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Mon, 30 Dec 2019 02:22:46 +0100
+
 mdvl-d5man2 (1.0.5) stable; urgency=medium
 
   * Fix bug in d5mantui which caused VIM to be started but closed shortly

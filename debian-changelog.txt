@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.7) stable; urgency=medium
+
+  * Provide VIM syntax file for mardkown.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Wed, 01 Jan 2020 22:44:53 +0100
+
 mdvl-d5man2 (1.0.6) stable; urgency=medium
 
   * Attempt to fix issues with mouse pointers and inability to paste from

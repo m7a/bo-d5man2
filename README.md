@@ -354,7 +354,14 @@ logic. With the new version, this feature is no longer available, thus the use
 of UTF-8 symbols is suggested. On some Linux systems, quotation is easily
 available by [ALTGR]-[V] (`„`), [ALTGR]-[B] (`“`) and [ALTGR]-[N] (`”`).
 
-Forced and half spaces are not available as of now.
+Forced spaces (aka. non-breaking spaces) can be inserted by using the respective
+unicode symbols. As described by
+[Thomas Keklak](https://coderwall.com/p/07mtla/insert-non-breaking-space-in-vim),
+a single non-breaking space can be entered in VIM by pressing
+[CTRL]-[K] [SPACE] [SPACE]. Similarly, a forced half-space can be entered by
+using the sequence [CTRL]-[V] [U] [2] [0] [2] [F].
+
+_TODO ARROWS_
 
 ## Images
 

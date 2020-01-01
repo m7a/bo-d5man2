@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.9) stable; urgency=medium
+
+  * Add Template file to allow creating new documents easily.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Wed, 01 Jan 2020 23:02:03 +0100
+
 mdvl-d5man2 (1.0.8) stable; urgency=medium
 
   * Attempt to fix syntax not being enabled by moving it later in the load

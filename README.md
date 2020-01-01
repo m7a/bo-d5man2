@@ -10,7 +10,7 @@ x-masysma-version: 2.0.0
 x-masysma-repository: https://www.github.com/m7a/bo-d5man2
 x-masysma-owned: 1
 x-masysma-copyright: |
-  Copyright (c) 2019 Ma_Sys.ma.
+  Copyright (c) 2019, 2020 Ma_Sys.ma.
   For further info send an e-mail to Ma_Sys.ma@web.de.
 ---
 WARNING: EXPERIMENTAL CODE
@@ -44,6 +44,10 @@ IAL (Information and Links)
     Pandoc Markdown format but e.g. HTML by specifying separate files with
     D5Man-style metadta for such existing files.
     See _Information and Links (IAL)_ for details.
+Auxiliary Resources
+:   The package provides a syntax file `markdown.md` as a replacement for VIM's
+    default Markdown style. This style makes sections more visible and is
+    loosely inspired by the style used in D5Man Legacy.
 
 This version “D5Man 2” replaces D5Man Legacy which was an attempt to achieve
 a similar outcome but in a much more sophisticated manner leading to excessive

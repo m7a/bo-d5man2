@@ -25,7 +25,7 @@ d5mantui/d5mantui /usr/bin
 d5manexportpdf/d5manexportpdf /usr/bin
 d5manexportpdf/tplpdf /usr/share/mdvl-d5man2
 d5manexporthtml /usr/bin
-markdown.vim /var/lib/vim/addons/syntax
+markdown.vim /usr/share/vim/vimfiles/after/syntax
 </property>
 
 <property name="mdpc.copyright.file"><![CDATA[

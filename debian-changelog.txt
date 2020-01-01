@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.8) stable; urgency=medium
+
+  * Attempt to fix syntax not being enabled by moving it later in the load
+    order.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Wed, 01 Jan 2020 22:51:42 +0100
+
 mdvl-d5man2 (1.0.7) stable; urgency=medium
 
   * Provide VIM syntax file for mardkown.

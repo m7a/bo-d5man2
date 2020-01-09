@@ -369,7 +369,17 @@ _TODO ARROWS_
 
 ## Images
 
-_TODO_
+The general syntax for images is `![CAPTION](FILE)`. By convention, `FILE` is
+given relative to the page's file and if it is associated directly to the page,
+then it is placed in a directory with the page's name concatenated with a
+trailing `_att`.
+
+For instance, an attachment `test.png` for this very page would be loaded by
+specifying `![Test](d5man2_att/test.png)`.
+
+Note that for `.svg` and `.pdf` files the extension of the image file name is
+normally not given in order to allow an automatic detection by pandoc/LaTeX to
+take place.
 
 Compiling and Installing D5Man 2
 ================================

@@ -32,13 +32,21 @@ class Application extends TApplication {
 		getScreen().clear();
 		restoreConsole();
 		exit();
-		do {
+		while(isRunning()) {
 			try {
 				Thread.sleep(30);
 			} catch(InterruptedException ex) {
 				ex.printStackTrace();
+				return;
 			}
-		} while(isRunning());
+		}
+		// It seems there still needs to be a delay because very often
+		// VIM reports that it is not connected to a terminal...
+		try {
+			Thread.sleep(60);
+		} catch(InterruptedException ex) {
+			ex.printStackTrace();
+		}
 	}
 
 }

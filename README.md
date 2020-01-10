@@ -221,6 +221,9 @@ follows:
 :   Defines a priority (0.0--1.0) and a change frequency (monthly, weekly etc.)
     to be used in sitemaps generated during the XHTML export.
     Default is priority=0.4, changefreq=monthly.
+`x-masysma-expires` (optional)
+:   Expiry date. Same format as `date`. The meaning of this field is up to
+    the user's interpretation interpretation.
 
 ## Attachments
 

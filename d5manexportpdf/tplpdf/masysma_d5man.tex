@@ -330,8 +330,18 @@ $endif$
 % from commandline
 % :   x-masysma-icon, x-masysma-loco
 %
-% TODO DECLARE CHARACTER ⇒
-\usepackage{rotating,semantic,bbold,scrpage2}
+\usepackage{newunicodechar,rotating,semantic,bbold,scrpage2}
+\newunicodechar{←}{$$\leftarrow$$}
+\newunicodechar{→}{$$\rightarrow$$}
+\newunicodechar{↑}{$$\uparrow$$}
+\newunicodechar{↓}{$$\downarrow$$}
+\newunicodechar{↖}{$$\nsarrow$$}
+\newunicodechar{↗}{$$\nearrow$$}
+\newunicodechar{↘}{$$\searrow$$}
+\newunicodechar{↙}{$$\swarrow$$}
+\newunicodechar{⇒}{$$\Rightarrow$$}
+\newunicodechar{⇐}{$$\Leftarrow$$}
+\newunicodechar{⇔}{$$\Leftrightarrow$$}
 \newcommand{\macurrentpagedescr}{$title$}
 \newcommand{\macurrentpagename}{$x-masysma-name$($section$)}
 \newcommand{\macurrentadditionalmetainfo}{%

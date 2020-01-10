@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.13) stable; urgency=medium
+
+  * Reduce spacing for headings to make them more suitable for lists.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Sat, 11 Jan 2020 00:56:40 +0100
+
 mdvl-d5man2 (1.0.12) stable; urgency=medium
 
   * Add link_attributes extension to allow images to be scaled.

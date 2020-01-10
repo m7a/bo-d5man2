@@ -20,7 +20,7 @@ fi
 # on them is only available with proper template and not from within -B/-H etc.
 exec pandoc \
 	-t latex \
-	-f markdown+compact_definition_lists+tex_math_single_backslash \
+	-f markdown+compact_definition_lists+tex_math_single_backslash+link_attributes \
 	-V papersize=a4 \
 	-V classoption=DIV10 \
 	-V fontsize=12pt \

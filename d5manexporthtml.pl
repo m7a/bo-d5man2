@@ -103,7 +103,7 @@ for my $root (@roots) {
 			"-t", "html4",
 			"--default-image-extension=svg",
 			"-f", "markdown+compact_definition_lists+".
-						"tex_math_single_backslash",
+				"tex_math_single_backslash+link_attributes",
 			"-o", $secdestdir."/".$namepart.".xhtml",
 		);
 		push @params, @pandocopts;

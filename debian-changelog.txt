@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.11) stable; urgency=medium
+
+  * Add default image extension to allow PDF/SVG image includes.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Fri, 10 Jan 2020 12:53:54 +0100
+
 mdvl-d5man2 (1.0.10) stable; urgency=medium
 
   * Attempt to fix VIM execution (again...)

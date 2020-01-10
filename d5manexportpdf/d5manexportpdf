@@ -1,5 +1,5 @@
 #!/bin/sh -e
-# Ma_Sys.ma D5Man PDF Export 2.0.0, Copyright (c) 2019 Ma_Sys.ma.
+# Ma_Sys.ma D5Man PDF Export 2.0.1, Copyright (c) 2019, 2020 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 # This file is a shell script intended to be reasonably simple to provide
@@ -28,6 +28,7 @@ exec pandoc \
 	-V fontfamily=kpfonts \
 	-V x-masysma-logo=/usr/share/mdvl-d5man2/tplpdf/logo_v2 \
 	-V x-masysma-icon=/usr/share/mdvl-d5man2/tplpdf/masysmaicon \
+	--default-image-extension=pdf \
 	--template=/usr/share/mdvl-d5man2/tplpdf/masysma_d5man.tex \
 	-o "$1.pdf" \
 	"$1"

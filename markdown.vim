@@ -67,6 +67,7 @@ syn match D5ManMetaKV contained "^\(title\|author\|keywords\|x-masysma-copyright
 syn match D5ManMetaKV contained "^date\ze: [0-9]\{4\}\(\/[0-9]\{2\}\(\/[0-9]\{2\}\( [0-9]\{2\}:[0-9]\{2\}\(:[0-9]\{2\}\)\?\)\?\)\?\)\?$"
 syn match D5ManMetaKV contained "^lang\ze: [a-z]\{2\}-[A-Z]\{2\}$"
 syn match D5ManMetaKV contained "^x-masysma-owned\ze: [01]$"
+syn match D5ManMetaKV contained "^toc\ze: [01]$"
 syn region D5ManMeta start=/^---$/ end=/^---$/ contains=D5ManMetaKV fold
 
 " Meta folding

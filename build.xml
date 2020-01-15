@@ -24,7 +24,7 @@ d5mantui/d5mantui.jar /usr/share/java
 d5mantui/d5mantui /usr/bin
 d5manexportpdf/d5manexportpdf /usr/bin
 d5manexportpdf/tplpdf /usr/share/mdvl-d5man2
-d5manexporthtml /usr/bin
+d5manexporthtml/d5manexporthtml /usr/bin
 markdown.vim /usr/share/vim/vimfiles/after/syntax
 d5man2.md /usr/share/mdvl/templates
 </property>
@@ -58,8 +58,8 @@ License: Expat
  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-Files: README.md build.xml d5man2.md markdown.vim d5manexporthtml.pl ial/* d5manexportpdf/d5manexportpdf d5manexportpdf/tplpdf/*.pdf d5mantui/* debian/* d5manapi/aux/* d5manapi/rel/* d5manapi/src/* d5manapi/ebin/* d5manapi/relx.config d5manapi/build.xml d5manapi/Makefile d5manapi/_rel/d5manapi_release/releases/* d5manapi/_rel/d5manapi_release/lib/d5manapi-2.0.0/* d5manapi/_rel/d5manapi_release/bin/* d5manapi/_rel/d5manapi_release/d5manapi_release-1.tar.gz
-Copyright: Copyright (c) 2019 Ma_Sys.ma <Ma_Sys.ma@web.de>
+Files: README.md build.xml d5man2.md markdown.vim d5manexporthtml/* ial/* d5manexportpdf/d5manexportpdf d5manexportpdf/tplpdf/*.pdf d5mantui/* debian/* d5manapi/aux/* d5manapi/rel/* d5manapi/src/* d5manapi/ebin/* d5manapi/relx.config d5manapi/build.xml d5manapi/Makefile d5manapi/_rel/d5manapi_release/releases/* d5manapi/_rel/d5manapi_release/lib/d5manapi-2.0.0/* d5manapi/_rel/d5manapi_release/bin/* d5manapi/_rel/d5manapi_release/d5manapi_release-1.tar.gz
+Copyright: Copyright (c) 2019, 2020 Ma_Sys.ma <Ma_Sys.ma@web.de>
 License: GPL-3+
 
 Files: d5manexportpdf/tplpdf/masysma_d5man.tex
@@ -113,35 +113,15 @@ License: BSD-2-Clause
  SUCH DAMAGE.
 ]]></property>
 
-<!-- PART OF TPL HERE FOR USE IN BUILD -->
-<property environment="env"/>
-<condition property="masysma.internal.includepath.rel" value="${env.MDVL_CI_PHOENIX_ROOT}" else=".."><isset property="env.MDVL_CI_PHOENIX_ROOT"/></condition>
-<property name="masysma.internal.includepath" location="${masysma.internal.includepath.rel}"/>
-
-<!-- SPECIFIC BUILD TODO THIS IS RECURSIVE ANT SHOULD BE SUPPORTED IN TEMPLATE! -->
-<target name="build">
-	<ant dir="d5manapi"/>
-	<ant dir="d5mantui" target="jar"/>
-	<copy file="d5manexporthtml.pl" tofile="d5manexporthtml"/>
-</target>
-
-<target name="clean">
-	<ant dir="d5manapi" target="clean"/>
-	<ant dir="d5mantui" target="clean"/>
-</target>
-
-<target name="dist-clean" depends="clean">
-	<ant dir="d5manapi" target="dist-clean"/>
-	<ant dir="d5mantui" target="dist-clean"/>
-	<delete file="d5manexporthtml"/>
-</target>
-
 <!-- CI INTEGRATION -->
 <target name="package_triggered" depends="package">
 	<property name="masysma.ci.trigger" value="newver"/>
 </target>
 
-<!-- TPL IMPORT (PARTIALLY GIVEN ABOVE) -->
+<!-- CONSTANT TPL IMPORT -->
+<property environment="env"/>
+<condition property="masysma.internal.includepath.rel" value="${env.MDVL_CI_PHOENIX_ROOT}" else=".."><isset property="env.MDVL_CI_PHOENIX_ROOT"/></condition>
+<property name="masysma.internal.includepath" location="${masysma.internal.includepath.rel}"/>
 <property name="masysma.internal.loadpath" value="${masysma.internal.includepath}/co-build/ant-build-template.xml"/>
 <condition property="masysma.internal.load" value="file://${masysma.internal.loadpath}" else="https://raw.githubusercontent.com/m7a/co-build/master/ant-build-template.xml"><resourceexists><file file="${masysma.internal.loadpath}"/></resourceexists></condition>
 <import><url url="${masysma.internal.load}"/></import>

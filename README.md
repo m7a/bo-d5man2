@@ -189,6 +189,9 @@ follows:
     `keywords` section. In legacy D5Man, this was called `tags`.
 `date` (optional)
 :   Specifies the date of document creation in `YYYY/MM/DD HH:ii:ss` format.
+`toc` (optional)
+:   Controls the generation of a table of contents for PDF exports
+    (processed by pandoc only).
 `x-masysma-name` (required)
 :   Determines the page's name. For newly created pages, it is recommended to
     chose names satisfying the regex `[a-z0-9_/]+`. Other names are

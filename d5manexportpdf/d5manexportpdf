@@ -26,6 +26,7 @@ exec pandoc \
 	-V fontsize=12pt \
 	-V documentclass=scrartcl \
 	-V fontfamily=kpfonts \
+	-V toc-depth=1 \
 	-V x-masysma-logo=/usr/share/mdvl-d5man2/tplpdf/logo_v2 \
 	-V x-masysma-icon=/usr/share/mdvl-d5man2/tplpdf/masysmaicon \
 	--default-image-extension=pdf \

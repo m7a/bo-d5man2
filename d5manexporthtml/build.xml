@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="build">
+	<target name="build">
+		<copy file="d5manexporthtml.pl" tofile="d5manexporthtml"/>
+	</target>
+	<target name="dist-clean">
+		<delete file="d5manexporthtml"/>
+	</target>
+	<!-- compat only -->
+	<target name="clean"/>
+</project>

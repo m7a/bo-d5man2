@@ -28,7 +28,7 @@ sub VERSION_MESSAGE {
 }
 
 sub HELP_MESSAGE {
-	print "\nUSAGE d5manexport -o DESTDIR -i ROOT[,ROOT...] ".
+	print "\nUSAGE d5manexporthtml -o DESTDIR -i ROOT[,ROOT...] ".
 			"-s SECTION[,SECTION...] -u URLPREFIX [-m PDF2SVG] ".
 			"[-- PANDOCOPTIONS...]\n";
 }

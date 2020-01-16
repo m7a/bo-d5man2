@@ -1,3 +1,15 @@
+mdvl-d5man2 (1.0.16) stable; urgency=medium
+
+  * Try yet another fix for terminal VIM problem.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Thu, 16 Jan 2020 14:30:57 +0100
+
+mdvl-d5man2 (1.0.15) stable; urgency=medium
+
+  * Increment delay between exect to VIM.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Thu, 16 Jan 2020 14:14:12 +0100
+
 mdvl-d5man2 (1.0.14) stable; urgency=medium
 
   * PDF export: Reduce TOC depth for better overview

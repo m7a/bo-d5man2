@@ -51,7 +51,7 @@ class Config {
 			}
 		}
 		commandEditor  = pr.getProperty("d5man.ui.command.editor",
-								"vim");
+							"d5man_invoc_editor");
 		commandBrowser = pr.getProperty("d5man.ui.command.browser",
 								"firefox");
 		api = new URL(pr.getProperty("d5man.api.url",

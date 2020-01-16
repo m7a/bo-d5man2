@@ -22,6 +22,7 @@ d5manapi/_rel/d5manapi_release/releases /usr/share/mdvl-d5man2/d5manapi
 d5manapi/aux/d5manapi /usr/bin
 d5mantui/d5mantui.jar /usr/share/java
 d5mantui/d5mantui /usr/bin
+d5mantui/d5man_invoc_editor /usr/bin
 d5manexportpdf/d5manexportpdf /usr/bin
 d5manexportpdf/tplpdf /usr/share/mdvl-d5man2
 d5manexporthtml/d5manexporthtml /usr/bin

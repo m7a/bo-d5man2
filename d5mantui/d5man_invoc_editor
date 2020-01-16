@@ -1,0 +1,3 @@
+#!/bin/sh -e
+# Hack until something better is devised.
+exec /usr/bin/vim "$@" < /dev/tty > /dev/tty 2> /dev/tty

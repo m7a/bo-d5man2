@@ -104,6 +104,8 @@ for my $root (@roots) {
 			"--default-image-extension=svg",
 			"-f", "markdown+compact_definition_lists+".
 				"tex_math_single_backslash+link_attributes",
+			"--base-header-level=2",
+			"--mathml",
 			"-o", $secdestdir."/".$namepart.".xhtml",
 		);
 		push @params, @pandocopts;

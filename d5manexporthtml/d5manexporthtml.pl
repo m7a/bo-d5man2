@@ -10,6 +10,7 @@ use File::stat; # switch stat's array to name-accessable structure.
 require File::Basename;
 require YAML::Tiny; # libyaml-tiny-perl
 require Getopt::Std;
+require File::Copy;
 require File::Copy::Recursive; # libfile-copy-recursive-perl
 #use Data::Dumper 'Dumper'; # debug only
 
@@ -97,22 +98,40 @@ for my $root (@roots) {
 		my $secdestdir = $destdir."/".$section;
 		mkdir($secdestdir) if(not -d $secdestdir);
 
+		# -- get modification time --
+		my ($tS, $tM, $tH, $td, $tm, $tY) = gmtime($mtime);
+		$tY += 1900;
+		$tm += 1;
+		my $date_meta = sprintf("%04d-%02d-%02d %02d:%02d:%02d",
+						$tY, $tm, $td, $tH, $tM, $tS);
+		my ($tSG, $tMG, $tHG, $tdG, $tmG, $tYG) = localtime($mtime);
+		$tYG += 1900;
+		$tmG += 1;
+		my $date_ger = sprintf("%02d.%02d.%04d %02d:%02d:%02d",
+					$tdG, $tmG, $tYG, $tHG, $tMG, $tSG);
+
 		# -- prepare parameters --
 		my @params = (
 			"-s",
 			"-t", "html4",
 			"--default-image-extension=svg",
+			"-V", "x-masysma-source=$secdestdir/$namepart.md",
+			"-V", "x-masysma-meta-revised=$date_meta",
+			"-V", "x-masysma-revised-human=$date_ger",
 			"-f", "markdown+compact_definition_lists+".
 				"tex_math_single_backslash+link_attributes",
 			"--base-header-level=2",
 			"--mathml",
-			"-o", $secdestdir."/".$namepart.".xhtml",
+			"-o", "$secdestdir/$namepart.xhtml",
 		);
 		push @params, @pandocopts;
 		push @params, $filepath;
 
 		# -- call export --
 		system("pandoc", @params);
+
+		# -- copy source --
+		File::Copy::copy($filepath, "$secdestdir/$namepart.md");
 
 		# -- copy attachments --
 		my $attdirnam = $namepart."_att";
@@ -134,9 +153,6 @@ for my $root (@roots) {
 		}
 
 		# -- append to sitemap --
-		my ($tS, $tM, $tH, $td, $tm, $tY) = gmtime($mtime);
-		$tY += 1900;
-		$tm += 1;
 		my $date_fmt = sprintf("%04d-%02d-%02dT%02d:%02d:%02dZ",
 						$tY, $tm, $td, $tH, $tM, $tS);
 		my $web_priority = defined($yaml->{"x-masysma-web-priority"})?

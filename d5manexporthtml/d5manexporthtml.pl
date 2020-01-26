@@ -107,8 +107,8 @@ for my $root (@roots) {
 		my ($tSG, $tMG, $tHG, $tdG, $tmG, $tYG) = localtime($mtime);
 		$tYG += 1900;
 		$tmG += 1;
-		my $date_ger = sprintf("%02d.%02d.%04d %02d:%02d:%02d",
-					$tdG, $tmG, $tYG, $tHG, $tMG, $tSG);
+		my $date_ger = sprintf("%04d/%02d/%02d %02d:%02d:%02d",
+					$tYG, $tmG, $tdG, $tHG, $tMG, $tSG);
 
 		# -- prepare parameters --
 		my @params = (

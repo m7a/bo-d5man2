@@ -228,6 +228,24 @@ follows:
 :   Expiry date. Same format as `date`. The meaning of this field is up to
     the user's interpretation interpretation.
 
+### Section Structure
+
+The section structure used by the Ma_Sys.ma is as given in the following table.
+
+Sec  Short Description
+---  --------------------------------------------------------------------------
+11   Documentation in the style of a classical man-page.
+21   IAL as generated from documentation
+22   IAL hand-added files
+23   IAL internal
+31   Website pages providing general website content (navigation, license, ...).
+32   Documentation for current Ma_Sys.ma developments (programs, scripts, etc.)
+33   Legacy (_TODO will this section actually be used?_)
+34   Creative section with Mods and Stories
+35   not public: UNI notes
+37   Blog, Knowledge Base, self-contained pages, other public notes
+42   not public: user notes
+
 ## Attachments
 
 By convention, images included in the document are stored in a directory

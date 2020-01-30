@@ -63,7 +63,7 @@ hi D5ManMeta ctermfg=LightBlue
 hi D5ManMetaKV cterm=bold ctermfg=LightBlue
 syn match D5ManMetaKV contained "^section\ze: [0-9]\+$"
 syn match D5ManmetaKV contained "^x-masysma-name\ze: [a-z0-9A-Z/_]\+$"
-syn match D5ManMetaKV contained "^\(title\|author\|keywords\|x-masysma-copyright\|x-masysma-version\|x-masysma-repository\|x-masysma-website\|x-masysma-redirect\|x-masysma-web-prioerity\|x-masysma-web-changefreq\)\ze: .*$"
+syn match D5ManMetaKV contained "^\(title\|author\|keywords\|x-masysma-copyright\|x-masysma-version\|x-masysma-repository\|x-masysma-website\|x-masysma-redirect\|x-masysma-web-prioerity\|x-masysma-web-changefreq\|x-masysma-download\|x-masysma-see-also\)\ze: .*$"
 syn match D5ManMetaKV contained "^date\ze: [0-9]\{4\}\(\/[0-9]\{2\}\(\/[0-9]\{2\}\( [0-9]\{2\}:[0-9]\{2\}\(:[0-9]\{2\}\)\?\)\?\)\?\)\?$"
 syn match D5ManMetaKV contained "^lang\ze: [a-z]\{2\}-[A-Z]\{2\}$"
 syn match D5ManMetaKV contained "^x-masysma-owned\ze: [01]$"

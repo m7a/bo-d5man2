@@ -220,6 +220,8 @@ follows:
     In case a file name is given, the given file (relative to the attachment
     directory) is opened instead of opening the page when running from
     D5Man TUI. All pages available through IAL need to supply this field.
+`x-masysma-download` (optional)
+:   Specify an URL for downloading a file (used for Website generation).
 `x-masysma-web-priority`, `x-masysma-web-changefreq` (optional)
 :   Defines a priority (0.0--1.0) and a change frequency (monthly, weekly etc.)
     to be used in sitemaps generated during the XHTML export.

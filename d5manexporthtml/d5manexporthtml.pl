@@ -10,6 +10,7 @@ use File::stat; # switch stat's array to name-accessable structure.
 require File::Basename;
 require YAML::Tiny; # libyaml-tiny-perl
 require Getopt::Std;
+require File::Path;
 require File::Copy;
 require File::Copy::Recursive; # libfile-copy-recursive-perl
 #use Data::Dumper 'Dumper'; # debug only
@@ -72,6 +73,11 @@ print $stream_sitemap <<~"EOF";
 	<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	EOF
 
+# -- delete data from last export --
+for my $section (@exportsections) {
+	File::Path::remove_tree("$destdir/$section") if(-d "$destdir/$section");
+}
+
 # -- process roots --
 for my $root (@roots) {
 	while(glob("'$root/??/*.md' '$root/?[po]-*/README.md'")) {
@@ -96,7 +102,21 @@ for my $root (@roots) {
 
 		# -- establish output directory --
 		my $secdestdir = $destdir."/".$section;
-		mkdir($secdestdir) if(not -d $secdestdir);
+		if(not -d $secdestdir) {
+			mkdir($secdestdir);
+			open my $hta, '>:encoding(UTF-8)', $secdestdir.
+								"/.htaccess";
+			print $hta <<~"EOF";
+				Deny from all
+				AddType application/xhtml+xml .xhtml
+				AddCharset UTF-8 .xhtml
+				<Files *.xhtml>
+					Order deny,allow
+					Allow from all
+				</Files>
+				EOF
+			close $hta;
+		}
 
 		# -- get modification time --
 		my ($tS, $tM, $tH, $td, $tm, $tY) = gmtime($mtime);

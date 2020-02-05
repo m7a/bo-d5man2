@@ -170,6 +170,18 @@ for my $root (@roots) {
 				next if (-f $attsvg);
 				system($pdf2svg, $attf, $attsvg);
 			}
+
+			# -- add htaccess allow --
+			open my $hta, '>:encoding(UTF-8)', $attachdest.
+								"/.htaccess";
+			print $hta <<~"EOF";
+				Deny from all
+				<Files *>
+					Order deny,allow
+					Allow from all
+				</Files>
+				EOF
+			close $hta;
 		}
 
 		# -- append to sitemap --

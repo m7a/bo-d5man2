@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.17) stable; urgency=medium
+
+  * Try to start a jexer terminal instead of exec because it did not
+    work this way with umlauts (ö produced C6 instead?)
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Sun, 09 Feb 2020 22:05:25 +0100
+
 mdvl-d5man2 (1.0.16) stable; urgency=medium
 
   * Try yet another fix for terminal VIM problem.

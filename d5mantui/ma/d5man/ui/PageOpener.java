@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 
 import jexer.TApplication;
 import jexer.TExceptionDialog;
+import jexer.TWindow;
 
 class PageOpener implements Consumer<APIPageRecord> {
 
@@ -32,7 +33,6 @@ class PageOpener implements Consumer<APIPageRecord> {
 
 	private void openPageRecord(APIPageRecord rec) throws IOException {
 		parent.shutdown();
-
 		if(rec.redirect != null) {
 			// This has a redirect, means it is to be viewn in the
 			// browser. Need to decide if this request is a relative
@@ -57,12 +57,14 @@ class PageOpener implements Consumer<APIPageRecord> {
 				commandEditor, rec.file.toString()
 			});
 			proc.inheritIO();
+			proc.start();
 			try {
-				proc.start().waitFor();
+				Thread.sleep(500);
 			} catch(InterruptedException ex) {
 				ex.printStackTrace();
 				System.exit(1);
 			}
+			System.exit(0);
 		}
 	}
 

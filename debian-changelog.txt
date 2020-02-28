@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.18) stable; urgency=medium
+
+  * Switch to Perl-based D5Man TUI (v3).
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Fri, 28 Feb 2020 21:11:05 +0100
+
 mdvl-d5man2 (1.0.17) stable; urgency=medium
 
   * Try to start a jexer terminal instead of exec because it did not

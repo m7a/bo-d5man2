@@ -23,7 +23,7 @@ my $target_root     = "/data/main/man/rr";
 my $api_url         = "http://127.0.0.1:7450";
 
 my $haveenv = defined($ENV{D5MAN_CONF_UI});
-my $homef = File::HomeDir::home()."/.mdvl/d5man/d5naui_properties.xml";
+my $homef = File::HomeDir::home()."/.mdvl/d5man/d5mantui_properties.xml";
 if($haveenv or -f $homef) {
 	my $conffile = $haveenv? $ENV{D5MAN_CONF_UI}: $homef;
 	my $domparser2 = new XML::DOM::Parser;

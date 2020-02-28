@@ -7,9 +7,9 @@
 # switch to Perl.
 
 if [ $# = 0 ] || [ "$1" = "--help" ]; then
-	echo USAGE $0 INPUT.d5i
+	echo USAGE $0 INPUT.md
 	echo
-	echo Produces OUTPUT.d5i.pdf
+	echo Produces OUTPUT.md.pdf
 	exit 0
 fi
 

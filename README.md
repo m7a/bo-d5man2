@@ -14,11 +14,6 @@ x-masysma-copyright: |
   Copyright (c) 2019, 2020 Ma_Sys.ma.
   For further info send an e-mail to Ma_Sys.ma@web.de.
 ---
-WARNING: EXPERIMENTAL CODE
-==========================
-
-**THIS IS HIGHLY EXPERIMENTAL AND UNDER DEVELOPMENT**
-
 Overview
 ========
 
@@ -31,8 +26,7 @@ components:
     means of a REST (Representional State Transfer) interface.
     See `d5manapi` for details.
 `d5mantui`
-:   _Terminal User Interface_ as an interactive means to query the D5Man API.
-    Currently, it provides a keyword-based search (only).
+:   _Terminal User Interface_ as an interactive means to query for D5Man pages.
     See `d5mantui` for details.
 d5manexport
 :   Multiple programs to export a special instance of pandoc's Markdown by
@@ -102,9 +96,8 @@ two digits (i.e. ranges from 10 to 99).
 
 A typical workflow for creating a page is as follows:
 
- 1. Create an empty page by copying from a template file to a file in a
-    section directory or repository's `README.md`
-    _TODO PROVIDE SUCH TEMPLATE FILE_
+ 1. Create an empty page by copying from a template file (`d5man2.md`) to a
+    file in a section directory or repository's `README.md`.
  2. Populate the file with information.
  3. Optionally: Export the file to target format of choice and print it or
     upload it to the Internet.
@@ -120,9 +113,10 @@ set of advantages:
  * _Terminal-only workflow_ possible. This allows for good integration into
    an environment where most applications in use are also running in terminals.
  * Full control over _individual files_: D5Man does not write to the documents
-   below the “roots”. This is the sole responsibility of the text editor.
-   Additionally, pages exist as dedicated files allowing existing backup
-   procedures to be effective for saving D5Man files as well.
+   below the “roots” except for creating new pages. Apart from that, writing is
+   the sole responsibility of the text editor. Additionally, pages exist as
+   dedicated files allowing existing backup procedures to be effective for
+   saving D5Man files as well.
  * _Partial Publishing_. It is possible to publish only a subset of the
    actually present documents as to distinguish between public and private
    information. Use of different sections for this purpose makes the distinction
@@ -132,8 +126,17 @@ set of advantages:
    correctly. Thus D5Man 2 uses a thoughtfully crafted subset of Pandoc's
    Markdown which ensures compatibility with printed and web-based formats and
    provides reasonably well-readable and easily editable source files.
+ * _Minimality_. After a failed attempt to develop a “large” system for the
+   purpose, D5Man 2 stays minimal. At the core (Perl and Erlang parts), its
+   source code is less than 1000 lines of code!
 
 ## Alternatives
+
+There are countless approaches to do _static blogs_ or _personal wikis_.
+As documentation is often available online, there is less and less need for
+the functionality provided by _Information and Links_. The following lists
+some alternative softwares to cover individual aspects of D5Man. There does not
+seem to be a comprehensive substitute with all the benefits, though.
 
 _TODO PROVIDE A LIST OF ALTERNATIVE SOFTWARE WHICH SERVES SIMILAR PURPOSES_
 
@@ -243,7 +246,7 @@ Sec  Short Description
 23   IAL internal
 31   Website pages providing general website content (navigation, license, ...).
 32   Documentation for current Ma_Sys.ma developments (programs, scripts, etc.)
-33   Legacy (_TODO will this section actually be used?_)
+33   Legacy (_currently unused_)
 34   Creative section with Mods and Stories
 35   not public: UNI notes
 37   Blog, Knowledge Base, self-contained pages, other public notes
@@ -333,9 +336,55 @@ Second Description List Item
 
 ## Tables
 
-_TODO ASTAT_
+Two distinct notations exist for tables: Tables with headings and without
+headings. All tables start from the first character in the line and leave two
+spaces between columns.
+
+For tables with headings, there is a single dashed line below the individual
+headings. Example:
+
+~~~{.markdown}
+Caption 1   Caption 2
+----------  ------------
+Inner Cell  Inner Cell 2
+Other Cell  Last Cell
+~~~
+
+For tables without headings, the same dashed lines are created and put above
+and below the respective table. Leaving out the captions, the table from before
+becomes this:
+
+~~~{.markdown}
+----------  ------------
+Inner Cell  Inner Cell 2
+Other Cell  Last Cell
+----------  ------------
+~~~
 
 ## Code
+
+Top-level code can be declared by either indenting the code with at least a
+single tab character or by enclosing it in lines with three tilde characters
+(`~~~`).
+
+Example for tilde-based code section (the source code uses indentation to
+make this appear as code in the output document):
+
+	~~~
+	code content
+	~~~
+
+The tilde-based notation allows for a programming language to be declared by
+replacing the first `~~~` with `~~~{.language}` where `language` is replaced by
+a programming language name as known to `pandoc`. Examples include `c`,
+`markdown` and `java`.
+
+Alternatively, here is the indented variant (the source code uses tilde
+symbols to make this appear as code in the output document):
+
+~~~
+	code content
+~~~
 
 ## Paragraphs and Inline Formatting
 
@@ -411,21 +460,262 @@ take place.
 Compiling and Installing D5Man 2
 ================================
 
+D5Man 2 requires an Erlang OTP runtime and a suitable Perl interpreter as well
+as a selection of Perl modules. A declaration of all dependencies for an
+installation on a Debian stable system can be found in file `build.xml`.
+
+Only the Erlang-based `d5manapi` requires external dependencies and needs to be
+compiled, all other D5Man 2 components are scripts and run without compilation
+or further processing. By providing `erlang.mk` along with `d5manapi`,
+compilation should automatically download all dependencies if a working
+Erlang OTP runtime can be found.
+
+To compile the individual parts, it might be sufficient to call `make`
+in directory `d5manapi`. If this succeeds, all components are already on disk.
+To generate an installable Debian package, `ant` and the usual build tools for
+Debian packages are required. One can then build the package by invoking
+`ant package` in the repository's top-level directory.
+
 `d5manapi`
 ==========
+
+The D5Man API server loads metadata for all pages into RAM and provides a
+REST API to query the respective metadata.
+
+## Configuration
+
+`erlang.mk` builds a script `d5manapi_release` to run the server which can be
+invoked as follows:
+
+	bin/d5manapi_release foreground [-config CONFIG]
+
+Here, `CONFIG` refers to an optional configuration file. Default values for
+the configuration can be found in `d5manapi/rel/sys.config` and are as follows:
+
+	[{d5manapi, [
+		{ip, {127, 0, 0, 1}},
+		{port, 7450},
+		{redirect_url_prefix, "http://127.0.0.1:7450/rrman/"},
+		{fs, #{
+			rrman => "/data/main/man/rr",
+			ial   => "/data/main/mdvl/rr/bo-d5man2/ial/home",
+			local => "/data/main/mdvl/rr/br-ial-local"
+		}},
+		{db_roots, [
+			"/data/main/man/rr",
+			"/data/main/mdvl/rr"
+		]}
+	]}].
+
+The lines with `ip`, `port` and `redirect_url_prefix` configure the server's
+address. For local usage, it is highly recommended to set `ip` to the defined
+`127.0.0.1`.
+
+The other parts of the configuration most likely require changes for local
+use. They are dividied into `fs` and `db_roots` which can be described as
+follows:
+
+`fs`
+:   Provides an association of server paths to local paths. This essentially
+    makes the D5Man API server serve static files. For instance in this
+    configuration, file `/data/main/man/rr/21/ada_att/rm-0-1.html` is available
+    thorugh the server at `http://127.0.0.1:7450/rrman/21/ada_att/rm-0-1.html`.
+`db_roots`
+:   Declares a list of directories to consult for D5Man pages. They can be
+    either in _Document-Root_ or _Program-Root_ organization. All the pages
+    found below the respective roots will be available for querying.
+
+Note that for Linux usage, script `d5manapi/aux/d5manapi` is provided. It
+invokes the server automatically detecting the presence of a configuration file
+in `$HOME/.mdvl/d5man/d5manapi.conf`. Additionally, a systemd unit
+`d5manapi.service` is provided. It is intended to be installed as a
+user-service. See `d5manapi.service` for details.
+
+## Usage
+
+Once configured, `d5manapi` can be started and awaits connections from other
+D5Man components (i.e. `d5mantui` or IAL).
+
+The API currently exposes a single endpoint called `query`. It can be invoked
+as follows:
+
+	curl http://127.0.0.1:7450/query/
+
+Without any actual query string, this will return all elements in the database
+up to the default limit of 100. To configure a different limit, use header
+`x-masysma-limit` e.g. as follows:
+
+	curl -H "x-masysma-limit: 4" http://127.0.0.1:7450/query/
+
+This query returns four elements from the database. Set the limit to 0 to
+return the entire database (can be large...)
+
+To send a query string, use it as path:
+
+	curl http://127.0.0.1:7450/query/31%20web
+
+This sends query `31 web` to the server which returns all pages in section
+`31` which match query string `web`.
+
+Currently, the API always outputs XML. An example output from the API can look
+as follows:
+
+~~~{.xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<d5man>
+	<page>
+		<meta>
+			<kv k="file" v="/data/main/man/rr/21/erlang.yml"/>
+			<kv k="section" v="21"/>
+			<kv k="name" v="erlang/snmp_user_based_sm_mib:delete_user/1"/>
+			<kv k="tags" v="erlang snmp_user_based_sm_mib:delete_user/1 snmp_user_based_sm_mib delete_user/1"/>
+			<kv k="redirect" v="http://127.0.0.1:7450/rrman/21/erlang_att/lib/snmp-5.2.12/doc/html/snmp_user_based_sm_mib.html#delete_user-1"/>
+		</meta>
+	</page>
+	<page>
+		<meta>
+			<kv k="file" v="/data/main/man/rr/21/erlang.yml"/>
+			<kv k="section" v="21"/>
+			<kv k="name" v="erlang/snmp_user_based_sm_mib:delete_user/1"/>
+			<kv k="tags" v="erlang snmp_user_based_sm_mib:delete_user/1 snmp_user_based_sm_mib delete_user/1"/>
+			<kv k="redirect" v="http://127.0.0.1:7450/rrman/21/erlang_att/lib/snmp-5.2.12/doc/html/snmp_user_based_sm_mib.html#delete_user-1"/>
+		</meta>
+	</page>
+</d5man>
+~~~
+
+The format is a little “complicated” for being mostly compatible with D5Man
+Legacy page files. It consists of a single `d5man` element which contains
+separate `page` elements for each page. In case of this API, each `page`
+contains exactly (and only) one `meta` element which in turn contains the
+actual metadata in form of `kv` (key-value) elements. Metadata `file`, `section`
+and `name` are expected to be always present. `tags` contains a space-separated
+list of tags obtained from `keywords` declarations in the files. In case a
+page is not expected to be opened directly, `redirect` indicates the page to
+open instead.
+
+The example XML from above shows metadata as can be generated by script
+`ial/pgen/pages_erlang.sh` for the Erlang documentation.
 
 `d5mantui`
 ==========
 
+The D5Man Terminal User Interface (TUI) is a special-purpose client for the
+D5Man API. It displays query results interactively in the terminal while
+typing the query.
+
+## Configuration
+
+D5Man TUI can be configured by providing a suitable XML property file. In the
+XML format, the default configuration looks as follows:
+
+~~~{.xml}
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+	<entry key="d5man.ui.command.editor">vim</entry>
+	<entry key="d5man.ui.command.browser">firefox</entry>
+	<entry key="d5man.ui.newpage.root">/data/main/man/rr</entry>
+	<entry key="d5man.api.url">http://127.0.0.1:7450/</entry>
+</properties>
+~~~
+
+The syntax is a subset of Java's XML properties (initially, `d5mantui` was
+intended to be a Java client).
+
+For very simple installations (where no new pages are going to be created, e.g.
+when using IAL only), the defaults may be sufficient. In other cases, the
+`d5man.ui.newpage.root` needs to be changed to point to the Document-Root
+to place newly created pages in. The other properties should be
+self-explanatory.
+
+To find the XML file, D5Man TUI looks in environment variable `$D5MAN_CONF_UI`
+and if that is absent, attempts to load file
+`$HOME/.mdvl/d5man/d5mantui_properties.xml`.
+
+## Usage
+
+The screen could e.g. look as follows:
+
+	> erlang
+	<o> 21 erlang/erl_syntax:receive_expr_action/1
+	< > 21 erlang/snmpm:which_agents/0
+	< > 21 erlang/snmpm_mpd:generate_msg/5
+	< > 21 erlang/common_test:Module:suite/0
+	< > 21 erlang/wxListCtrl:setItemData/3
+	< > 21 erlang/sys:remove/2
+	< > 21 erlang/snmpa_conf:append_target_params_config/2
+	< > 21 erlang/leex:tokens/3
+	< > 21 erlang/wxStyledTextCtrl:startStyling/3
+	< > 21 erlang/snmpa_network_interface:get_log_type/1
+	< > 21 erlang/wxLocale:getString/5
+	< > 21 erlang/sys:replace_state/2
+	< > 21 erlang/gl:clear/1
+	< > 21 erlang/wxPopupTransientWindow:destroy/1
+	< > 21 erlang/unicode:characters_to_nfkd_list/1
+	< > 21 erlang/gl:map2d/10
+	< > 21 erlang/gl:getProgramInfoLog/2
+	< > 21 erlang/io:parse_erl_form/3
+	< > 21 erlang/snmpa_error_io:config_err/2
+	< > 21 erlang/wxStyledTextCtrl:wordPartLeft/1
+	< > 21 erlang/erlang:fun_info/2
+	< > 21 erlang/gl:getHandleARB/1
+		2 New                                                           0 Exit
+
+The first line is a prompt where the user can enter any query that will be sent
+to D5Man API. The list below displays the search results and can be scrolled
+with [UP] and [DOWN] arrows on the keyboard. Upon pressing [ENTER], the selected
+page is opened.
+
+All commandline arguments to `d5manqtui` are treated as an input for the
+prompt. If the initial query (as given on the commandline) yields exactly one
+result, the TUI will not be displayed and the respective page will be opened
+directly.
+
+Additionally, one can press [F2] to create a new page. To do this, the input
+at the prompt needs to be in format `SECTION NAME` i.e. the new page's section
+followed by its name. [F2] will then copy a predefined template to a new file
+and open it in the configured editor. Note that this function only supports
+Document-Root organization for creating new files.
+
 `d5manexportpdf`
 ================
 
+## Name
+
+`d5manexportpdf` -- Script to export D5Man 2 Pandoc Markdown to PDF
+
+## Synopsis
+
+	d5manexportpdf INPUT.md
+
+## Description
+
+This invokes `pandoc` on the provided filename `INPUT.md` and writes the export
+result to `INPUT.md.pdf` (i.e. adds extension `.pdf` to the input file name).
+Note that due to hardcoded paths, this script only works if D5Man 2 is installed
+(e.g. as a Debian package).
+
+The script deliberately contains almost no logic at all.
+This allows it to be ported to other scripting languages like Windows Batch.
+Additionally, a “regular” pandoc invocation can serve as a fallback if D5Man 2
+is not available.
+
+## Example
+
+	d5manexportpdf README.md
+
+This should produce a nicely readable PDF for any instructions supplied as
+part of Ma_Sys.ma repositories.
+
+
 `d5manexporthtml`
 =================
+
+_TODO ASTAT DOCUMENT THIS_
 
 	USAGE d5manexport -o DESTDIR -i ROOT[,ROOT...] -s SECTION[,SECTION...] -u URLPREFIX [-m PDF2SVG] [-- PANDOCOPTIONS...]
 
 Information and Links (IAL)
 ===========================
 
-TODO Needs to copy resource directories
+_TODO Needs to copy resource directories_

@@ -173,14 +173,15 @@ sub invoke_tui {
 		$curses_input->focus();
 	};
 	$curses->add_callback("updateresults", sub {
-		my $results_to_proc;
+		my $results_to_proc = undef;
 		while(1) {
 			my $curr = $queue_search_results->peek();
-			return if not defined($curr);
+			last if not defined($curr);
 			$queue_search_results->dequeue();
 			$results_to_proc = $curr;
 		}
-		$displayresults->($results_to_proc);
+		$displayresults->($results_to_proc)
+						if(defined($results_to_proc));
 	});
 	$displayresults->(\@initial_results);
 	$curses->mainloop();

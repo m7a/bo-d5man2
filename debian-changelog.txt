@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.19) stable; urgency=medium
+
+  * Fix regression where query results are never updated.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Fri, 28 Feb 2020 21:15:25 +0100
+
 mdvl-d5man2 (1.0.18) stable; urgency=medium
 
   * Switch to Perl-based D5Man TUI (v3).

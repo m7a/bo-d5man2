@@ -109,8 +109,14 @@ for my $root (@roots) {
 			print $hta <<~"EOF";
 				Deny from all
 				AddType application/xhtml+xml .xhtml
+				AddType text/plain .md
 				AddCharset UTF-8 .xhtml
+				AddCharset UTF-8 .md
 				<Files *.xhtml>
+					Order deny,allow
+					Allow from all
+				</Files>
+				<Files *.md>
 					Order deny,allow
 					Allow from all
 				</Files>

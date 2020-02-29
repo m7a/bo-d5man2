@@ -492,20 +492,22 @@ invoked as follows:
 Here, `CONFIG` refers to an optional configuration file. Default values for
 the configuration can be found in `d5manapi/rel/sys.config` and are as follows:
 
-	[{d5manapi, [
-		{ip, {127, 0, 0, 1}},
-		{port, 7450},
-		{redirect_url_prefix, "http://127.0.0.1:7450/rrman/"},
-		{fs, #{
-			rrman => "/data/main/man/rr",
-			ial   => "/data/main/mdvl/rr/bo-d5man2/ial/home",
-			local => "/data/main/mdvl/rr/br-ial-local"
-		}},
-		{db_roots, [
-			"/data/main/man/rr",
-			"/data/main/mdvl/rr"
-		]}
-	]}].
+~~~{.erlang}
+[{d5manapi, [
+	{ip, {127, 0, 0, 1}},
+	{port, 7450},
+	{redirect_url_prefix, "http://127.0.0.1:7450/rrman/"},
+	{fs, #{
+		rrman => "/data/main/man/rr",
+		ial   => "/data/main/mdvl/rr/bo-d5man2/ial/home",
+		local => "/data/main/mdvl/rr/br-ial-local"
+	}},
+	{db_roots, [
+		"/data/main/man/rr",
+		"/data/main/mdvl/rr"
+	]}
+]}].
+~~~
 
 The lines with `ip`, `port` and `redirect_url_prefix` configure the server's
 address. For local usage, it is highly recommended to set `ip` to the defined
@@ -707,13 +709,74 @@ is not available.
 This should produce a nicely readable PDF for any instructions supplied as
 part of Ma_Sys.ma repositories.
 
-
 `d5manexporthtml`
 =================
 
-_TODO ASTAT DOCUMENT THIS_
+## Name
 
-	USAGE d5manexport -o DESTDIR -i ROOT[,ROOT...] -s SECTION[,SECTION...] -u URLPREFIX [-m PDF2SVG] [-- PANDOCOPTIONS...]
+`d5manexporthtml` -- Export D5Man 2 roots to multiple XHTML pages
+
+## Synopsis
+
+	d5manexportpdf -o DESTDIR -i ROOT[,ROOT...] [-s SECTION[,SECTION...]] [-m PDF2SVG] [-u URLPREFIX] [-- PANDOCOPTIONS...]
+
+## Description
+
+D5Man 2's HTML export exports a selection of sections from (optionally multiple)
+root directories to a given output directory structure. The output structure
+resembles a Document-Root structure independently of whether the given `ROOT`
+directories are Document-Root or Program-Root organized.
+
+In addition to the exported XHTML pages, a `sitemap.xml` and `.htaccess` files
+are generated to allow hosting the result structure online. PDF attachments are
+automatically converted to SVG.
+
+## Options
+
+`-o DESTDIR`
+:   Configures the output directory to be `DESTDIR`
+`-i ROOT[,ROOT...]`
+:   Configures a comma-separated list of input directories.
+    (As a result, it is currently impossible to process directories which
+    contain comma as part of their name)
+`-s SECTION[,SECTION...]`
+:   Specifies a list of sections to export.
+    If this is not given, the default value of 11,31,32,33,34,37,38,39 will
+    be used.
+`-m PDF2SVG`
+:   Specifies the path to a `pdf2svg` executable. On Debian systems, package
+    `pdf2svg` can be installed and then the default `/usr/bin/pdf2svg` will
+    be sufficient. In other cases, it might be necessary to create an auxiliary
+    script that invokes Inkscape or another tool capable of converting PDF to
+    SVG. The `pdf2svg` is expected to take the input PDF file as its first
+    parameter and the output SVG file as its second parameter.
+`-u URLPREFIX`
+:   Defines a prefix to be used for sitemap generation. By default, it is set
+    to `&masysma_url_prefix;` which will most likely _not work_. In case the
+    generated sitemap is of interest, this parameter needs to be given and
+    have an URL value. The Ma_Sys.ma Website uses
+    `-u https://masysma.lima-city.de`, for instance.
+`-- PANDOCOPTIONS...`
+:   After the double dashes, an arbitrary number of pandoc options can be
+    given which are passed directly to the `pandoc` command. Most users will
+    want to specify a `--template=...` here in order to obtain a nicely
+    formatted page up to their liking.
+
+## Ma_Sys.ma Variables
+
+Using this script, the invocation of `pandoc` is passed the following additional
+variables:
+
+`x-masysma-source`
+:   Set to the Markdown source code file name for the current page.
+`x-masysma-meta-revised`
+:   Set to the pages last modification in UTC (`Y-m-d H:i:s`)
+`x-masysma-revised-human`
+:   Set to the pages last modification in local timezone (`Y/m/d H:i:s`)
+
+## Examples
+
+_TODO provide a neutral example template and invocation_
 
 Information and Links (IAL)
 ===========================

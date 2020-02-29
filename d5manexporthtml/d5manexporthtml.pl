@@ -31,8 +31,8 @@ sub VERSION_MESSAGE {
 
 sub HELP_MESSAGE {
 	print "\nUSAGE d5manexporthtml -o DESTDIR -i ROOT[,ROOT...] ".
-			"-s SECTION[,SECTION...] -u URLPREFIX [-m PDF2SVG] ".
-			"[-- PANDOCOPTIONS...]\n";
+			"[-s SECTION[,SECTION...]] [-u URLPREFIX] ".
+			"[-m PDF2SVG] [-- PANDOCOPTIONS...]\n";
 }
 
 # -- read arguments --
@@ -135,7 +135,7 @@ for my $root (@roots) {
 			"-s",
 			"-t", "html4",
 			"--default-image-extension=svg",
-			"-V", "x-masysma-source=$secdestdir/$namepart.md",
+			"-V", "x-masysma-source=$namepart.md",
 			"-V", "x-masysma-meta-revised=$date_meta",
 			"-V", "x-masysma-revised-human=$date_ger",
 			"-f", "markdown+compact_definition_lists+".

@@ -52,7 +52,7 @@ function ial15_fixed_content_query(element) {
 		if(req.readyState === 4)
 			ial15_set_links(element, req.responseXML, false);
 	}
-	req.open("GET", "/query/21%20" + element.getAttribute("id"));
+	req.open("GET", "/query/" + element.getAttribute("id"));
 	req.send();
 }
 

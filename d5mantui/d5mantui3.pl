@@ -185,12 +185,8 @@ sub invoke_tui {
 	});
 	$displayresults->(\@initial_results);
 	$curses->mainloop();
-	# TODO z bad hack
 	# We need to clear the TUI s.t. the terminal will not be messed up.
-	# Problem is: If calling exec, the destructor is never called (?) and
-	# the terminal remains messed up after vim or firefox return. Thus,
-	# call the destructor early (bad practice) to clean terminal state...
-	$curses->DESTROY();
+	$curses->leave_curses();
 	return $result;
 }
 

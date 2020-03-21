@@ -168,11 +168,12 @@ for my $root (@roots) {
 			File::Copy::Recursive::dircopy($attachments,
 								$attachdest);
 			# -- convert pdfs without associated svg --
-			while(glob("'$secdestdir/*.pdf'")) {
+			while(glob("'$attachdest/*.pdf'")) {
 				my $attf = $_;
-				my $attnam = File::Basename::basename($attf,
-								qr"\..[^.]*$");
-				my $attsvg = "$secdestdir/$attnam.svg";
+				my ($attnam, $_path, $_suffix) =
+						File::Basename::fileparse($attf,
+								qr".[^.]+$");
+				my $attsvg = "$attachdest/$attnam.svg";
 				next if (-f $attsvg);
 				system($pdf2svg, $attf, $attsvg);
 			}

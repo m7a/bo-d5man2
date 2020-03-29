@@ -72,7 +72,49 @@ A third option is _detached_, that is a directory unknown to the D5Man programs
 which contains one or more pages. Such files are not found by the D5Man API
 Server but can still be converted to PDF.
 
-_TODO ADD SOME EXAMPLES_
+### Example for a Document-Root Structure: IAL
+
+	/rr
+	 |
+	 +-- 21/
+	 |    |
+	 |    +-- ada_att/
+	 |    |    |
+	 |    |    +-- ...
+	 |    |
+	 |    +-- ant_att/
+	 |    |    |
+	 |    |    +-- ...
+	 |    |
+	 |    +-- ada.yml
+	 |    |
+	 |    +-- ant.yml
+	 |    |
+	 |    +-- ...
+	 |
+	 +-- ...
+
+### Example for a Program-Root Structure: Ma_Sys.ma Repositories
+
+	/rr
+	 |
+	 +-- bo-adler32/
+	 |    |
+	 |    +-- README.md
+	 |    |
+	 |    +-- ...
+	 |
+	 +-- bo-big/
+	 |    |
+	 |    +-- big4_att/
+	 |    |    |
+	 |    |    +-- screenshot3.png
+	 |    |
+	 |    +-- README.md
+	 |    |
+	 |    +-- ...
+	 |
+	 +-- ...
 
 ## Concept
 
@@ -138,7 +180,28 @@ the functionality provided by _Information and Links_. The following lists
 some alternative softwares to cover individual aspects of D5Man. There does not
 seem to be a comprehensive substitute with all the benefits, though.
 
-_TODO PROVIDE A LIST OF ALTERNATIVE SOFTWARE WHICH SERVES SIMILAR PURPOSES_
+### Local Wikis
+
+ * Dedicated wiki: [DokiWiki](https://www.dokuwiki.org/dokuwiki)
+ * [Fossil SCM](https://www.fossil-scm.org/home/doc/trunk/www/index.wiki)
+   integrates a Wiki and Issue Tracker storing all data in an SQLite database.
+ * [EMACS Org-Mode](https://orgmode.org/)
+ * Using VIM as a personal notekeeping application or Wiki:
+    * with help files:
+      <https://vim.fandom.com/wiki/Add_your_note_files_to_Vim_help>,
+      <https://vim.fandom.com/wiki/Keep_a_to-do_memo_file_with_links_as_in_Vim_help>
+    * with vimwiki: <https://github.com/vimwiki/vimwiki>,
+      <https://github.com/lervag/wiki.vim>
+    * <https://github.com/tomtom/vikibase_vim>
+
+### Static website generation with Markdown
+
+Close-to-comprehensive list: <https://www.staticgen.com/>, some candiates:
+[Hugo](https://gohugo.io/), [Jekyll](https://jekyllrb.com/)
+
+### Offline Documentation Management (IAL Alternative)
+
+<https://zealdocs.org/>
 
 D5Man Format 2
 ==============
@@ -718,7 +781,7 @@ part of Ma_Sys.ma repositories.
 
 ## Synopsis
 
-	d5manexportpdf -o DESTDIR -i ROOT[,ROOT...] [-s SECTION[,SECTION...]] [-m PDF2SVG] [-u URLPREFIX] [-- PANDOCOPTIONS...]
+	d5manexporthtml -o DESTDIR -i ROOT[,ROOT...] [-s SECTION[,SECTION...]] [-m PDF2SVG] [-u URLPREFIX] [-- PANDOCOPTIONS...]
 
 ## Description
 
@@ -776,7 +839,47 @@ variables:
 
 ## Examples
 
-_TODO provide a neutral example template and invocation_
+As an example, consider downloading some of the Ma_Sys.ma Repositories into
+a common directory tree to obtain a structure as shown above in section
+_Example for a Program-Root Structure: Ma_Sys.ma Repositories_.
+
+Then, you could create an XHTML export of their contents as follows:
+
+	$ mkdir /tmp/test
+	$ d5manexporthtml -o /tmp/test -i /rr
+
+Below the output directory `/tmp/test`, this will create a document-root
+structure of output files like this:
+
+	/tmp/test
+	 |
+	 +-- 11/
+	 |    |
+	 |    +-- maloadmon_att/
+	 |    |    |
+	 |    |    +-- ...
+	 |    |
+	 |    +-- ...
+	 |
+	 +-- 32/
+	 |    |
+	 |    +-- d5man2.md
+	 |    |
+	 |    +-- d5man2.xhtml
+	 |    |
+	 |    +-- ...
+	 |
+	 +-- ...
+
+Opening `d5man2.xhtml` one can see the XHTML representation of this very page,
+it might look as follows:
+
+![Excerpt from exporting this very page to XHTML (beginning of the page
+shown)](d5man2_att/exportpreview)
+
+Without further options, exporting uses the template supplied with pandoc.
+If you want to use this for your own purposes, it makes sense to derive an own
+template for customization.
 
 Information and Links (IAL)
 ===========================

@@ -893,7 +893,7 @@ large) pieces of documentation offline. For this purpose, IAL 1.5 integrates
 with D5Man 2 by providing a _web interface_ and a set of _scripts_ contained
 in the following directory structure in the repository:
 
-`ial/pgen (scripts)
+`ial/pgen` (scripts)
 :   Provides scripts to prepare existing pieces of documentation for use with
     IAL.
 

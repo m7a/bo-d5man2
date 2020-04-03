@@ -504,7 +504,11 @@ a single non-breaking space can be entered in VIM by pressing
 [CTRL]-[K] [SPACE] [SPACE]. Similarly, a forced half-space can be entered by
 using the sequence [CTRL]-[V] [U] [2] [0] [2] [F].
 
-_TODO ARROWS_
+Arrows are best inserted by using their UTF-8 symbols. The paragraph below
+shows a few examples, see <http://xahlee.info/comp/unicode_arrows.html> for
+a more comprehensive treatise.
+
+Arrows: ← → ↑ ↓ ⇐ ⇒ ⇔
 
 ## Images
 
@@ -884,4 +888,43 @@ template for customization.
 Information and Links (IAL)
 ===========================
 
-_TODO Needs to copy resource directories_
+_Information and Links_ provides a system for storing and using (potentially
+large) pieces of documentation offline. For this purpose, IAL 1.5 integrates
+with D5Man 2 by providing a _web interface_ and a set of _scripts_ contained
+in the following directory structure in the repository:
+
+`ial/pgen (scripts)
+:   Provides scripts to prepare existing pieces of documentation for use with
+    IAL.
+
+`ial/home` (web interface)
+:   Contains a “template” to use as a web interface to IAL.
+    The implementation is mostly contained in JavaScript file `ial15.js` with
+    the remainder of the files serving as a GUI skeleton.
+
+Assumptions
+:   By default, IAL assumes that all pages to be considered for IAL are in
+    sections 21 (for automatically generated pages) and 22 (for hand-crafted
+    pages) respectively.
+
+## Scripts
+
+The scripts provided as part of the repository require the `co-maartifact`
+repository for [maartifact(11)](../11/maartifact.xhtml) to be present next to
+`bo-d5man2`.
+
+Invoking the individual `pages_...sh` scripts then creates directories with
+files suitable for copying into an appropriate document-root D5Man 2 structure.
+Each script may have additional requirements/features which are documented at
+the beginning of its source code.
+
+## Web Interface
+
+Assumptions
+:   The web interface assumes that all IAL pages contain a `x-masysma-redirect`
+    field to identify the HTML page or website to open. This makes webbrowser
+    integration easy at the expense of not allowing “regular” D5Man 2 pages to
+    be visible in the web interface.
+
+_TODO Provide an example screen and usage howto, explain how API serves the pages_
+_TODO Provide a script to copy/update resource directories_

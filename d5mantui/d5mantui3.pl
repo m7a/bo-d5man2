@@ -216,6 +216,7 @@ if($search_result->{section} eq -2) {
 	mkdir($dir) if(not -d $dir);
 	open(my $fd, ">:encoding(UTF-8)", $path);
 	print $fd <<~EOF;
+		---
 		section: $section
 		x-masysma-name: $name
 		title: Template Page Title

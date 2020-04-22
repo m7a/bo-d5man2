@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.22) stable; urgency=medium
+
+  * Remove teubner because it cannot be loaded at the place given.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Wed, 22 Apr 2020 21:31:34 +0200
+
 mdvl-d5man2 (1.0.21) stable; urgency=medium
 
   * Make use of teubner package (experimental).

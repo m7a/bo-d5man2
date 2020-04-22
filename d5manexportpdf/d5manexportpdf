@@ -27,6 +27,7 @@ exec pandoc \
 	-V documentclass=scrartcl \
 	-V fontfamily=kpfonts \
 	-V babel-otherlangs=greek \
+	-V babel-newcommands=\\usepackage{teubner} \
 	-V toc-depth=1 \
 	-V x-masysma-logo=/usr/share/mdvl-d5man2/tplpdf/logo_v2 \
 	-V x-masysma-icon=/usr/share/mdvl-d5man2/tplpdf/masysmaicon \

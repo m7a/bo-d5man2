@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.23) stable; urgency=medium
+
+  * Implement using teubner using babel-otherlangs and babel-newcommands s.t.
+    the template continues to work with just two customizations.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Wed, 22 Apr 2020 21:47:08 +0200
+
 mdvl-d5man2 (1.0.22) stable; urgency=medium
 
   * Remove teubner because it cannot be loaded at the place given.

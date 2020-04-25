@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.24) stable; urgency=medium
+
+  * Add package pdfpages to allow including PDFs as whole pages.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Sat, 25 Apr 2020 20:03:50 +0200
+
 mdvl-d5man2 (1.0.23) stable; urgency=medium
 
   * Implement using teubner using babel-otherlangs and babel-newcommands s.t.

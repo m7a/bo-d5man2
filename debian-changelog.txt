@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.25) stable; urgency=medium
+
+  * Add package mathtools to allow advanced formula input.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Mon, 27 Apr 2020 13:45:45 +0200
+
 mdvl-d5man2 (1.0.24) stable; urgency=medium
 
   * Add package pdfpages to allow including PDFs as whole pages.

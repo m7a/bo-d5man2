@@ -1,11 +1,19 @@
 " Vim syntax file
 " Language:	Markdown
 " Maintainer:	Linux-Fan <Ma_Sys.ma@web.de>
-" LastChange:	2020/01
-" Version:      2.0.0
+" LastChange:	2020/05
+" Version:      2.0.1
 "
 
 syntax clear
+
+" General
+" =======
+
+" Potential Bad Characters in TeX commands
+" Happens when you are typing \epsilon too quickly...
+hi D5ManInvalid ctermbg=DarkRed
+syn match D5ManInvalid "\\[æ“¢ð€đŋħþſŧł„“]"
 
 " Inline Formatting
 " =================
@@ -22,7 +30,7 @@ syn region D5ManBold start="\(^\|[^A-Za-z_]\)\zs\*\*" end="\*\*\ze\([^A-Za-z_]\|
 
 " Contained TeX markup $...$
 hi D5ManTex ctermfg=LightBlue
-syn region D5ManTex start="\$" end="\$" skip="\\\$"
+syn region D5ManTex start="\$" end="\$" skip="\\\$" contains=D5ManInvalid
 
 " Links
 hi D5ManLink ctermfg=DarkGreen

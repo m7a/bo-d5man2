@@ -776,6 +776,16 @@ is not available.
 This should produce a nicely readable PDF for any instructions supplied as
 part of Ma_Sys.ma repositories.
 
+## Troubleshooting export issues
+
+If the export fails during the invocation of `pdflatex`, it will most likely
+generate a meaningless error message. Here is a regex for finding unicode
+chars which might not be supported:
+
+	/[^\x00-\x7F]
+
+Source: <https://stackoverflow.com/questions/16987362/how-to-get-vim-to-highlight-non-ascii-characters>
+
 `d5manexporthtml`
 =================
 

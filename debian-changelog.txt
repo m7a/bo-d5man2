@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.26) stable; urgency=medium
+
+  * Improve syntax highlighting and documentation wrt. bad characters
+    causing PDF export to fail.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Fri, 15 May 2020 10:19:27 +0200
+
 mdvl-d5man2 (1.0.25) stable; urgency=medium
 
   * Add package mathtools to allow advanced formula input.

@@ -1,3 +1,11 @@
+mdvl-d5man2 (1.0.30) stable; urgency=medium
+
+  * Fix d3ff89b88fd6586af1dac7c8b6688dbb1d22fc88 (215):
+    d5mantui no longer crashes upon pressing enter while suggestion list
+    is empty.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Fri, 07 Aug 2020 22:40:59 +0200
+
 mdvl-d5man2 (1.0.29) stable; urgency=medium
 
   * Fix d6031834a4db16d6c157af0e1086c39fd154ed10 (216):

@@ -16,6 +16,8 @@ require DateTime;               # libdatetime-perl
 require File::HomeDir;          # libfile-homedir-perl
 require Thread::Queue;          # (perl-modules-5.24)
 
+use Data::Dumper;
+
 #---------------------------------------------------------------------[ Conf ]--
 my $command_editor  = "vim";
 my $command_browser = "firefox";
@@ -134,9 +136,11 @@ sub invoke_tui {
 	$curses_input->set_binding(sub {
 		# enter press (open existing)
 		my @items = $curses_listbox->get();
-		$result = $page_metadata->{$items[0]} if $#items >= 0 and
-					defined($page_metadata->{$items[0]});
-		$curses->mainloopExit();
+		if($#items >= 0 and defined($items[0]) and
+					defined($page_metadata->{$items[0]})) {
+			$result = $page_metadata->{$items[0]};
+			$curses->mainloopExit();
+		}
 	}, Curses::UI::TextEditor::KEY_ENTER());
 	$curses_input->set_binding(sub {
 		# up (go upwards, select)

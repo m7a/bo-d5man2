@@ -11,6 +11,7 @@
 init([URLPrefix, RootList]) ->
 	% id := page(section)
 	io:fwrite("[INFO ] Reading DB...~n"),
+	T0 = erlang:monotonic_time(millisecond),
 	ets:new(page_metadata,  [set, named_table]), % id -> #page
 	ets:new(index_names,    [bag, named_table]), % name -> idlist
 	lists:foreach(fun(Root) ->
@@ -20,17 +21,21 @@ init([URLPrefix, RootList]) ->
 						atom_to_list(Emsg), "~n"]);
 		{ok, Entries} ->
 			Dirs = lists:filter(fun(E) ->
-				filelib:is_dir([Root, "/", E])
+				% skip x- entries because they may contain
+				% incompatible README.md files...
+				filelib:is_dir([Root, "/", E]) and
+						not lists:prefix("x-", E)
 			end, Entries),
-			case lists:all(fun(Str) ->is_number(catch
+			case lists:all(fun(Str) -> is_number(catch
 					list_to_integer(Str)) end, Dirs) of
 			true  -> proc_root_d5man(URLPrefix, Root, Dirs);
 			false -> proc_root_repos(URLPrefix, Root, Dirs)
 			end
 		end
 	end, RootList),
-	% TODO z add statistics on how long it took to load the DB
-	io:fwrite("[INFO ] DB load complete~n"),
+	io:fwrite(["[INFO ] DB load completed after ", integer_to_list(
+			erlang:monotonic_time(millisecond) - T0), "ms"]),
+	io:fwrite("~n"),
 	{ok, RootList}.
 
 proc_root_d5man(URLPrefix, Root, Sections) ->
@@ -77,10 +82,9 @@ proc_document(URLPrefix, DocFile) ->
 			% (which is often null)
 			lists:droplast(DocumentList))
 	catch
-		Etype:Emsg:StackTrace ->
+		Etype:_Emsg:StackTrace ->
 			io:fwrite(["[ERROR] Failed to process ", DocFile,
-						": ", atom_to_list(Etype), ":",
-						atom_to_list(Emsg), "\n"]),
+					": ", atom_to_list(Etype), "\n"]),
 			erlang:display(StackTrace)
 	end.
 

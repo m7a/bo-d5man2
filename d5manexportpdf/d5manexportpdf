@@ -33,5 +33,6 @@ exec pandoc \
 	-V x-masysma-icon=/usr/share/mdvl-d5man2/tplpdf/masysmaicon \
 	--default-image-extension=pdf \
 	--template=/usr/share/mdvl-d5man2/tplpdf/masysma_d5man.tex \
-	-o "$1.pdf" \
+	--resource-path="$(dirname "$1")" \
+	-o "$(basename "$1").pdf" \
 	"$1"

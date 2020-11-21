@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.32) stable; urgency=medium
+
+  * Add automatic debugging capability to PDF export.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Sat, 21 Nov 2020 16:00:32 +0100
+
 mdvl-d5man2 (1.0.31) stable; urgency=medium
 
   * Fix spelling of `priority` in syntax highlight.

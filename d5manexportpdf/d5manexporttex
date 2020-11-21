@@ -1,0 +1,23 @@
+#!/bin/sh -e
+# Ma_Sys.ma D5Man 2, LaTeX export script 1.0.0, Copyright (c) 2020 Ma_Sys.ma.
+# For further info send an e-mail to Ma_Sys.ma@web.de.
+
+# This script is intended to perform manual or automated LaTeX exports for error
+# diagnosis.
+exec pandoc \
+	-t latex \
+	-f markdown+compact_definition_lists+tex_math_single_backslash+link_attributes \
+	-V papersize=a4 \
+	-V classoption=DIV10 \
+	-V fontsize=12pt \
+	-V documentclass=scrartcl \
+	-V fontfamily=kpfonts \
+	-V babel-otherlangs=greek \
+	-V babel-newcommands=\\usepackage{teubner} \
+	-V toc-depth=1 \
+	-V x-masysma-logo=/usr/share/mdvl-d5man2/tplpdf/logo_v2 \
+	-V x-masysma-icon=/usr/share/mdvl-d5man2/tplpdf/masysmaicon \
+	--default-image-extension=pdf \
+	--template=/usr/share/mdvl-d5man2/tplpdf/masysma_d5man.tex \
+	-o "$1.tex" \
+	"$1"

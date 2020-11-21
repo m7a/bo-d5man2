@@ -15,15 +15,18 @@ log="$tmpdir/export$$.txt"
 # shellcheck disable=SC2064 # Explicitly expand the variable value right now.
 trap "rm -r \"$tmpdir\" || true" INT TERM EXIT
 
-{ d5manexportpdf "$@" 2>&1 || echo FAIL; } | tee "$log"
+{ d5manexportpdf "$@" 2>&1 || echo FAIL; } | tee "$log" | \
+					sed 's/^\(.*\)$/[40;31m\1[0m/g'
 if grep -qF FAIL "$log"; then
 	echo "Export failed. Attempting error reporting..."
-	line="$(grep -qE "^l.[0-9]+" "$log" | cut -d. -f 2- | cut -d" " -f1)"
+	line="$(grep -E "^l.[0-9]+" "$log" | tail -n 1 | cut -d. -f 2- | \
+								cut -d" " -f1)"
 	echo "Line of error=$line. Running LaTeX export..."
 	cp "$1" "$tmpdir/in.md"
 	cd "$tmpdir"
 	if d5manexporttex in.md; then
 		echo LaTeX export succeeded. Analyzing result.
+		echo
 		export LC_ALL=C
 		head -n $((line + 3)) in.md.tex | tail -n 25 | \
 					sed 's/\([^ -~]\+\)/[30;45m\1[0m/g'

@@ -182,7 +182,7 @@ seem to be a comprehensive substitute with all the benefits, though.
 
 ### Local Wikis
 
- * Dedicated wiki: [DokiWiki](https://www.dokuwiki.org/dokuwiki)
+ * Dedicated wiki: [DokuWiki](https://www.dokuwiki.org/dokuwiki)
  * [Fossil SCM](https://www.fossil-scm.org/home/doc/trunk/www/index.wiki)
    integrates a Wiki and Issue Tracker storing all data in an SQLite database.
  * [EMACS Org-Mode](https://orgmode.org/)
@@ -499,7 +499,7 @@ available by [ALTGR]-[V] (`„`), [ALTGR]-[B] (`“`) and [ALTGR]-[N] (`”`).
 
 Forced spaces (aka. non-breaking spaces) can be inserted by using the respective
 unicode symbols. As described by
-[Thomas Keklak](https://coderwall.com/p/07mtla/insert-non-breaking-space-in-vim),
+[Thomas Peklak](https://coderwall.com/p/07mtla/insert-non-breaking-space-in-vim),
 a single non-breaking space can be entered in VIM by pressing
 [CTRL]-[K] [SPACE] [SPACE]. Similarly, a forced half-space can be entered by
 using the sequence [CTRL]-[V] [U] [2] [0] [2] [F].

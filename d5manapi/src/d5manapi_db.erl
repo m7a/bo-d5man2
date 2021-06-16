@@ -65,27 +65,29 @@ proc_root_repos(URLPrefix, Root, Repos) ->
 % DocFile absolute path but made of nested lists
 proc_document(URLPrefix, DocFile) ->
 	try yaml_from_pandoc_md(DocFile) of
-		DocumentList ->
-			lists:foreach(fun(DocMeta) ->
-				% for debugging:
-				%erlang:display(DocMeta),
-				Rec = document_metadata_to_record(URLPrefix,
+	DocumentList ->
+		ProcessDoc = fun(DocMeta) ->
+			Rec = document_metadata_to_record(URLPrefix,
 						#page{file=DocFile}, DocMeta),
-				Id = iolist_to_binary([Rec#page.name,
-					<<"(">>,
-					integer_to_binary(Rec#page.section),
-					<<")">>]),
-				ets:insert(page_metadata, {Id, Rec}),
-				ets:insert(index_names, {Rec#page.name, Id})
-			end,
-			% droplast: do not process document content part
-			% (which is often null)
-			lists:droplast(DocumentList))
-	catch
+			Id = iolist_to_binary([Rec#page.name, <<"(">>,
+				integer_to_binary(Rec#page.section), <<")">>]),
+			ets:insert(page_metadata, {Id, Rec}),
+			ets:insert(index_names,   {Rec#page.name, Id})
+		end,
+		% droplast: do not process document content part
+		% (which is often null)
+		try lists:foreach(ProcessDoc, lists:droplast(DocumentList))
+		catch
 		Etype:_Emsg:StackTrace ->
-			io:fwrite(["[ERROR] Failed to process ", DocFile,
-					": ", atom_to_list(Etype), "\n"]),
+			io:fwrite(["[ERROR] Failed to process ", DocFile, ": ",
+						atom_to_list(Etype), "\n"]),
 			erlang:display(StackTrace)
+		end
+	catch
+	Etype:_Emsg:StackTrace ->
+		io:fwrite(["[ERROR] Failed to process ", DocFile, ": ",
+						atom_to_list(Etype), "\n"]),
+		erlang:display(StackTrace)
 	end.
 
 % https://www.rosettacode.org/wiki/Read_a_file_line_by_line#Erlang

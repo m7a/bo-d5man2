@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.34) stable; urgency=medium
+
+  * d5manapi: Improve error reporting for (invalid) single-YAML-doc pages.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Wed, 16 Jun 2021 12:06:28 +0200
+
 mdvl-d5man2 (1.0.33) stable; urgency=medium
 
   * Improve formatting of PDF export debugging.

@@ -268,7 +268,7 @@ follows:
     name with `/` replaced by `_` and an additional `.md` suffix.
 `x-masysma-version`, `x-masysma-copyright` (optional)
 :   Specifies a version and copyright for the document (and the program it is
-    describing). Fromat and use of these fields are entirely up to the user.
+    describing). Format and use of these fields are entirely up to the user.
 `x-masysma-repository` (optional)
 :   Provides a link to the source code repository associated with the document
     and/or the software it describes.
@@ -295,7 +295,7 @@ follows:
     Default is priority=0.4, changefreq=monthly.
 `x-masysma-expires` (optional)
 :   Expiry date. Same format as `date`. The meaning of this field is up to
-    the user's interpretation interpretation.
+    the user's interpretation.
 
 ### Section Structure
 
@@ -329,8 +329,8 @@ Additionally, images which are supplied in vector formats (SVG or PDF) are
 included by their file name _without extension_. This allows the LaTeX
 export to use a PDF file and the XHTML export to use a SVG file without
 changing the source file. Finally, D5Man's XHTML export also instantiates
-a simple automatic conversion from PDF to SVG in order to avoid that redundant
-vector images need to be stored in the attachments directory.
+a simple automatic conversion from PDF to SVG in order to avoid storing
+redundant vector graphics in the attachments directory.
 
 Unlike legacy D5Man, an explicit list of all files attached is no longer needed
 to be declared in the documents themselves.
@@ -373,10 +373,10 @@ numbered lists are prefixed by the item's number followed by a dot
 `:` at the beginning of the first line of the description list's content.
 Note that for description lists, the offset from the left has to be exactly
 four characters wide (`:   ` / colon-space-space-space on the first line;
-`    ` space-space-space-space on the second line onwards). Here are
+`    ` / space-space-space-space on the second line onwards). Here are
 examples for the respective list types.
 
-~~~{.markdown}
+~~~
 Description List
 :   This is the term being described.
     This is the second line of the term being described.
@@ -847,9 +847,9 @@ variables:
 `x-masysma-source`
 :   Set to the Markdown source code file name for the current page.
 `x-masysma-meta-revised`
-:   Set to the pages last modification in UTC (`Y-m-d H:i:s`)
+:   Set to the pages last modification in UTC (`YYYY-mm-dd HH:ii:ss`)
 `x-masysma-revised-human`
-:   Set to the pages last modification in local timezone (`Y/m/d H:i:s`)
+:   Set to the pages last modification in local timezone (`YYYY/mm/dd HH:ii:ss`)
 
 ## Examples
 

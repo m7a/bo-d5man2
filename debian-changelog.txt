@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.35) stable; urgency=medium
+
+  * Rebuild against more recent erlang version.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Wed, 15 Sep 2021 22:21:02 +0200
+
 mdvl-d5man2 (1.0.34) stable; urgency=medium
 
   * d5manapi: Improve error reporting for (invalid) single-YAML-doc pages.

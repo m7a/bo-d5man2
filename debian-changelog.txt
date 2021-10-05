@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.36) stable; urgency=medium
+
+  * Replace use of scrpage2 by scrlayer-scrpage to be compatible with
+    Debian 11 Buster.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Tue, 05 Oct 2021 19:07:10 +0200
+
 mdvl-d5man2 (1.0.35) stable; urgency=medium
 
   * Rebuild against more recent erlang version.

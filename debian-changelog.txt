@@ -1,3 +1,13 @@
+mdvl-d5man2 (1.0.37) stable; urgency=medium
+
+  * Load textalpha pacakge to fix the following error:
+    ! You can't use `\spacefactor' in vertical mode.
+    \@->\spacefactor 
+                     \@m {}
+    l.289 }
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Tue, 05 Oct 2021 20:48:43 +0200
+
 mdvl-d5man2 (1.0.36) stable; urgency=medium
 
   * Replace use of scrpage2 by scrlayer-scrpage to be compatible with

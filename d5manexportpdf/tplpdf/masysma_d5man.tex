@@ -330,7 +330,7 @@ $endif$
 % from commandline
 % :   x-masysma-icon, x-masysma-loco
 %
-\usepackage{newunicodechar,rotating,semantic,bbold,scrlayer-scrpage,titlesec}
+\usepackage{newunicodechar,rotating,semantic,bbold,scrlayer-scrpage}
 \usepackage{pdfpages,mathtools,wasysym,textalpha}
 \newunicodechar{←}{$$\leftarrow$$}
 \newunicodechar{→}{$$\rightarrow$$}
@@ -373,7 +373,7 @@ $endif$
 				{\textup{\ttfamily\macurrentpagename}}
 \ofoot[\pagemark]{\pagemark}
 % reduce spacing as to be suited better for list headings
-\titlespacing\subsubsection{0pt}{8pt plus 4pt minus 4pt}{2pt plus 2pt minus 2pt}
+\RedeclareSectionCommand[afterindent=false,beforeskip=8pt,afterskip=2pt]{subsubsection}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  END MASYSMA CHANGED  %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -1,3 +1,11 @@
+mdvl-d5man2 (1.0.38) stable; urgency=medium
+
+  * Remove `titlesec` and update syntax to fix heading spacings.
+    This is the third attempt to become compatible with the new LaTeX
+    distribution from Debian 11 Buster.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Tue, 05 Oct 2021 21:00:20 +0200
+
 mdvl-d5man2 (1.0.37) stable; urgency=medium
 
   * Load textalpha pacakge to fix the following error:

@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.39) stable; urgency=medium
+
+  * Update configuration to new FS structure.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Sat, 30 Oct 2021 01:00:33 +0200
+
 mdvl-d5man2 (1.0.38) stable; urgency=medium
 
   * Remove `titlesec` and update syntax to fix heading spacings.

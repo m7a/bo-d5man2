@@ -565,13 +565,13 @@ the configuration can be found in `d5manapi/rel/sys.config` and are as follows:
 	{port, 7450},
 	{redirect_url_prefix, "http://127.0.0.1:7450/rrman/"},
 	{fs, #{
-		rrman => "/data/main/man/rr",
-		ial   => "/data/main/mdvl/rr/bo-d5man2/ial/home",
-		local => "/data/main/mdvl/rr/br-ial-local"
+		rrman => "/data/main/300t399_man_rr",
+		ial   => "/data/main/400t699_mdvl_rr/bo-d5man2/ial/home",
+		local => "/data/main/400t699_mdvl_rr/br-ial-local"
 	}},
 	{db_roots, [
-		"/data/main/man/rr",
-		"/data/main/mdvl/rr"
+		"/data/main/300t399_man_rr",
+		"/data/main/400t699_mdvl_rr"
 	]}
 ]}].
 ~~~
@@ -587,8 +587,9 @@ follows:
 `fs`
 :   Provides an association of server paths to local paths. This essentially
     makes the D5Man API server serve static files. For instance in this
-    configuration, file `/data/main/man/rr/21/ada_att/rm-0-1.html` is available
-    thorugh the server at `http://127.0.0.1:7450/rrman/21/ada_att/rm-0-1.html`.
+    configuration, file `/data/main/300t399_man_rr/21/ada_att/rm-0-1.html` is
+    available thorugh the server at
+    `http://127.0.0.1:7450/rrman/21/ada_att/rm-0-1.html`.
 `db_roots`
 :   Declares a list of directories to consult for D5Man pages. They can be
     either in _Document-Root_ or _Program-Root_ organization. All the pages
@@ -634,7 +635,7 @@ as follows:
 <d5man>
 	<page>
 		<meta>
-			<kv k="file" v="/data/main/man/rr/21/erlang.yml"/>
+			<kv k="file" v="/data/main/300t399_man_rr/21/erlang.yml"/>
 			<kv k="section" v="21"/>
 			<kv k="name" v="erlang/snmp_user_based_sm_mib:delete_user/1"/>
 			<kv k="tags" v="erlang snmp_user_based_sm_mib:delete_user/1 snmp_user_based_sm_mib delete_user/1"/>
@@ -643,7 +644,7 @@ as follows:
 	</page>
 	<page>
 		<meta>
-			<kv k="file" v="/data/main/man/rr/21/erlang.yml"/>
+			<kv k="file" v="/data/main/300t399_man_rr/21/erlang.yml"/>
 			<kv k="section" v="21"/>
 			<kv k="name" v="erlang/snmp_user_based_sm_mib:delete_user/1"/>
 			<kv k="tags" v="erlang snmp_user_based_sm_mib:delete_user/1 snmp_user_based_sm_mib delete_user/1"/>
@@ -683,7 +684,7 @@ XML format, the default configuration looks as follows:
 <properties>
 	<entry key="d5man.ui.command.editor">vim</entry>
 	<entry key="d5man.ui.command.browser">firefox</entry>
-	<entry key="d5man.ui.newpage.root">/data/main/man/rr</entry>
+	<entry key="d5man.ui.newpage.root">/data/main/300t399_man_rr</entry>
 	<entry key="d5man.api.url">http://127.0.0.1:7450/</entry>
 </properties>
 ~~~

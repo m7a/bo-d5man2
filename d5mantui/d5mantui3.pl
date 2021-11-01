@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Ma_Sys.ma D5Man Terminal UI 3, Copyright (c) 2020 Ma_Sys.ma.
+# Ma_Sys.ma D5Man Terminal UI 3.0.1, Copyright (c) 2020 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 use strict;
@@ -21,7 +21,7 @@ use Data::Dumper;
 #---------------------------------------------------------------------[ Conf ]--
 my $command_editor  = "vim";
 my $command_browser = "firefox";
-my $target_root     = "/data/main/man/rr";
+my $target_root     = "/data/main/300t399_man_rr";
 my $api_url         = "http://127.0.0.1:7450";
 
 my $haveenv = defined($ENV{D5MAN_CONF_UI});

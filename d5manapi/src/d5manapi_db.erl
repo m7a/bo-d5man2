@@ -108,10 +108,10 @@ stream_file_to_yamerl(Line, IO, Stream) ->
 		stream_file_to_yamerl(io:get_line(IO, ''), IO, StreamNew);
 	[H|_T] ->
 		% Current heuristics to terminate processing is the first line
-		% encountered beginning with an uppercase letter. Note that
-		% this heuristics is quite incomplete and might need future
+		% encountered beginning with an uppercase letter or number. Note
+		% that this heuristics is quite incomplete and might need future
 		% revision.
-		if (H >= $A) and (H =< $Z) ->
+		if ((H >= $A) and (H =< $Z)) or ((H >= $0) and (H =< $9)) ->
 			% terminate here
 			stream_file_to_yamerl(eof, IO, Stream);
 		true ->

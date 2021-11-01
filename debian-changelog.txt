@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.40) stable; urgency=medium
+
+  * Fix bug in d5manapi that caused .md files whose first heading starts with
+    a number to be processed incorrectly.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Mon, 01 Nov 2021 15:49:08 +0100
+
 mdvl-d5man2 (1.0.39) stable; urgency=medium
 
   * Update configuration to new FS structure.

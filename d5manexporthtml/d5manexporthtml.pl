@@ -146,7 +146,7 @@ for my $root (@roots) {
 			"-V", "x-masysma-revised-human=$date_ger",
 			"-f", "markdown+compact_definition_lists+".
 				"tex_math_single_backslash+link_attributes",
-			"--base-header-level=2",
+			"--shift-heading-level-by=1",
 			"--mathml",
 			"-o", "$secdestdir/$namepart.xhtml",
 		);

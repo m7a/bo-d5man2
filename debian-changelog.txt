@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.44) stable; urgency=medium
+
+  * Decrease input width again to fix wrong display in Firefox.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Mon, 20 Dec 2021 22:02:54 +0100
+
 mdvl-d5man2 (1.0.43) stable; urgency=medium
 
   * Fix wrong style after Firefox upgrade.

@@ -5,8 +5,8 @@ mkdir pages_posix
 
 MDVL_CI_PHOENIX_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 "$MDVL_CI_PHOENIX_ROOT/co-maartifact/maartifact.pl" \
-	extract ial_in_posix.tar.bz2 pages_posix \
-	https://pubs.opengroup.org/onlinepubs/9699919799/download/susv4-2018.tar.bz2
+	extract ial_in_posix.zip pages_posix \
+	https://pubs.opengroup.org/onlinepubs/9699919799/download/susv4-2018.zip
 
 mv pages_posix/* pages_posix/posix_att
 cat > pages_posix/posix.yml <<EOF

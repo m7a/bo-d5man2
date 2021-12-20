@@ -84,6 +84,7 @@ for i in 7 8 fx8 11 xz; do
 					ial_in_java_$i.deb pages_java; then
 		echo "[WARNING] Skipped java$i (non-downloadable resource)."
 		isfail=1
+		continue
 	fi
 	case "$i" in
 	(fx8)

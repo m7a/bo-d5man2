@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.43) stable; urgency=medium
+
+  * Fix wrong style after Firefox upgrade.
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Mon, 20 Dec 2021 21:59:07 +0100
+
 mdvl-d5man2 (1.0.42) stable; urgency=medium
 
   * Fix mismatches in documentation and default configuration.

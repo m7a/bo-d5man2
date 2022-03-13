@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.45) stable; urgency=medium
+
+  * Change storage location (again, probably final).
+
+ -- Linux-Fan, Ma_Sys.ma <Ma_Sys.ma@web.de>  Sun, 13 Mar 2022 16:33:34 +0100
+
 mdvl-d5man2 (1.0.44) stable; urgency=medium
 
   * Decrease input width again to fix wrong display in Firefox.

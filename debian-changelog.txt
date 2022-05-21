@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.49) stable; urgency=medium
+
+  * Add GUID field to RSS in order to fix odd behaviour in some RSS readers.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Sat, 21 May 2022 21:18:34 +0200
+
 mdvl-d5man2 (1.0.48) stable; urgency=medium
 
   * Fix corner case in RSS feed creation where htaccess would be missing.

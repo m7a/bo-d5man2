@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Ma_Sys.ma D5Man Export 2.1.2, Copyright (c) 2019, 2022 Ma_Sys.ma.
+# Ma_Sys.ma D5Man Export 2.1.3, Copyright (c) 2019, 2022 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 use strict;
@@ -347,6 +347,7 @@ if(defined($newsp_found)) {
 					title       => $metadata->{title},
 					description => $description,
 					link        => $metadata->{url_loc},
+					guid        => $metadata->{url_loc},
 					pubDate     => $pubdate,
 				);
 			}

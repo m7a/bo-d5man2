@@ -21,7 +21,7 @@ use Data::Dumper;
 #---------------------------------------------------------------------[ Conf ]--
 my $command_editor  = "vim";
 my $command_browser = "firefox";
-my $target_root     = "/data/main/300t399_man_rr";
+my $target_root     = "/data/main/119_man_rr";
 my $api_url         = "http://127.0.0.1:7450";
 
 my $haveenv = defined($ENV{D5MAN_CONF_UI});

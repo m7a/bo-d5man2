@@ -275,8 +275,8 @@ if(defined($newsp_found)) {
 		copyright   => $newsp_found->{copyright},
 		docts       => "https://www.rssboard.org/rss-specification",
 		atom        => { link => { rel => "self", href => $urlprefix.
-					"/".$newsp_found->{section}."/".
-					$newsp_found->{namepart}."_rss.xml" } }
+				"/".$newsp_found->{section}."/".
+				$newsp_found->{namepart}."_att/rss.xml" } }
 	);
 	$rss->image(
 		title => $newsp_found->{title},
@@ -350,8 +350,12 @@ if(defined($newsp_found)) {
 		}
 	}
 
-	$rss->save($newsp_found->{secdestdir}."/".$newsp_found->{namepart}.
-								"_rss.xml");
+	my $target_dir = $newsp_found->{secdestdir}."/".
+						$newsp_found->{namepart}."_att";
+	if(not -d $target_dir) {
+		mkdir($target_dir);
+	}
+	$rss->save($target_dir."/rss.xml");
 }
 
 print $stream_sitemap "</urlset>\n";

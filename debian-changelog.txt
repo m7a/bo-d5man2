@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.47) stable; urgency=medium
+
+  * Fix RSS location to allow retrieving it by htaccess.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Sat, 21 May 2022 19:15:15 +0200
+
 mdvl-d5man2 (1.0.46) stable; urgency=medium
 
   * Add RSS capability to d5manexporthtml. See source or

@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.46) stable; urgency=medium
+
+  * Add RSS capability to d5manexporthtml. See source or
+    https://masysma.lima-city.de/31/web_news.md for how to use this.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Sat, 21 May 2022 19:08:56 +0200
+
 mdvl-d5man2 (1.0.45) stable; urgency=medium
 
   * Change storage location (again, probably final).

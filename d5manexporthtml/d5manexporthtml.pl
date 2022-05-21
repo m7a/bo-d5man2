@@ -1,19 +1,22 @@
 #!/usr/bin/perl
-# Ma_Sys.ma D5Man Export 2.0.0, Copyright (c) 2019 Ma_Sys.ma.
+# Ma_Sys.ma D5Man Export 2.1.1, Copyright (c) 2019, 2022 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 use strict;
 use warnings FATAL => 'all';
 use autodie;
 
-use File::stat; # switch stat's array to name-accessable structure.
+use File::stat;                     # switch stat's array to key-value hash
 require File::Basename;
-require YAML::Tiny; # libyaml-tiny-perl
+require YAML::Tiny;                 # libyaml-tiny-perl
 require Getopt::Std;
 require File::Path;
 require File::Copy;
-require File::Copy::Recursive; # libfile-copy-recursive-perl
-#use Data::Dumper 'Dumper'; # debug only
+require File::Copy::Recursive;      # libfile-copy-recursive-perl
+require XML::RSS;                   # libxml-rss-perl
+require DateTime::Format::Strptime; # libdatetime-format-strptime-perl
+
+use Data::Dumper 'Dumper'; # debug only
 
 # -- getopt conf --
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
@@ -32,12 +35,12 @@ sub VERSION_MESSAGE {
 sub HELP_MESSAGE {
 	print "\nUSAGE d5manexporthtml -o DESTDIR -i ROOT[,ROOT...] ".
 			"[-s SECTION[,SECTION...]] [-u URLPREFIX] ".
-			"[-m PDF2SVG] [-- PANDOCOPTIONS...]\n";
+			"[-n NEWSP] [-m PDF2SVG] [-- PANDOCOPTIONS...]\n";
 }
 
 # -- read arguments --
 my %options;
-Getopt::Std::getopts("o:i:s:u:m:", \%options);
+Getopt::Std::getopts("o:i:s:u:n:m:", \%options);
 
 if(not exists $options{o}) {
 	print STDERR "Argument -o is required and needs to specify DESTDIR.\n";
@@ -79,6 +82,10 @@ for my $section (@exportsections) {
 }
 
 # -- process roots --
+my %all_page_metadata;
+my $look_for_newsp = (exists $options{n});
+my $newsp_found = undef;
+
 for my $root (@roots) {
 	while(glob("'$root/??/*.md' '$root/?[po]-*/README.md'")) {
 		my $filepath = $_;
@@ -91,17 +98,36 @@ for my $root (@roots) {
 			last if(($line =~ /^---/) and ($#yaml_lines ge 0));
 			push @yaml_lines, $line;
 		}
-		close $fh;
 		my $yaml = YAML::Tiny::Load(join "", @yaml_lines);
 
 		my $mtime = stat($filepath)->mtime;
 		my $section = $yaml->{section};
 		my $namepart = $yaml->{"x-masysma-name"};
+		my $namestr = "$namepart($section)";
 		$namepart =~ tr/\//_/;
+		my $secdestdir = $destdir."/".$section;
+
+		# if its the news page, process it.
+		if($look_for_newsp and $options{n} eq $namestr) {
+			my @content_lines = <$fh>;
+			$newsp_found = {
+				section    => $section,
+				namepart   => $namepart,
+				secdestdir => $secdestdir,
+				lines      => [@content_lines],
+				title      => $yaml->{title},
+				lang       => $yaml->{lang},
+				copyright  => $yaml->{"x-masysma-copyright"},
+				image      => $yaml->{"x-masysma-news-image"},
+				url => "$urlprefix/$section/$namepart.xhtml",
+			};
+		}
+
+		close $fh;
+
 		next if not exists $exportmap{$section};
 
 		# -- establish output directory --
-		my $secdestdir = $destdir."/".$section;
 		if(not -d $secdestdir) {
 			mkdir($secdestdir);
 			open my $hta, '>:encoding(UTF-8)', $secdestdir.
@@ -199,15 +225,133 @@ for my $root (@roots) {
 		my $web_changefreq =
 				defined($yaml->{"x-masysma-web-changefreq"})?
 				$yaml->{"x-masysma-web-changefreq"}: "monthly";
+		my $url_loc = "$urlprefix/$section/$namepart.xhtml";
 		print $stream_sitemap <<~"EOF";
 			<url>
-			<loc>$urlprefix/$section/$namepart.xhtml</loc>
-			<lastmod>$date_fmt</lastmod>
-			<priority>$web_priority</priority>
-			<changefreq>$web_changefreq</changefreq>
+				<loc>$url_loc</loc>
+				<lastmod>$date_fmt</lastmod>
+				<priority>$web_priority</priority>
+				<changefreq>$web_changefreq</changefreq>
 			</url>
 			EOF
+
+		# -- append to metadata --
+		$all_page_metadata{$namestr} = {
+			section => $section,
+			author  => $yaml->{author},
+			title   => $yaml->{title},
+			lang    => $yaml->{lang},
+			url_loc => $url_loc,
+			skip    => defined($yaml->{"x-masysma-news-skip"}),
+		};
 	}
+}
+
+sub htmlspecialchars {
+	my $str = shift;
+	$str =~ s/&/&amp;/g; 
+	$str =~ s/"/&quot;/g; 
+	$str =~ s/'/&apos;/g; 
+	$str =~ s/</&lt;/g; 
+	$str =~ s/>/&gt;/g; 
+	return $str;
+}
+
+# -- process news page --
+if(defined($newsp_found)) {
+	my $current_item = undef;
+	my $current_content = "";
+
+	my $rss = XML::RSS->new(version => "2.0");
+	$rss->add_module(
+		prefix => "atom",
+		uri    => "http://www.w3.org/2005/Atom"
+	);
+	$rss->channel(
+		title       => $newsp_found->{title},
+		description => $newsp_found->{title},
+		link        => $newsp_found->{url},
+		language    => $newsp_found->{lang},
+		copyright   => $newsp_found->{copyright},
+		docts       => "https://www.rssboard.org/rss-specification",
+		atom        => { link => { rel => "self", href => $urlprefix.
+					"/".$newsp_found->{section}."/".
+					$newsp_found->{namepart}."_rss.xml" } }
+	);
+	$rss->image(
+		title => $newsp_found->{title},
+		url   => $newsp_found->{image},
+		link  => $newsp_found->{url},
+	);
+
+	for my $line (@{$newsp_found->{lines}}) {
+		my $has_item = defined($current_item);
+		my $proc_item = undef;
+
+		if($line =~ /^[0-9]{2}\.[0-9]{2}\.[0-9]{4} [0-9]{2}:[0-9]{2}:[0-9]{2}/) {
+			$proc_item = $current_item;
+			chomp($line);
+			$current_item = $line;
+		} elsif($line =~ /^:?\s+([^\s].*)$/ and
+						defined($current_item)) {
+			$current_content .= $1." ";
+		} elsif($has_item) {
+			$proc_item = $current_item;
+			$current_item = undef;
+		}
+
+		if(defined($proc_item)) {
+			my @mentioned_pages = $current_content =~
+					/\[([a-z0-9\.\/_-]+\([0-9]+\))\]/g;
+			for my $page (@mentioned_pages) {
+				my $metadata = $all_page_metadata{$page};
+				next if($metadata->{skip});
+
+				# Now this is the entry to process.
+				my @author_if_def = ();
+				if(defined($metadata->{author})) {
+					my $author = join(", ",
+							$metadata->{author});
+					$author =~ s/(^\["|"\]$)//g;
+					@author_if_def = (author => $author);
+				}
+				# remove inner links as we link this via RSS
+				$current_content =~ s/\[([a-z0-9\.\/_-]+\([0-9]+\))\]\([^\s]+\)/$1/g;
+				my $pubdate = DateTime::Format::Strptime->new(
+					pattern   => "%d.%m.%Y %H:%M:%S",
+					time_zone => "local"
+				)->parse_datetime($proc_item);
+				$pubdate->set_time_zone("UTC");
+				# Cannot directly pass the object. Although it
+				# is supported, it produces the wrong date
+				# format for FSS2.0. If this is fixed upstream,
+				# it should be possible to delete this
+				# statement.
+				$pubdate = $pubdate->strftime(
+						"%a, %d %b %Y %H:%M:%S %z");
+				# XML::RSS already does htmlentities _once_, but
+				# we actually need to do it _twice_ because the
+				# CDATA content of the element is interpreted
+				# as HTML and this makes some of our notation
+				# in text content invalid. E.g. if an item
+				# has description = "See <https://example.com>"
+				# then it needs to encode to
+				# "See &amp;lt;https://example.gom&amp;gt;"
+				my $description =
+					htmlspecialchars($current_content);
+				$rss->add_item(
+					title       => $metadata->{title},
+					description => $description,
+					link        => $metadata->{url_loc},
+					pubDate     => $pubdate,
+				);
+			}
+			$current_content = "";
+		}
+	}
+
+	$rss->save($newsp_found->{secdestdir}."/".$newsp_found->{namepart}.
+								"_rss.xml");
 }
 
 print $stream_sitemap "</urlset>\n";

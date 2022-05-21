@@ -6,10 +6,12 @@
 <property name="mdpc.section" value="misc"/>
 <property name="mdpc.descrs"  value="D5Man 2"/>
 <property name="mdpc.arch"    value="all"/>
+<!-- bdep devscripts, erlang, ant, pkg-config-dev ? -->
 <property name="mdpc.depends">erlang-base, libyaml-tiny-perl,
 	libfile-copy-recursive-perl, librest-client-perl, liburi-encode-perl,
 	libxml-dom-perl, libcurses-ui-perl, libdatetime-perl,
-	libfile-homedir-perl</property>
+	libfile-homedir-perl, libxml-rss-perl,
+	libdatetime-format-strptime-perl</property>
 <property name="mdpc.descrl">
  Ma_Sys.ma D5Man is a locally run knowledge base consisting of:
  d5manapi        -- a server to provide metadata access

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Ma_Sys.ma D5Man Export 2.1.1, Copyright (c) 2019, 2022 Ma_Sys.ma.
+# Ma_Sys.ma D5Man Export 2.1.2, Copyright (c) 2019, 2022 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 use strict;
@@ -79,6 +79,19 @@ print $stream_sitemap <<~"EOF";
 # -- delete data from last export --
 for my $section (@exportsections) {
 	File::Path::remove_tree("$destdir/$section") if(-d "$destdir/$section");
+}
+
+sub create_attachment_htaccess {
+	my $attachdest = shift;
+	open my $hta, '>:encoding(UTF-8)', $attachdest."/.htaccess";
+	print $hta <<~"EOF";
+		Deny from all
+		<Files *>
+			Order deny,allow
+			Allow from all
+		</Files>
+		EOF
+	close $hta;
 }
 
 # -- process roots --
@@ -205,16 +218,7 @@ for my $root (@roots) {
 			}
 
 			# -- add htaccess allow --
-			open my $hta, '>:encoding(UTF-8)', $attachdest.
-								"/.htaccess";
-			print $hta <<~"EOF";
-				Deny from all
-				<Files *>
-					Order deny,allow
-					Allow from all
-				</Files>
-				EOF
-			close $hta;
+			create_attachment_htaccess($attachdest);
 		}
 
 		# -- append to sitemap --
@@ -354,6 +358,7 @@ if(defined($newsp_found)) {
 						$newsp_found->{namepart}."_att";
 	if(not -d $target_dir) {
 		mkdir($target_dir);
+		create_attachment_htaccess($target_dir);
 	}
 	$rss->save($target_dir."/rss.xml");
 }

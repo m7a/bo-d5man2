@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.48) stable; urgency=medium
+
+  * Fix corner case in RSS feed creation where htaccess would be missing.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Sat, 21 May 2022 19:29:33 +0200
+
 mdvl-d5man2 (1.0.47) stable; urgency=medium
 
   * Fix RSS location to allow retrieving it by htaccess.

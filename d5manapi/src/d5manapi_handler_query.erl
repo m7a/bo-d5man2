@@ -13,32 +13,46 @@ allowed_methods(Req, State) ->
 content_types_provided(Req, State) ->
 	{[
 		{{<<"application">>, <<"xml">>, []}, query_xml}
-		%{{<<"text">>, <<"plain">>,      []}, ls_text_plain}
 	], Req, State}.
 
 query_xml(Req, Opts) ->
 	Limit = binary_to_integer(cowboy_req:header(<<"x-masysma-limit">>, Req,
 								<<"100">>)),
-	{[<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<d5man>\n">>,
-	lists:map(fun(Page) ->
+	QueryResult = gen_server:call(d5manapi_db, {query, Limit,
+			lists:join(<<"/">>, cowboy_req:path_info(Req)),
+			cowboy_req:parse_qs(Req)}),
+	{InnerXML, ReturnCode} = process_query_result(QueryResult),
+	Response = [<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<d5man>\n">>,
+			InnerXML, <<"</d5man>\n">>],
+	% In theory, we could return the body right here. But there does not
+	% seem to be a way to set status code 404 (not found) and also return
+	% formatted output?
+	{stop, cowboy_req:reply(ReturnCode, #{}, Response, Req), Opts}.
+
+process_query_result(QueryResult) ->
+	case QueryResult of
+	{error, Error} ->
+		{[<<"\t<error>">>, quote_xml(Error), <<"</error>\n">>], 404};
+	List -> {lists:map(fun(Page) ->
 			[<<"\t<page>\n\t\t<meta>\n">>,
-			 getkv("file", Page#page.file),
-			 case Page#page.section of
-				0 -> <<>>;
-				Sec -> getkv("section", integer_to_binary(Sec))
-			 end,
-			 getkv("name", Page#page.name),
-			 getkv("lang", Page#page.lang),
-			 case Page#page.tags of
-				[] -> <<>>;
-				Tags -> getkv("tags", lists:join(" ", Tags))
-			 end,
-			 getkv("redirect", Page#page.redirect),
-			 <<"\t\t</meta>\n\t</page>\n">>]
-		end,
-		gen_server:call(d5manapi_db, {query, Limit, lists:join(<<"/">>,
-						cowboy_req:path_info(Req))})
-	), <<"</d5man>\n">>], Req, Opts}.
+			getkv("file", Page#page.file),
+			case Page#page.section of
+			       0 -> <<>>;
+			       Sec -> getkv("section", integer_to_binary(Sec))
+			end,
+			getkv("name",          Page#page.name),
+			getkv("title",         Page#page.title),
+			getkv("lang",          Page#page.lang),
+			getkv("redirect",      Page#page.redirect),
+			getkv("task-type",     Page#page.task_type),
+			getkv("task-priority", Page#page.task_priority),
+			case Page#page.tags of
+			       [] -> <<>>;
+			       Tags -> getkv("tags", lists:join(" ", Tags))
+			end,
+			<<"\t\t</meta>\n\t</page>\n">>]
+		end, List), 200}
+	end.
 
 getkv(K, V) ->
 	case V of

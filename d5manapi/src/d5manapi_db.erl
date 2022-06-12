@@ -40,7 +40,8 @@ init([URLPrefix, RootList]) ->
 
 proc_root_d5man(URLPrefix, Root, Sections) ->
 	proc_filtered_files_as_documents(URLPrefix, Root, Sections, fun(File) ->
-		lists:suffix(".yml", File) or lists:suffix(".md", File)
+		lists:suffix(".yml", File) or lists:suffix(".md", File) or
+		lists:suffix(".hot", File)
 	end).
 
 proc_filtered_files_as_documents(URLPrefix, Root, Dirs, Filter) ->
@@ -59,7 +60,8 @@ proc_filtered_files_as_documents(URLPrefix, Root, Dirs, Filter) ->
 
 proc_root_repos(URLPrefix, Root, Repos) ->
 	proc_filtered_files_as_documents(URLPrefix, Root, Repos, fun(File) ->
-		(File =:= "README.md") or (File =:= "manpage.md")
+		(File =:= "README.md") or (File =:= "manpage.md") or
+		(File =:= "TODO.hot")
 	end).
 
 % DocFile absolute path but made of nested lists
@@ -131,6 +133,8 @@ document_metadata_to_record(URLPrefix, InRecord, DocumentMetadata) ->
 			R#page{section=Sec};
 		{"x-masysma-name",Name} ->
 			R#page{name=list_to_binary(Name)};
+		{"title",Title} ->
+			R#page{title=Title};
 		{"keywords",TagList} ->
 			R#page{tags=lists:map(fun list_to_binary/1, TagList)};
 		{"x-masysma-redirect",Red} ->
@@ -149,6 +153,10 @@ document_metadata_to_record(URLPrefix, InRecord, DocumentMetadata) ->
 					filename:extension(R#page.file)),
 					"_att/", Red]
 			end};
+		{"x-masysma-task-type",Type} ->
+			R#page{task_type=Type};
+		{"x-masysma-task-priority",Priority} ->
+			R#page{task_priority=Priority};
 		{_Field,_Val} ->
 			R % silently ignore other fields
 		end
@@ -158,22 +166,49 @@ document_metadata_to_record(URLPrefix, InRecord, DocumentMetadata) ->
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DATABASE QUERYING %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-handle_call({query, Limit, Query}, _From, Context) ->
-	EmptyFilter = fun(_Record) -> true end,
-	case string:split(erlang:list_to_binary([string:trim(Query)]),
+handle_call({query, Limit, Query, QSVals}, _From, Context) ->
+	case get_task_filter_for_qsvals(QSVals) of
+	{error, Error} -> {reply, {error, Error}, Context};
+	TaskFilter ->
+		case string:split(erlang:list_to_binary([string:trim(Query)]),
 								" ", all) of
-	[<<>>] ->
-		{reply, query_full_table_scan([], Limit, EmptyFilter), Context};
-	QueryParts ->
-		[QueryBegin|_QueryTail] = QueryParts,
-		case binary:first(QueryBegin) of
-		$:     -> respond_to_google_query(Query, Context);
-		_Other -> respond_to_normal_query(QueryParts, EmptyFilter,
-								Limit, Context)
+		[<<>>] -> {reply, query_full_table_scan([], Limit, TaskFilter),
+								Context};
+		QueryParts ->
+			[QueryBegin|_QueryTail] = QueryParts,
+			case binary:first(QueryBegin) of
+			$:     -> respond_to_google_query(Query, Context);
+			_Other -> respond_to_normal_query(QueryParts,
+						TaskFilter, Limit, Context)
+			end
 		end
 	end;
-handle_call(_Call, _From, Context) ->
-	{reply, 0, Context}.
+handle_call(_Call, _From, Context) -> {reply, 0, Context}.
+
+get_task_filter_for_qsvals(QSVals) ->
+	case lists:keyfind(<<"task">>, 1, QSVals) of
+	{_Key, <<"board">>} -> fun(Record) ->
+			is_task(Record) andalso
+			not(is_task_delayed(Record)) andalso
+			not(is_task_subtask(Record))
+		end;
+	{_Key, <<"subtask">>} -> fun(Record) ->
+			is_task(Record) andalso is_task_subtask(Record)
+		end;
+	{_Key, <<"delayed">>} -> fun(Record) ->
+			is_task(Record) andalso is_task_delayed(Record)
+		end;
+	{_Key, <<"no">>} -> fun(Record) -> not(is_task(Record)) end;
+	{_Key, _Other} -> {error,
+		<<"Invalid task filter. Try: board | subtask | delayed | no">>};
+	% identity filter / empty filter
+	false -> fun(_Record) -> true end
+	end.
+
+is_task(Record) -> Record#page.task_type =/= undefined andalso
+					Record#page.task_priority =/= undefined.
+is_task_subtask(Record) -> Record#page.task_type =:= "subtask".
+is_task_delayed(Record) -> Record#page.task_priority =:= "delayed".
 
 % Catches all : queries but returns empty for everything but the two old
 %	:google:<term>
@@ -198,14 +233,14 @@ respond_to_google_query(Query, Context) ->
 		{reply, [], Context}
 	end.
 
-respond_to_normal_query(QueryParts=[QueryBegin|QueryTail], EmptyFilter, Limit,
+respond_to_normal_query(QueryParts=[QueryBegin|QueryTail], TaskFilter, Limit,
 								Context) ->
 	{ResultFilter, QConsider} = case is_number(catch binary_to_integer(
 								QueryBegin)) of
 		true ->  CmpNum = binary_to_integer(QueryBegin),
-			 {fun(Record)  -> Record#page.section =:= CmpNum end,
-								QueryTail};
-		false -> {EmptyFilter, QueryParts}
+			 {fun(Record)  -> TaskFilter(Record) andalso
+				Record#page.section =:= CmpNum end, QueryTail};
+		false -> {TaskFilter, QueryParts}
 	end,
 	{reply, case QConsider of
 		[H|[]] -> case ets:lookup(index_names, iolist_to_binary(H)) of

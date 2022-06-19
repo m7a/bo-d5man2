@@ -1,7 +1,8 @@
 -module(d5manapi_handler_query).
 -behavior(cowboy_handler).
 -include_lib("d5manapi_page.hrl").
--export([init/2, allowed_methods/2, content_types_provided/2, query_xml/2]).
+-export([init/2, allowed_methods/2, content_types_provided/2, query_xml/2,
+	generate_response_xml/1]).
 % https://ninenines.eu/docs/en/cowboy/2.2/guide/rest_flowcharts/
 
 init(Req, _State) ->
@@ -16,18 +17,28 @@ content_types_provided(Req, State) ->
 	], Req, State}.
 
 query_xml(Req, Opts) ->
-	Limit = binary_to_integer(cowboy_req:header(<<"x-masysma-limit">>, Req,
-								<<"100">>)),
-	QueryResult = gen_server:call(d5manapi_db, {query, Limit,
-			lists:join(<<"/">>, cowboy_req:path_info(Req)),
-			cowboy_req:parse_qs(Req)}),
-	{InnerXML, ReturnCode} = process_query_result(QueryResult),
-	Response = [<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<d5man>\n">>,
-			InnerXML, <<"</d5man>\n">>],
+	QueryString = cowboy_req:parse_qs(Req),
+	% Newly, we permit specifying limit thorugh either header or ?limit=
+	% parameter. Since we use parameters for other purposes, too.
+	Limit = case cowboy_req:header(<<"x-masysma-limit">>, Req, undef) of
+		undef -> case lists:keyfind(<<"limit">>, 1, QueryString) of
+			 false            -> 100;
+			 {_Key, RawLimit} -> binary_to_integer(RawLimit)
+			 end;
+		RawLimit -> binary_to_integer(RawLimit)
+		end,
+	{Response, ReturnCode} = generate_response_xml(gen_server:call(
+			d5manapi_db, {query, Limit, lists:join(<<"/">>,
+			cowboy_req:path_info(Req)), QueryString})),
 	% In theory, we could return the body right here. But there does not
 	% seem to be a way to set status code 404 (not found) and also return
 	% formatted output?
 	{stop, cowboy_req:reply(ReturnCode, #{}, Response, Req), Opts}.
+
+generate_response_xml(QueryResult) ->
+	{InnerXML, ReturnCode} = process_query_result(QueryResult),
+	{[<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<d5man>\n">>,
+				InnerXML, <<"</d5man>\n">>], ReturnCode}.
 
 process_query_result(QueryResult) ->
 	case QueryResult of

@@ -22,7 +22,9 @@ start(_Type, _Args) ->
 			env => #{ dispatch => cowboy_router:compile([{'_',
 				[
 					{"/query/[...]",
-						d5manapi_handler_query, []}
+						d5manapi_handler_query, []},
+					{"/page/[...]",
+						d5manapi_handler_page, []}
 				] ++ maps:fold(fun(K, V, Tail) ->
 					[{"/" ++ atom_to_list(K) ++ "/[...]",
 					cowboy_static,

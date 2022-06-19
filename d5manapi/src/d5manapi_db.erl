@@ -138,11 +138,10 @@ document_metadata_to_record(URLPrefix, InRecord, DocumentMetadata) ->
 		{"keywords",TagList} ->
 			R#page{tags=lists:map(fun list_to_binary/1, TagList)};
 		{"x-masysma-redirect",Red} ->
-			R#page{redirect=case URLPrefix of
-				noredir ->
-					Red;
-				_URLPrefix ->
-					[URLPrefix,
+			case URLPrefix of
+			noredir -> R#page{redirect=Red};
+			noupdate -> R;
+			_URlPrefix -> R#page{redirect=[URLPrefix,
 					% get directory name. Do not use
 					% section for this because it might not
 					% be available yet!
@@ -151,8 +150,8 @@ document_metadata_to_record(URLPrefix, InRecord, DocumentMetadata) ->
 					"/",
 					filename:basename(R#page.file,
 					filename:extension(R#page.file)),
-					"_att/", Red]
-			end};
+					"_att/", Red]}
+			end;
 		{"x-masysma-task-type",Type} ->
 			R#page{task_type=Type};
 		{"x-masysma-task-priority",Priority} ->
@@ -172,8 +171,8 @@ handle_call({query, Limit, Query, QSVals}, _From, Context) ->
 	TaskFilter ->
 		case string:split(erlang:list_to_binary([string:trim(Query)]),
 								" ", all) of
-		[<<>>] -> {reply, query_full_table_scan([], Limit, TaskFilter),
-								Context};
+		[<<>>] -> {reply, sort_results(query_full_table_scan([], Limit,
+							TaskFilter)), Context};
 		QueryParts ->
 			[QueryBegin|_QueryTail] = QueryParts,
 			case binary:first(QueryBegin) of
@@ -183,6 +182,39 @@ handle_call({query, Limit, Query, QSVals}, _From, Context) ->
 			end
 		end
 	end;
+% PageID format is page_name(section). this is a key into page_metadata table
+% which will point us to the file to consult. Returns io list.
+handle_call({page_post_updated, PageID}, _From, Context) ->
+	{reply, case ets:lookup(page_metadata, iolist_to_binary(PageID)) of
+	[] -> {error, ["No page found to match provided ID. Nothing updated."]};
+	[{_Val, PageMetadata}]->
+		% some similarities with proc_document but not exactly the same
+		DocFile = PageMetadata#page.file,
+		try yaml_from_pandoc_md(DocFile) of
+		DocumentList ->
+			ProcessDoc = fun(DocMeta) ->
+				NewMetadata = document_metadata_to_record(
+					noupdate,
+					#page{file=PageMetadata#page.file,
+					redirect=PageMetadata#page.redirect},
+					DocMeta
+				),
+				ets:update_element(page_metadata, PageID,
+							{1, NewMetadata}),
+				NewMetadata
+			end,
+			try lists:map(ProcessDoc,
+						lists:droplast(DocumentList))
+			catch
+			_Etype:Emsg:_StackTrace ->
+				{error, ["Failed to process ", DocFile, ": ",
+									Emsg]}
+			end
+		catch
+		_Etype:_Emsg:_StackTrace ->
+			{error, ["Failed to process ", DocFile]}
+		end
+	end, Context};
 handle_call(_Call, _From, Context) -> {reply, 0, Context}.
 
 get_task_filter_for_qsvals(QSVals) ->
@@ -238,25 +270,53 @@ respond_to_normal_query(QueryParts=[QueryBegin|QueryTail], TaskFilter, Limit,
 	{ResultFilter, QConsider} = case is_number(catch binary_to_integer(
 								QueryBegin)) of
 		true ->  CmpNum = binary_to_integer(QueryBegin),
-			 {fun(Record)  -> TaskFilter(Record) andalso
+			 {fun(Record) -> TaskFilter(Record) andalso
 				Record#page.section =:= CmpNum end, QueryTail};
 		false -> {TaskFilter, QueryParts}
 	end,
-	{reply, case QConsider of
-		[H|[]] -> case ets:lookup(index_names, iolist_to_binary(H)) of
-			  [] -> query_full_table_scan(QConsider, Limit,
+	{reply, sort_results(query_by_parts(Limit, ResultFilter, QConsider)),
+								Context}.
+
+sort_results(ResultList) ->
+	lists:sort(fun(A, B) ->
+		PrioA = priority_ordering(A#page.task_priority),
+		PrioB = priority_ordering(B#page.task_priority),
+
+		if
+		A#page.section < B#page.section -> true;
+		A#page.section > B#page.section -> false;
+		% TODO z might sort after type cyclic/long/short, too to allow red to be used in both places w/o re-ordering
+		% A#page.section =:= B#page.section
+		PrioA < PrioB -> true;
+		PrioA > PrioB -> false;
+		% A#page.section =:= B#page.section and PrioA =:= PrioB
+		true -> A#page.name < B#page.name
+		end
+	end, ResultList).
+
+priority_ordering("yellow") -> 10;
+priority_ordering("red")    -> 20;
+priority_ordering("green")  -> 30;
+priority_ordering("purple") -> 40;
+priority_ordering("black")  -> 50;
+priority_ordering("white")  -> 60;
+priority_ordering(_Other)   -> 99.
+
+query_by_parts(Limit, ResultFilter, QConsider) ->
+	case QConsider of
+	[H|[]] -> case ets:lookup(index_names, iolist_to_binary(H)) of
+			[] -> query_full_table_scan(QConsider, Limit,
 								ResultFilter);
-			  Matched -> lists:filter(ResultFilter, lists:map(
-					fun({_K, V}) ->
-						[{_Val, PageMeta}] = ets:lookup(
+			Matched -> lists:filter(ResultFilter, lists:map(
+				fun({_K, V}) ->
+					[{_Val, PageMeta}] = ets:lookup(
 							page_metadata, V),
-						PageMeta
-					end,
-					Matched))
-			  end;
-		_QConsider -> query_full_table_scan(QConsider, Limit,
-								ResultFilter)
-	end, Context}.
+					PageMeta
+				end,
+				Matched))
+		  end;
+	_QConsider -> query_full_table_scan(QConsider, Limit, ResultFilter)
+	end.
 
 query_full_table_scan(QConsider, Limit, ResultFilter) ->
 	query_full_table_scan_sub(QConsider, Limit, 0, ResultFilter,

@@ -1,0 +1,24 @@
+---
+section: 43
+x-masysma-name: "119.43.YYY"
+title: Template Issue Summary
+date: 2022/01/01 00:00:00
+lang: en-US
+keywords: ["task"]
+x-masysma-task-type: periodic
+x-masysma-task-priority: considered
+---
+Task Overview
+=============
+
+This text can be upgraded as needed
+
+	x-masysma-task-type      long | short | subtask | periodic
+	
+	x-masysma-task-priority: red | green | black | white | yellow |
+				 purple | delayed | considered
+
+2022/01/01
+==========
+
+Task Step. This text is never changed after being added.

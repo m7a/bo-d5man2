@@ -201,6 +201,7 @@ sub invoke_tui {
 					-y => $scrh - 1, -x => $aidx * 8)
 					if(defined($labels[$aidx]));
 	}
+
 	my $last_query = $initial_query;
 	my $last_task_filter = $task_filter;
 	my $change_callback = sub {
@@ -216,6 +217,7 @@ sub invoke_tui {
 		$last_query = $newquery;
 		$last_task_filter = $task_filter;
 	};
+
 	my $curses_input = $curses_window->add("input", "TextEntry", -x => 2,
 			-text => $initial_query, -pos => length($initial_query),
 			-onchange => $change_callback);
@@ -268,6 +270,7 @@ sub invoke_tui {
 		$curses->mainloopExit();
 	}, 274);
 	$curses_input->focus();
+
 	my $displayresults = sub {
 		my $results_to_proc = shift;
 		undef %{$page_metadata};
@@ -296,7 +299,8 @@ sub invoke_tui {
 		$curses_listbox->draw();
 		$curses_input->focus();
 	};
-	$curses->add_callback("updateresults", sub {
+
+	my $updateresults = sub {
 		my $results_to_proc = undef;
 		while(1) {
 			my $curr = $queue_search_results->peek();
@@ -306,7 +310,16 @@ sub invoke_tui {
 		}
 		$displayresults->($results_to_proc)
 						if(defined($results_to_proc));
-	});
+	};
+
+	# Although it would be intuitive to use the callback, the timer works
+	# much more reliably in case only the filter is changed. Interestingly,
+	# having both of the callbacks seems to provide the most responsive
+	# experience although it is a little unexpected that it matters to have
+	# both of them...
+	$curses->add_callback("updateresults", $updateresults);
+	$curses->set_timer("timer_updateresults", $updateresults, 0.1);
+
 	$displayresults->(\@initial_results);
 	$curses->mainloop();
 	# We need to clear the TUI s.t. the terminal will not be messed up.

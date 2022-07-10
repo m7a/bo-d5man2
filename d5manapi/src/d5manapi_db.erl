@@ -185,7 +185,8 @@ handle_call({query, Limit, Query, QSVals}, _From, Context) ->
 % PageID format is page_name(section). this is a key into page_metadata table
 % which will point us to the file to consult. Returns io list.
 handle_call({page_post_updated, PageID}, _From, Context) ->
-	{reply, case ets:lookup(page_metadata, iolist_to_binary(PageID)) of
+	Key = iolist_to_binary(PageID),
+	{reply, case ets:lookup(page_metadata, Key) of
 	[] -> {error, ["No page found to match provided ID. Nothing updated."]};
 	[{_Val, PageMetadata}]->
 		% some similarities with proc_document but not exactly the same
@@ -199,8 +200,8 @@ handle_call({page_post_updated, PageID}, _From, Context) ->
 					redirect=PageMetadata#page.redirect},
 					DocMeta
 				),
-				ets:update_element(page_metadata, PageID,
-							{1, NewMetadata}),
+				% replaces existent item
+				ets:insert(page_metadata, {Key, NewMetadata}),
 				NewMetadata
 			end,
 			try lists:map(ProcessDoc,

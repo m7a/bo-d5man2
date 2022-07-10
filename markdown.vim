@@ -98,3 +98,26 @@ hi D5ManForcedSpace ctermbg=Gray
 syn match D5ManForcedSpace " "
 hi D5ManForcedHalfSpace ctermbg=Cyan
 syn match D5ManForcedHalfSpace " "
+
+" Commands
+" ========
+
+" inspired by D5Man Legacy (v1) VIM plugin but in a very reduced fashion.
+
+command D5U call D5ManDBUpdate()
+
+function D5ManDBUpdate()
+	let section = D5ManGetKey("section")
+	let name    = D5ManGetKey("x-masysma-name")
+	let name2   = substitute(name, "\"", "", "g")
+	" TODO currently not configurable. d5mantui_properties.xml would be
+	"      the conf file to read this from properly. However, it seems to
+	"      be quite difficult to access from within VIM?
+	let url     = "http://127.0.0.1:7450/page/".name2."(".section.")"
+	call system("wget --post-data= -O/dev/null ".shellescape(url))
+endfunction
+
+function D5ManGetKey(k)
+	return substitute(getline(search("^".a:k.":\\s\\+.*")),
+						\ "^".a:k.":\\s\\+", "", "")
+endfunction

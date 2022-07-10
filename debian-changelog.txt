@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.51) stable; urgency=medium
+
+  * Implement more features from task management.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Sun, 10 Jul 2022 21:07:11 +0200
+
 mdvl-d5man2 (1.0.50) stable; urgency=medium
 
   * Intermediate release: Preview task management (not fully functional yet).

@@ -5,7 +5,7 @@ title: Template Issue Summary
 date: 2022/01/01 00:00:00
 lang: en-US
 keywords: ["task"]
-x-masysma-task-type: periodic
+x-masysma-task-type: subtask
 x-masysma-task-priority: considered
 ---
 Task Overview

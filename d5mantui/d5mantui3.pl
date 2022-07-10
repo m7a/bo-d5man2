@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Ma_Sys.ma D5Man Terminal UI 3.1.0, Copyright (c) 2020, 2022 Ma_Sys.ma.
+# Ma_Sys.ma D5Man Terminal UI 3.1.1, Copyright (c) 2020, 2022 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 use strict;
@@ -46,6 +46,7 @@ if($haveenv or -f $homef) {
 	}
 }
 
+# color name -> [fg, bg]
 my %COLOR_TABLE = (
 	"red"    => ["white", "red"],
 	"green"  => ["black", "green"],
@@ -345,35 +346,67 @@ if($search_result->{section} eq -2) {
 	my $filename = $name;
 	$filename =~ s/\//_/g;
 	my $dir = $target_root."/".$section;
-	my $path = $dir."/".$filename.".md";
+	my $is_task = ($section eq "43");
+	my $path = $dir."/".$filename.($is_task? ".hot": ".md");
 	my $localtz = DateTime::TimeZone->new(name => 'local');
 	my $dateobj = DateTime->now(time_zone => $localtz);
 	my $date = $dateobj->strftime("%Y/%m/%d %H:%M:%S");
 	my $year = $dateobj->strftime("%Y");
 	mkdir($dir) if(not -d $dir);
 	open(my $fd, ">:encoding(UTF-8)", $path);
-	print $fd <<~EOF;
-		---
-		section: $section
-		x-masysma-name: $name
-		title: Template Page Title
-		date: $date
-		lang: en-US
-		author: ["Linux-Fan, Ma_Sys.ma (Ma_Sys.ma\@web.de)"]
-		keywords: ["key", "word"]
-		x-masysma-version: 1.0.0
-		x-masysma-repository: https://www.github.com/m7a/...
-		x-masysma-website: https://masysma.lima-city.de/$section/$filename.xhtml
-		x-masysma-owned: 1
-		x-masysma-copyright: |
-		  Copyright (c) $year Ma_Sys.ma.
-		  For further info send an e-mail to Ma_Sys.ma\@web.de.
-		---
-		Template
-		========
+	if($is_task) {
+		print $fd <<~EOF;
+			---
+			section: 43
+			x-masysma-name: "$name"
+			title: Template Issue Summary
+			date: $date
+			lang: en-US
+			keywords: ["task"]
+			x-masysma-task-type: subtask
+			x-masysma-task-priority: considered
+			---
+			Task Overview
+			=============
 
-		D5Man 2 Template file. Edit metadata, delete template, start writing.
-		EOF
+			This text can be upgraded as needed.
+
+			x-masysma-task-type
+			:   long | short | subtask | periodic
+			x-masysma-task-priority
+			:   red | green | black | white | yellow | purple |
+			    delayed | considered
+
+			2022/01/01
+			==========
+
+			Task Step. This text is never changed after being added.
+			EOF
+	} else {
+		print $fd <<~EOF;
+			---
+			section: $section
+			x-masysma-name: $name
+			title: Template Page Title
+			date: $date
+			lang: en-US
+			author: ["Linux-Fan, Ma_Sys.ma (Ma_Sys.ma\@web.de)"]
+			keywords: ["key", "word"]
+			x-masysma-version: 1.0.0
+			x-masysma-repository: https://www.github.com/m7a/...
+			x-masysma-website: https://masysma.lima-city.de/$section/$filename.xhtml
+			x-masysma-owned: 1
+			x-masysma-copyright: |
+			  Copyright (c) $year Ma_Sys.ma.
+			  For further info send an e-mail to Ma_Sys.ma\@web.de.
+			---
+			Template
+			========
+
+			D5Man 2 Template file.
+			Edit metadata, delete template, start writing.
+			EOF
+	}
 	close($fd);
 	exec $command_editor, ($path);
 } elsif(defined($search_result->{redirect})) {

@@ -285,7 +285,7 @@ sort_results(ResultList) ->
 		if
 		A#page.section < B#page.section -> true;
 		A#page.section > B#page.section -> false;
-		% TODO z might sort after type cyclic/long/short, too to allow red to be used in both places w/o re-ordering
+		% TODO z might sort after type periodic/long/short, too to allow red to be used in both places w/o re-ordering
 		% A#page.section =:= B#page.section
 		PrioA < PrioB -> true;
 		PrioA > PrioB -> false;

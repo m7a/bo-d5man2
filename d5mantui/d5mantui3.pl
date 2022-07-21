@@ -19,13 +19,14 @@ require Thread::Queue;          # (perl-modules-5.24)
 #use Data::Dumper; # DEBUG ONLY
 
 #---------------------------------------------------------------------[ Conf ]--
-my $command_editor  = "vim";
-my $command_browser = "firefox";
-my $target_root     = "/data/main/119_man_rr";
-my $api_url         = "http://127.0.0.1:7450";
-
 my $haveenv = defined($ENV{D5MAN_CONF_UI});
 my $homef = File::HomeDir::home()."/.mdvl/d5man/d5mantui_properties.xml";
+my %properties = (
+	"d5man.ui.command.editor"  => "vim",
+	"d5man.ui.command.browser" => "firefox",
+	"d5man.ui.newpage.root"    => "/data/main/119_man_rr",
+	"d5man.api.url"            => "http://127.0.0.1:7450",
+);
 if($haveenv or -f $homef) {
 	my $conffile = $haveenv? $ENV{D5MAN_CONF_UI}: $homef;
 	my $domparser2 = new XML::DOM::Parser;
@@ -34,15 +35,30 @@ if($haveenv or -f $homef) {
 	for(my $i = 0; $i < $entries->getLength(); $i++) {
 		my $k = $entries->item($i)->getAttribute("key");
 		my $v = $entries->item($i)->getData();
-		if($k eq "d5man.ui.command.editor") {
-			$command_editor = $v;
-		} elsif($k eq "d5man.ui.command.browser") {
-			$command_browser = $v;
-		} elsif($k eq "d5man.api.url") {
-			$api_url = $v;
-		} elsif($k eq "d5man.ui.newpage.root") {
-			$target_root = $v;
-		}
+		$properties{$k} = $v;
+	}
+}
+
+my $command_editor;
+my $command_browser;
+my $target_root;
+my $api_url;
+
+for my $k (keys %properties) {
+	my $v = $properties{$k};
+	for my $i (keys %properties) {
+		my $search = "\${$i}";
+		my $replace = $properties{$i};
+		$v =~ s/\Q$search\E/\Q$replace\E/g;
+	}
+	if($k eq "d5man.ui.command.editor") {
+		$command_editor = $v;
+	} elsif($k eq "d5man.ui.command.browser") {
+		$command_browser = $v;
+	} elsif($k eq "d5man.api.url") {
+		$api_url = $v;
+	} elsif($k eq "d5man.ui.newpage.root") {
+		$target_root = $v;
 	}
 }
 
@@ -408,10 +424,10 @@ if($search_result->{section} eq -2) {
 			EOF
 	}
 	close($fd);
-	exec $command_editor, ($path);
+	exec $command_editor." \"".$path."\"";
 } elsif(defined($search_result->{redirect})) {
 	# open in web browser
-	exec $command_browser, ($search_result->{redirect});
+	exec $command_browser." \"".$search_result->{redirect}."\"";
 	# Should the browser start process be the same as the running browser,
 	# it might make sense to fork here for GUI browsers?
 	#my $child = fork();
@@ -420,5 +436,5 @@ if($search_result->{section} eq -2) {
 	#}
 } else {
 	# open in editor
-	exec $command_editor, ($search_result->{file});
+	exec $command_editor." \"".$search_result->{file}."\"";
 }

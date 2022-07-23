@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.52) stable; urgency=medium
+
+  * Allow :D5U with configurable URL.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Sat, 23 Jul 2022 21:30:45 +0200
+
 mdvl-d5man2 (1.0.51) stable; urgency=medium
 
   * Implement more features from task management.

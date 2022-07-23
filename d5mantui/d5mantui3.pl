@@ -22,10 +22,11 @@ require Thread::Queue;          # (perl-modules-5.24)
 my $haveenv = defined($ENV{D5MAN_CONF_UI});
 my $homef = File::HomeDir::home()."/.mdvl/d5man/d5mantui_properties.xml";
 my %properties = (
-	"d5man.ui.command.editor"  => "vim",
+	"d5man.ui.command.editor" =>
+		"vim -c \"let g:d5man_api_url=\\\"\${d5man.api.url}\\\"\"",
 	"d5man.ui.command.browser" => "firefox",
-	"d5man.ui.newpage.root"    => "/data/main/119_man_rr",
-	"d5man.api.url"            => "http://127.0.0.1:7450",
+	"d5man.ui.newpage.root" => "/data/main/119_man_rr",
+	"d5man.api.url" => "http://127.0.0.1:7450",
 );
 if($haveenv or -f $homef) {
 	my $conffile = $haveenv? $ENV{D5MAN_CONF_UI}: $homef;

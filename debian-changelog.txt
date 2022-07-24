@@ -1,3 +1,10 @@
+mdvl-d5man2 (1.0.55) stable; urgency=medium
+
+  * Change location back to non-numbered because adding the numbers to the
+    repository names would wreck havoc w/ Github structure.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Sun, 24 Jul 2022 13:06:34 +0200
+
 mdvl-d5man2 (1.0.54) stable; urgency=medium
 
   * 120.004.01: Add missing slash in wget invocation.

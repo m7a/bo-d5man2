@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.53) stable; urgency=medium
+
+  * Attempt to fix D5U function.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Sun, 24 Jul 2022 12:21:08 +0200
+
 mdvl-d5man2 (1.0.52) stable; urgency=medium
 
   * Allow :D5U with configurable URL.

@@ -112,7 +112,7 @@ function D5ManDBUpdate()
 	let name2   = substitute(name, "\"", "", "g")
 	let url     = "http://127.0.0.1:7450/page/".name2."(".section.")"
 	if exists("g:d5man_api_url")
-		let url = g:d5man_api_url."/page".name2."(".section.")"
+		let url = g:d5man_api_url."/page/".name2."(".section.")"
 	endif
 	call system("wget --post-data= -O/dev/null ".shellescape(url))
 endfunction

@@ -11,7 +11,7 @@ x-masysma-repository: https://www.github.com/m7a/bo-d5man2
 x-masysma-website: https://masysma.lima-city.de/32/d5man2.xhtml
 x-masysma-owned: 1
 x-masysma-copyright: |
-  Copyright (c) 2019, 2020 Ma_Sys.ma.
+  Copyright (c) 2019, 2020, 2022 Ma_Sys.ma.
   For further info send an e-mail to Ma_Sys.ma@web.de.
 ---
 Overview
@@ -265,7 +265,15 @@ follows:
     supported, but may not contain any whitespace or other characters that
     are uncommon in file names processed by scripts (except for `/`).
     For _Document-Root_ organizazion, the file name should be the page's
-    name with `/` replaced by `_` and an additional `.md` suffix.
+    name with `/` replaced by `_` and an additional `.md` suffix. For tasks,
+    suffix `.hot` should be used.
+`x-masysma-task-priority` (required and only allowed for tasks)
+:   Specifies the priority of this task (cf. section _D5Man TUI Task
+    Management_). Allowed values are the following:
+    red, green, black, white, yellow, purple, delayed, considered.
+`x-masysma-task-type` (required and only allowed for tasks)
+:   Specifies the type fo this task (cf. section _D5Man TUI Task Management_).
+    Allowed values are the following: long, short, subtask, periodic.
 `x-masysma-version`, `x-masysma-copyright` (optional)
 :   Specifies a version and copyright for the document (and the program it is
     describing). Format and use of these fields are entirely up to the user.
@@ -314,6 +322,7 @@ Sec  Short Description
 35   not public: UNI notes
 37   Blog, Knowledge Base, self-contained pages, other public notes
 42   not public: user notes
+43   not public: tasks
 
 ## Attachments
 
@@ -565,13 +574,13 @@ the configuration can be found in `d5manapi/rel/sys.config` and are as follows:
 	{port, 7450},
 	{redirect_url_prefix, "http://127.0.0.1:7450/rrman/"},
 	{fs, #{
-		rrman => "/data/main/300t399_man_rr",
-		ial   => "/data/main/400t699_mdvl_rr/bo-d5man2/ial/home",
-		local => "/data/main/400t699_mdvl_rr/br-ial-local"
+		rrman => "/data/main/119_man_rr",
+		ial   => "/data/main/120_mdvl_rr/bo-d5man2/ial/home",
+		local => "/data/main/120_mdvl_rr/br-ial-local"
 	}},
 	{db_roots, [
-		"/data/main/300t399_man_rr",
-		"/data/main/400t699_mdvl_rr"
+		"/data/main/119_man_rr",
+		"/data/main/120_mdvl_rr"
 	]}
 ]}].
 ~~~
@@ -612,13 +621,12 @@ as follows:
 	curl http://127.0.0.1:7450/query/
 
 Without any actual query string, this will return all elements in the database
-up to the default limit of 100. To configure a different limit, use header
-`x-masysma-limit` e.g. as follows:
+up to the default limit of 100. To configure a different limit, use query
+parameter `limit` e.g. as follows:
 
-	curl -H "x-masysma-limit: 4" http://127.0.0.1:7450/query/
+	curl http://127.0.0.1:7450/query/?limit=4
 
-This query returns four elements from the database. Set the limit to 0 to
-return the entire database (can be large...)
+This query returns four elements from the database..
 
 To send a query string, use it as path:
 
@@ -674,6 +682,10 @@ The D5Man Terminal User Interface (TUI) is a special-purpose client for the
 D5Man API. It displays query results interactively in the terminal while
 typing the query.
 
+## Synopsis
+
+	d5mantui [--documents-only|--board|--delayed|--subtask] [query]
+
 ## Configuration
 
 D5Man TUI can be configured by providing a suitable XML property file. In the
@@ -682,9 +694,10 @@ XML format, the default configuration looks as follows:
 ~~~{.xml}
 <?xml version="1.0" encoding="UTF-8"?>
 <properties>
-	<entry key="d5man.ui.command.editor">vim</entry>
+	<entry key="d5man.ui.command.editor"
+		>vim -c "let g:d5man_api_url=\"${d5man.api.url}\""</entry>
 	<entry key="d5man.ui.command.browser">firefox</entry>
-	<entry key="d5man.ui.newpage.root">/data/main/300t399_man_rr</entry>
+	<entry key="d5man.ui.newpage.root">/data/main/119_man_rr</entry>
 	<entry key="d5man.api.url">http://127.0.0.1:7450/</entry>
 </properties>
 ~~~
@@ -695,8 +708,11 @@ intended to be a Java client).
 For very simple installations (where no new pages are going to be created, e.g.
 when using IAL only), the defaults may be sufficient. In other cases, the
 `d5man.ui.newpage.root` needs to be changed to point to the Document-Root
-to place newly created pages in. The other properties should be
-self-explanatory.
+to place newly created pages in.
+
+Syntax `${variable.name}` can be used to refer to any of the other properties
+from inside a given entry. It is currently not possible to escape the `$` to
+not expand the variable substition.
 
 To find the XML file, D5Man TUI looks in environment variable `$D5MAN_CONF_UI`
 and if that is absent, attempts to load file
@@ -706,30 +722,30 @@ and if that is absent, attempts to load file
 
 The screen could e.g. look as follows:
 
-	> erlang
-	<o> 21 erlang/erl_syntax:receive_expr_action/1
-	< > 21 erlang/snmpm:which_agents/0
-	< > 21 erlang/snmpm_mpd:generate_msg/5
+	> erlan
+	<o> 21 erlang/array:to_list/1
+	< > 21 erlang/base64:encode_to_string/1
+	< > 21 erlang/binary:matches/3
+	< > 21 erlang/code:load_abs/1
 	< > 21 erlang/common_test:Module:suite/0
-	< > 21 erlang/wxListCtrl:setItemData/3
-	< > 21 erlang/sys:remove/2
-	< > 21 erlang/snmpa_conf:append_target_params_config/2
-	< > 21 erlang/leex:tokens/3
-	< > 21 erlang/wxStyledTextCtrl:startStyling/3
-	< > 21 erlang/snmpa_network_interface:get_log_type/1
-	< > 21 erlang/wxLocale:getString/5
-	< > 21 erlang/sys:replace_state/2
-	< > 21 erlang/gl:clear/1
-	< > 21 erlang/wxPopupTransientWindow:destroy/1
-	< > 21 erlang/unicode:characters_to_nfkd_list/1
-	< > 21 erlang/gl:map2d/10
-	< > 21 erlang/gl:getProgramInfoLog/2
-	< > 21 erlang/io:parse_erl_form/3
-	< > 21 erlang/snmpa_error_io:config_err/2
-	< > 21 erlang/wxStyledTextCtrl:wordPartLeft/1
+	< > 21 erlang/ct_snmp:set_values/4
+	< > 21 erlang/ct_snmp:unregister_users/1
+	< > 21 erlang/dbg:get_tracer/1
+	< > 21 erlang/dict:fetch_keys/1
+	< > 21 erlang/dict:merge/3
+	< > 21 erlang/digraph:info/1
+	< > 21 erlang/disk_log:block/1
+	< > 21 erlang/erl_syntax:receive_expr_action/1
+	< > 21 erlang/erl_syntax:record_type_field_type/1
 	< > 21 erlang/erlang:fun_info/2
+	< > 21 erlang/ets:match_object/3
+	< > 21 erlang/ets:to_dets/2
+	< > 21 erlang/gl:bindVertexArray/1
+	< > 21 erlang/gl:clear/1
+	< > 21 erlang/gl:createShaderObjectARB/1
+	< > 21 erlang/gl:deleteBuffers/1
 	< > 21 erlang/gl:getHandleARB/1
-		2 New                                                           0 Exit
+		2 New           4 All           6 Docs  7 Board 8 W+1   9 Tasks
 
 The first line is a prompt where the user can enter any query that will be sent
 to D5Man API. The list below displays the search results and can be scrolled
@@ -741,11 +757,71 @@ prompt. If the initial query (as given on the commandline) yields exactly one
 result, the TUI will not be displayed and the respective page will be opened
 directly.
 
-Additionally, one can press [F2] to create a new page. To do this, the input
-at the prompt needs to be in format `SECTION NAME` i.e. the new page's section
-followed by its name. [F2] will then copy a predefined template to a new file
-and open it in the configured editor. Note that this function only supports
-Document-Root organization for creating new files.
+Function keys can be used as described in the following subsections.
+
+### [F2] -- New Page/Task
+
+One can press [F2] to create a new page. To do this, the input at the prompt
+needs to be in format `SECTION NAME` i.e. the new page's section followed by its
+name. [F2] will then copy a predefined template to a new file and open it in the
+configured editor. Note that this function only supports Document-Root
+organization for creating new files. If SECTION is set to 43 then a task rather
+than a page will be created.
+
+## D5Man TUI Task Management
+
+Since package version 1.0.54, D5Man provides some basic means to manage
+“tasks”, i.e. TODO lists or issues or the like. The idea behind this scheme is
+to leverage the Markdown format and D5Man's querying capabilities for management
+of tasks. Two distinct dimensions are considered to organize tasks:
+
+ 1. The _task type_ specifies if this task is long, short, periodic or a
+    subtask. The order of display is: periodic, then long, then short. Subtasks
+    are hidden by default and provided on a separate “tasks” screen.
+ 2. The _task priority_ specifies how important a task is by assinging colors
+    (purple, red, yellow, green, black, white). The use of the colors is up to
+    the user. Instead of a color a task can also be in state _considered_ or
+    _delayed_: Considered means that it should be kept in mind but is not
+    assigned any priority (think: very low priority) and _delayed_ means that it
+    should be hidden by default because it is not expected to be worked on any
+    time soon (e.g. not in the current week).
+
+D5Man assings the file extension `.hot` to task files to distinguish them from
+documents and all tasks are placed and expected to be in section 43. D5Man
+automatically finds tasks in Document-Root structures' section 43. Also, it
+scans the directories in Program-Root structures for `TODO.hot` files and adds
+them to the tasks to consider.
+
+The `x-masysma-name` field is expected to be set to a short identifier (e.g.
+code and number or similar) whereas the `title` is expected to summarize the
+matter of the issue.
+
+### [F4] -- All
+
+Displays all results for the given query (default). Queries will return tasks
+as well as documents depending on which matches the input string.
+
+### [F6] -- Docs
+
+Hides tasks from the result list. This is equivalent to invoking `d5mantui` with
+argument `--documents-only`.
+
+### [F7] -- Board
+
+Filters the results for large tasks that are currently considered. This is all
+tasks that have a priority not equals to `delayed` and which are also not of
+type `subtask`. This is equivalent to invoking `d5mantui` with argument
+`--board`.
+
+### [F8] -- Week + 1
+
+Filters the results for tasks that are currently delayed. This is equivalent
+to invoking `d5mantui` with argument `--delayed`.
+
+### [F9] -- Tasks
+
+Specifically filters for all subtasks. This is equivalent to invoking `d5mantui`
+with argument `--subtask`.
 
 `d5manexportpdf`
 ================

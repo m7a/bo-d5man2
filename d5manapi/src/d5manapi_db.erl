@@ -95,7 +95,8 @@ proc_document(URLPrefix, DocFile) ->
 % https://www.rosettacode.org/wiki/Read_a_file_line_by_line#Erlang
 % https://hexdocs.pm/yamerl/yamerl_constr.html
 yaml_from_pandoc_md(DocFile) ->
-	{ok, IO} = file:open(DocFile, [read]),
+	% encoding, utf8
+	{ok, IO} = file:open(DocFile, [read, binary]),
 	stream_file_to_yamerl(io:get_line(IO, ''), IO, yamerl_constr:new(
 				{file, "<stdin>"}, [{detailed_constr, false}])).
 
@@ -104,11 +105,12 @@ stream_file_to_yamerl(eof, IO, Stream) ->
 	yamerl_constr:last_chunk(Stream, <<>>);
 stream_file_to_yamerl(Line, IO, Stream) ->
 	case Line of
-	"" ->
+	<<"">> ->
 		% process normally
 		{continue, StreamNew} = yamerl_constr:next_chunk(Stream, Line),
 		stream_file_to_yamerl(io:get_line(IO, ''), IO, StreamNew);
-	[H|_T] ->
+	_Other ->
+		H = binary:at(Line, 0),
 		% Current heuristics to terminate processing is the first line
 		% encountered beginning with an uppercase letter or number. Note
 		% that this heuristics is quite incomplete and might need future
@@ -187,6 +189,8 @@ handle_call({query, Limit, Query, QSVals}, _From, Context) ->
 handle_call({page_post_updated, PageID}, _From, Context) ->
 	Key = iolist_to_binary(PageID),
 	{reply, case ets:lookup(page_metadata, Key) of
+	% TODO SHOULD BE ABLE TO CREATE A PAGE THAT IS NOT KNOWN TO THE DB YET!
+	%      SCAN FOR THE PAGE NAME IN THE KNOWN ROOTS?
 	[] -> {error, ["No page found to match provided ID. Nothing updated."]};
 	[{_Val, PageMetadata}]->
 		% some similarities with proc_document but not exactly the same

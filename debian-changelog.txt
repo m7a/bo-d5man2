@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.56) stable; urgency=medium
+
+  * Fix encoding issue in d5manapi.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Sun, 31 Jul 2022 22:06:00 +0200
+
 mdvl-d5man2 (1.0.55) stable; urgency=medium
 
   * Change location back to non-numbered because adding the numbers to the

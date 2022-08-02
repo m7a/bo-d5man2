@@ -370,7 +370,7 @@ if($search_result->{section} eq -2) {
 	my $date = $dateobj->strftime("%Y/%m/%d %H:%M:%S");
 	my $year = $dateobj->strftime("%Y");
 	mkdir($dir) if(not -d $dir);
-	if(not -f $path) {
+	if(-f $path) {
 		print("Error: File already exists: $path. Not overwriting.\n");
 		exit(1);
 	}

@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.57) stable; urgency=medium
+
+  * Avoid overwriting already existent pages upon creating new ones.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Tue, 02 Aug 2022 18:47:23 +0200
+
 mdvl-d5man2 (1.0.56) stable; urgency=medium
 
   * Fix encoding issue in d5manapi.

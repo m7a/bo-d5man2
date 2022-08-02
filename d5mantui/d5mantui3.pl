@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Ma_Sys.ma D5Man Terminal UI 3.1.1, Copyright (c) 2020, 2022 Ma_Sys.ma.
+# Ma_Sys.ma D5Man Terminal UI 3.1.2, Copyright (c) 2020, 2022 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 use strict;
@@ -370,6 +370,10 @@ if($search_result->{section} eq -2) {
 	my $date = $dateobj->strftime("%Y/%m/%d %H:%M:%S");
 	my $year = $dateobj->strftime("%Y");
 	mkdir($dir) if(not -d $dir);
+	if(not -f $path) {
+		print("Error: File already exists: $path. Not overwriting.\n");
+		exit(1);
+	}
 	open(my $fd, ">:encoding(UTF-8)", $path);
 	if($is_task) {
 		print $fd <<~EOF;

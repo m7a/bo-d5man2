@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.59) stable; urgency=medium
+
+  * Improve colorscheme for tasks. Black+White now get help from blue.
+
+ -- Ma_Sys.ma Linux-Fan <Ma_Sys.ma@web.de>  Wed, 03 Aug 2022 21:00:13 +0200
+
 mdvl-d5man2 (1.0.58) stable; urgency=medium
 
   * Fix wrong condition in code.

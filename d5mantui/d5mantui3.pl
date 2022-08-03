@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Ma_Sys.ma D5Man Terminal UI 3.1.2, Copyright (c) 2020, 2022 Ma_Sys.ma.
+# Ma_Sys.ma D5Man Terminal UI 3.1.3, Copyright (c) 2020, 2022 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 use strict;
@@ -65,12 +65,13 @@ for my $k (keys %properties) {
 
 # color name -> [fg, bg]
 my %COLOR_TABLE = (
-	"red"    => ["white", "red"],
-	"green"  => ["black", "green"],
-	"black"  => ["black", "white"],
-	"white"  => ["white", "gray"],
-	"yellow" => ["black", "yellow"],
-	"purple" => ["white", "magenta"],
+	"red"     => ["white", "red"],
+	"green"   => ["black", "green"],
+	"black"   => ["black", "white"],
+	"white"   => ["white", "blue"],
+	"yellow"  => ["black", "yellow"],
+	"purple"  => ["white", "magenta"],
+	"delayed" => ["blue",  "black"],
 );
 
 #-----------------------------------------------------[ Custom Listbox Class ]--

@@ -412,15 +412,13 @@ if($search_result->{section} eq -2) {
 			title: Template Page Title
 			date: $date
 			lang: en-US
-			author: ["Linux-Fan, Ma_Sys.ma (Ma_Sys.ma\@web.de)"]
+			author: ["Linux-Fan, Ma_Sys.ma (info\@masysma.net)"]
 			keywords: ["key", "word"]
 			x-masysma-version: 1.0.0
 			x-masysma-repository: https://www.github.com/m7a/...
-			x-masysma-website: https://masysma.lima-city.de/$section/$filename.xhtml
+			x-masysma-website: https://masysma.net/$section/$filename.xhtml
 			x-masysma-owned: 1
-			x-masysma-copyright: |
-			  Copyright (c) $year Ma_Sys.ma.
-			  For further info send an e-mail to Ma_Sys.ma\@web.de.
+			x-masysma-copyright: (c) $year Ma_Sys.ma <info@masysma.net>.
 			---
 			Template
 			========

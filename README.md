@@ -8,7 +8,7 @@ author: ["Linux-Fan, Ma_Sys.ma (Ma_Sys.ma@web.de)"]
 keywords: ["d5man", "d5man2", "d5manapi", "d5mantui", "ial"]
 x-masysma-version: 2.0.0
 x-masysma-repository: https://www.github.com/m7a/bo-d5man2
-x-masysma-website: https://masysma.lima-city.de/32/d5man2.xhtml
+x-masysma-website: https://masysma.net/32/d5man2.xhtml
 x-masysma-owned: 1
 x-masysma-copyright: |
   Copyright (c) 2019, 2020, 2022 Ma_Sys.ma.

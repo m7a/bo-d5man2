@@ -201,7 +201,8 @@ Close-to-comprehensive list: <https://www.staticgen.com/>, some candiates:
 
 ### Offline Documentation Management (IAL Alternative)
 
-<https://zealdocs.org/>
+ * <https://zealdocs.org/>
+ * <https://archivebox.io/>
 
 D5Man Format 2
 ==============

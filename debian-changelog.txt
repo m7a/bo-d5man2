@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.60) stable; urgency=medium
+
+  * Add unicode box drawing characters to LaTeX export using pmboxdraw package.
+
+ -- Ma_Sys.ma Linux-Fan <info@masysma.net>  Sun, 18 Dec 2022 22:49:59 +0100
+
 mdvl-d5man2 (1.0.59) stable; urgency=medium
 
   * Improve colorscheme for tasks. Black+White now get help from blue.

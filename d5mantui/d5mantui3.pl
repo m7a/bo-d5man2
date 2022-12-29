@@ -418,7 +418,7 @@ if($search_result->{section} eq -2) {
 			x-masysma-repository: https://www.github.com/m7a/...
 			x-masysma-website: https://masysma.net/$section/$filename.xhtml
 			x-masysma-owned: 1
-			x-masysma-copyright: (c) $year Ma_Sys.ma <info@masysma.net>.
+			x-masysma-copyright: (c) $year Ma_Sys.ma <info\@masysma.net>.
 			---
 			Template
 			========

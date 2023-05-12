@@ -5,14 +5,12 @@ title: Ma_Sys.ma D5Man 2
 date: 2019/12/06 13:16:32
 lang: en-US
 author: ["Linux-Fan, Ma_Sys.ma (Ma_Sys.ma@web.de)"]
-keywords: ["d5man", "d5man2", "d5manapi", "d5mantui", "ial"]
-x-masysma-version: 2.0.0
+keywords: ["d5man", "d5man2", "d5manapi", "d5mantui"]
+x-masysma-version: 2.1.0
 x-masysma-repository: https://www.github.com/m7a/bo-d5man2
 x-masysma-website: https://masysma.net/32/d5man2.xhtml
 x-masysma-owned: 1
-x-masysma-copyright: |
-  Copyright (c) 2019, 2020, 2022 Ma_Sys.ma.
-  For further info send an e-mail to Ma_Sys.ma@web.de.
+x-masysma-copyright: (c) 2019-2023 Ma_Sys.ma <info@masysma.net>.
 ---
 Overview
 ========
@@ -34,13 +32,8 @@ d5manexport
     supplied: `d5manexportpdf` exports a single page to a printable PDF
     document; `d5manexporthtml` exports a whole directory structure of D5Man
     pages to a specified directory.
-IAL (Information and Links)
-:   The D5Man API allows for integration of pages which are not in D5Man's
-    Pandoc Markdown format but e.g. HTML by specifying separate files with
-    D5Man-style metadta for such existing files.
-    See _Information and Links (IAL)_ for details.
 Auxiliary Resources
-:   The package provides a syntax file `markdown.md` as a replacement for VIM's
+:   The package provides a syntax file `markdown.vim` as a replacement for VIM's
     default Markdown style. This style makes sections more visible and is
     loosely inspired by the style used in D5Man Legacy.
 
@@ -972,47 +965,3 @@ shown)](d5man2_att/exportpreview)
 Without further options, exporting uses the template supplied with pandoc.
 If you want to use this for your own purposes, it makes sense to derive an own
 template for customization.
-
-Information and Links (IAL)
-===========================
-
-_Information and Links_ provides a system for storing and using (potentially
-large) pieces of documentation offline. For this purpose, IAL 1.5 integrates
-with D5Man 2 by providing a _web interface_ and a set of _scripts_ contained
-in the following directory structure in the repository:
-
-`ial/pgen` (scripts)
-:   Provides scripts to prepare existing pieces of documentation for use with
-    IAL.
-
-`ial/home` (web interface)
-:   Contains a “template” to use as a web interface to IAL.
-    The implementation is mostly contained in JavaScript file `ial15.js` with
-    the remainder of the files serving as a GUI skeleton.
-
-Assumptions
-:   By default, IAL assumes that all pages to be considered for IAL are in
-    sections 21 (for automatically generated pages) and 22 (for hand-crafted
-    pages) respectively.
-
-## Scripts
-
-The scripts provided as part of the repository require the `co-maartifact`
-repository for [maartifact(11)](../11/maartifact.xhtml) to be present next to
-`bo-d5man2`.
-
-Invoking the individual `pages_...sh` scripts then creates directories with
-files suitable for copying into an appropriate document-root D5Man 2 structure.
-Each script may have additional requirements/features which are documented at
-the beginning of its source code.
-
-## Web Interface
-
-Assumptions
-:   The web interface assumes that all IAL pages contain a `x-masysma-redirect`
-    field to identify the HTML page or website to open. This makes webbrowser
-    integration easy at the expense of not allowing “regular” D5Man 2 pages to
-    be visible in the web interface.
-
-_TODO Provide an example screen and usage howto, explain how API serves the pages_
-_TODO Provide a script to copy/update resource directories_

@@ -21,10 +21,12 @@
 </property>
 
 <property name="mdpc.file.install">
-d5manapi/_rel/d5manapi_release/bin /usr/share/mdvl-d5man2/d5manapi
-d5manapi/_rel/d5manapi_release/lib /usr/share/mdvl-d5man2/d5manapi
-d5manapi/_rel/d5manapi_release/log /usr/share/mdvl-d5man2/d5manapi
-d5manapi/_rel/d5manapi_release/releases /usr/share/mdvl-d5man2/d5manapi
+d5manapi/ebin/d5manapi.app /usr/share/mdvl-d5man2/d5manapi
+d5manapi/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
+d5manapi/deps/cowboy/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
+d5manapi/deps/cowlib/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
+d5manapi/deps/ranch/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
+d5manapi/deps/yamerl/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
 d5manapi/aux/d5manapi /usr/bin
 d5mantui/d5mantui /usr/bin
 d5manexportpdf/d5manexportpdf /usr/bin
@@ -79,19 +81,19 @@ Files: d5manapi/erlang.mk d5manapi/.erlang.mk/*
 Copyright: Copyright (c) 2013-2016, Loïc Hoguin <essen@ninenines.eu>
 License: Expat
 
-Files: d5manapi/_rel/d5manapi_release/lib/cowboy-2.7.0/* d5manapi/deps/cowboy/*
+Files: d5manapi/deps/cowboy/*
 Copyright: Copyright (c) 2011-2017, Loïc Hoguin <essen@ninenines.eu>
 License: Expat
 
-Files: d5manapi/_rel/d5manapi_release/lib/cowlib-2.8.0/* d5manapi/deps/cowlib/*
+Files: d5manapi/deps/cowlib/*
 Copyright: Copyright (c) 2013-2018, Loïc Hoguin <essen@ninenines.eu>
 License: Expat
 
-Files: d5manapi/_rel/d5manapi_release/lib/ranch-1.7.1/* d5manapi/deps/ranch/*
+Files: d5manapi/deps/ranch/*
 Copyright: Copyright (c) 2011-2018, Loïc Hoguin <essen@ninenines.eu>
 License: Expat
 
-Files: d5manapi/_rel/d5manapi_release/lib/yamerl-0.7.0/* d5manapi/deps/yamerl/*
+Files: d5manapi/deps/yamerl/*
 Copyright:
  Copyright (c) 2012-2014 Yakaz
  Copyright (c) 2016-2018 Jean-Sébastien Pédron <jean-sebastien.pedron@dumbbell.fr>

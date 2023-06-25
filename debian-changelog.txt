@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.63) stable; urgency=medium
+
+  * Add missing .app files to installation
+
+ -- Ma_Sys.ma Linux-Fan <info@masysma.net>  Sun, 25 Jun 2023 16:10:00 +0200
+
 mdvl-d5man2 (1.0.62) stable; urgency=medium
 
   * Update documentation. Rebuild for Debian 12.

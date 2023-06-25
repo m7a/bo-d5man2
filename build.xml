@@ -22,6 +22,10 @@
 
 <property name="mdpc.file.install">
 d5manapi/ebin/d5manapi.app /usr/share/mdvl-d5man2/d5manapi
+d5manapi/deps/cowboy/ebin/cowboy.app /usr/share/mdvl-d5man2/d5manapi
+d5manapi/deps/cowlib/ebin/cowlib.app /usr/share/mdvl-d5man2/d5manapi
+d5manapi/deps/ranch/ebin/ranch.app /usr/share/mdvl-d5man2/d5manapi
+d5manapi/deps/yamerl/ebin/yamerl.app /usr/share/mdvl-d5man2/d5manapi
 d5manapi/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
 d5manapi/deps/cowboy/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
 d5manapi/deps/cowlib/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi

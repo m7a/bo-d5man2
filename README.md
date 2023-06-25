@@ -10,7 +10,7 @@ x-masysma-version: 2.1.0
 x-masysma-repository: https://www.github.com/m7a/bo-d5man2
 x-masysma-website: https://masysma.net/32/d5man2.xhtml
 x-masysma-owned: 1
-x-masysma-copyright: (c) 2019-2023 Ma_Sys.ma <info@masysma.net>.
+x-masysma-copyright: (c) 2019--2023 Ma_Sys.ma <info@masysma.net>.
 ---
 Overview
 ========
@@ -127,7 +127,7 @@ two digits (i.e. ranges from 10 to 99).
    “browsing” large pieces of information (like e.g. an API documentation),
    a web-based interface is desirable. Thus there is also a read-only
    web-based interface for exactly that purpose called IAL
-   (_Information and Links_).
+   (_Information and Links_) as a separate program, see [ial(32)](ial.xhtml).
 
 A typical workflow for creating a page is as follows:
 
@@ -168,10 +168,11 @@ set of advantages:
 ## Alternatives
 
 There are countless approaches to do _static blogs_ or _personal wikis_.
-As documentation is often available online, there is less and less need for
-the functionality provided by _Information and Links_. The following lists
-some alternative softwares to cover individual aspects of D5Man. There does not
-seem to be a comprehensive substitute with all the benefits, though.
+
+### Static website generation with Markdown
+
+Close-to-comprehensive list: <https://www.staticgen.com/>, some candiates:
+[Hugo](https://gohugo.io/), [Jekyll](https://jekyllrb.com/)
 
 ### Local Wikis
 
@@ -179,23 +180,15 @@ seem to be a comprehensive substitute with all the benefits, though.
  * [Fossil SCM](https://www.fossil-scm.org/home/doc/trunk/www/index.wiki)
    integrates a Wiki and Issue Tracker storing all data in an SQLite database.
  * [EMACS Org-Mode](https://orgmode.org/)
- * Using VIM as a personal notekeeping application or Wiki:
-    * with help files:
-      <https://vim.fandom.com/wiki/Add_your_note_files_to_Vim_help>,
-      <https://vim.fandom.com/wiki/Keep_a_to-do_memo_file_with_links_as_in_Vim_help>
-    * with vimwiki: <https://github.com/vimwiki/vimwiki>,
-      <https://github.com/lervag/wiki.vim>
-    * <https://github.com/tomtom/vikibase_vim>
 
-### Static website generation with Markdown
+### Using VIM as a personal notekeeping application or Wiki
 
-Close-to-comprehensive list: <https://www.staticgen.com/>, some candiates:
-[Hugo](https://gohugo.io/), [Jekyll](https://jekyllrb.com/)
-
-### Offline Documentation Management (IAL Alternative)
-
- * <https://zealdocs.org/>
- * <https://archivebox.io/>
+ * with help files:
+   <https://vim.fandom.com/wiki/Add_your_note_files_to_Vim_help>,
+   <https://vim.fandom.com/wiki/Keep_a_to-do_memo_file_with_links_as_in_Vim_help>
+ * with vimwiki: <https://github.com/vimwiki/vimwiki>,
+   <https://github.com/lervag/wiki.vim>
+ * <https://github.com/tomtom/vikibase_vim>
 
 D5Man Format 2
 ==============

@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.62) stable; urgency=medium
+
+  * Update documentation. Rebuild for Debian 12.
+
+ -- Ma_Sys.ma Linux-Fan <info@masysma.net>  Sun, 25 Jun 2023 15:08:41 +0200
+
 mdvl-d5man2 (1.0.61) stable; urgency=medium
 
   * Fix '@' being an unintended interpolation.

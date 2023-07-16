@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.64) stable; urgency=medium
+
+  * Switch syntax highlighting to monochrome
+
+ -- Ma_Sys.ma Linux-Fan <info@masysma.net>  Sun, 16 Jul 2023 20:45:59 +0200
+
 mdvl-d5man2 (1.0.63) stable; urgency=medium
 
   * Add missing .app files to installation

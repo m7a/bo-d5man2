@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Ma_Sys.ma D5Man Export 2.1.3, Copyright (c) 2019, 2022 Ma_Sys.ma.
+# Ma_Sys.ma D5Man Export 2.1.5, Copyright (c) 2019, 2022, 2023 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 use strict;
@@ -176,9 +176,12 @@ for my $root (@roots) {
 					$tYG, $tmG, $tdG, $tHG, $tMG, $tSG);
 
 		# -- prepare parameters --
+		# find alternative highlight styles with
+		# pandoc --list-highlight-styles
 		my @params = (
 			"-s",
 			"-t", "html4",
+			"--highlight-style=monochrome",
 			"--default-image-extension=svg",
 			"-V", "x-masysma-source=$namepart.md",
 			"-V", "x-masysma-meta-revised=$date_meta",

@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.65) stable; urgency=medium
+
+  * Add support for news feed stylesheet.
+
+ -- Ma_Sys.ma Linux-Fan <info@masysma.net>  Fri, 04 Aug 2023 23:28:44 +0200
+
 mdvl-d5man2 (1.0.64) stable; urgency=medium
 
   * Switch syntax highlighting to monochrome

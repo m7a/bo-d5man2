@@ -123,10 +123,15 @@ for my $root (@roots) {
 		# if its the news page, process it.
 		if($look_for_newsp and $options{n} eq $namestr) {
 			my @content_lines = <$fh>;
+			my $hasstyle = 0;
+			if (-f "$root/$section/${namepart}_att/rss.xsl") {
+				$hasstyle = 1;
+			}
 			$newsp_found = {
 				section    => $section,
 				namepart   => $namepart,
 				secdestdir => $secdestdir,
+				hasstyle   => $hasstyle,
 				lines      => [@content_lines],
 				title      => $yaml->{title},
 				lang       => $yaml->{lang},
@@ -269,7 +274,12 @@ if(defined($newsp_found)) {
 	my $current_item = undef;
 	my $current_content = "";
 
-	my $rss = XML::RSS->new(version => "2.0");
+	my $rss;
+	if ($newsp_found->{hasstyle}) {
+		$rss = XML::RSS->new(version => "2.0", stylesheet => "rss.xsl");
+	} else {
+		$rss = XML::RSS->new(version => "2.0");
+	}
 	$rss->add_module(
 		prefix => "atom",
 		uri    => "http://www.w3.org/2005/Atom"

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Ma_Sys.ma D5Man Export 2.1.5, Copyright (c) 2019, 2022, 2023 Ma_Sys.ma.
+# Ma_Sys.ma D5Man Export 2.1.6, Copyright (c) 2019, 2022, 2023 Ma_Sys.ma.
 # For further info send an e-mail to Ma_Sys.ma@web.de.
 
 use strict;
@@ -339,13 +339,11 @@ if(defined($newsp_found)) {
 					time_zone => "local"
 				)->parse_datetime($proc_item);
 				$pubdate->set_time_zone("UTC");
-				# Cannot directly pass the object. Although it
-				# is supported, it produces the wrong date
-				# format for FSS2.0. If this is fixed upstream,
-				# it should be possible to delete this
-				# statement.
-				$pubdate = $pubdate->strftime(
+				my $rssdate = $pubdate->strftime(
 						"%a, %d %b %Y %H:%M:%S %z");
+				# GUID from date... a hack to make the
+				# validator happy
+				my $guidd = $pubdate->strftime("%Y%m%d%H%M%sZ");
 				# XML::RSS already does htmlentities _once_, but
 				# we actually need to do it _twice_ because the
 				# CDATA content of the element is interpreted
@@ -360,8 +358,9 @@ if(defined($newsp_found)) {
 					title       => $metadata->{title},
 					description => $description,
 					link        => $metadata->{url_loc},
-					guid        => $metadata->{url_loc},
-					pubDate     => $pubdate,
+					guid        => $metadata->{url_loc}."#".
+							$guidd,
+					pubDate     => $rssdate,
 				);
 			}
 			$current_content = "";

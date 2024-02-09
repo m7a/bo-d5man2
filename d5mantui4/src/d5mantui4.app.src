@@ -1,0 +1,11 @@
+{application, d5mantui4, [
+	{description,  "Ma_Sys.ma D5Man TUI"},
+	{vsn,          "4.0.0"},
+	{registered,   []},
+	{mod,          {d5mantui4_app, []}},
+	{applications, [kernel, stdlib, sasl, yamerl, cecho]},
+	{env,          []},
+	{modules,      []},
+	{licenses,     ["GPL-3+"]},
+	{links,        []}
+]}.

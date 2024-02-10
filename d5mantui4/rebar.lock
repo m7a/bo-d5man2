@@ -1,9 +1,5 @@
 {"1.2.0",
-[{<<"cecho">>,
-  {git,"https://github.com/mazenharake/cecho.git",
-       {ref,"6b5ada4769b0f16a53a4b4925b4ba2879c50de01"}},
-  0},
- {<<"yamerl">>,{pkg,<<"yamerl">>,<<"0.10.0">>},0}]}.
+[{<<"yamerl">>,{pkg,<<"yamerl">>,<<"0.10.0">>},0}]}.
 [
 {pkg_hash,[
  {<<"yamerl">>, <<"4FF81FEE2F1F6A46F1700C0D880B24D193DDB74BD14EF42CB0BCF46E81EF2F8E">>}]},

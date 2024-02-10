@@ -1,4 +1,5 @@
 release:
+	-rm /data/main/114_projects_wrk_wrpru/114.164_cecho/priv/cecho.so
 	rebar3 release
 
 compile:

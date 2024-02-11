@@ -3,7 +3,6 @@
 -behaviour(gen_server).
 
 -include_lib("cecho/include/cecho.hrl").
-%-include_lib("cecho/include/cecho_commands.hrl"). % TODO x FOR ENDWIN!
 -include_lib("d5mantui4_page.hrl").
 
 -define(CPAIR_HEADING,     1).
@@ -21,12 +20,29 @@
 -define(CPAIR_TSK_PURPLE,  13).
 -define(CPAIR_TSK_DELAYED, 14).
 
+%-include_lib("cecho/include/cecho_commands.hrl"). % TODO x FOR ENDWIN!
 %-define(ceKEY_BACKSPACE, 263).  % TODO x PR THIS!
 
 % TODO x DEV Old D5Man TUI
 % /data/main/118_man_d5i/30_man_program_etc/program/mdvl-d5man-1.0.0/d5manui/view.c
+% new page handling in d5manui.c
+
+% TODO IDEA FOR NEW PAGE OPERATION
+% Store this as a state in view record and then have the lowermost functions
+% react to it s.t. cursor handling stuff can remain in place as-is. Use F10 for
+% “exit” and maybe assign a key for “back” key. Also create a page under
+% construction state record in the view?
+
 % struct d5manui_view
--record(view, {db_status, height, width, command_editor, new_page_root,
+% mode transitions
+%  error                               -- Displaying an error message
+%  loading                             -- DB is loading
+%  display                             -- Display Query results
+%  [new_task_type, new_task_priority,] -- Special task creation steps
+%  new_tags                            -- Keywords entering step
+% end mode transitions
+-record(view, {mode, height, width, page_template,
+		command_editor, new_page_root,
 		flt_general, flt_toplevel, flt_delayed,
 		main_query, main_query_subpos, main_query_max,
 		wnd_title, wnd_input, wnd_subtitle, wnd_output, wnd_descr,
@@ -53,11 +69,12 @@ init({CommandEditor, NewPageRoot}) ->
 			"Ma_Sys.ma D5Man Terminal User Interface 4.0.0"),
 	display_title(Width, WndSubtitle, "Loading..."),
 	{ok, #view{
-		db_status         = loading,
+		mode              = loading,
 		command_editor    = CommandEditor, % TODO MAKE USE OF
 		new_page_root     = NewPageRoot,   % TODO MAKE USE OF
 		height            = Height,
 		width             = Width,
+		page_template     = #page{},       % TODO MAKE USE OF
 		flt_general       = all,
 		flt_toplevel      = all,
 		flt_delayed       = all,
@@ -153,8 +170,7 @@ handle_cast({getch, Character}, Context) ->
 	{noreply, case Character of
 		% -- Program Control --
 		?ceKEY_F(2) ->
-			% TODO CREATE NEW PAGE
-			Context;
+			page_new(Context);
 		?ceKEY_F(4) ->
 			update_filters(Context#view{flt_general = all,
 					flt_toplevel = all, flt_delayed = all});
@@ -175,9 +191,6 @@ handle_cast({getch, Character}, Context) ->
 			%        after the last application has closed. For now
 			%        this hack has to suffice.
 			init:stop(0),
-			% Other things tried:
-			%  - ok = application:stop(d5mantui4) % incomplete?
-			%  - ok = application:stop(cecho)     % error but works
 			Context;
 		?ceKEY_UP ->
 			paint_result(Context#view{main_cur_idx = max(1,
@@ -233,9 +246,38 @@ handle_cast({db_loading_complete, TimeMS}, Context) ->
 			[TimeMS])),
 	display_title(Context#view.width, Context#view.wnd_subtitle,
 							"Query Results"),
-	{noreply, query_and_draw(Context)};
+	{noreply, query_and_draw(Context#view{mode = display})};
 handle_cast(_Cast, Context) ->
 	{ok, Context}.
+
+page_new(Context) ->
+	case query_to_page_template(Context#view.main_query) of
+	{error, Msg} ->
+		display_error(Context, Msg);
+	Page ->
+		query_and_draw(Context#view{
+			page_template = Page,
+			main_query = "",
+			main_query_subpos = 0,
+			mode = case Page#page.section of
+				43 -> new_task_type; _Other -> new_tags
+				end
+		})
+	end.
+
+query_to_page_template(Query) ->
+	case string:split(erlang:list_to_binary([string:trim(Query)]),
+								" ", all) of
+	[<<>>] ->
+		{error, "Section prefix required!"};
+	[QueryBegin|QueryTail] ->
+		case is_number(catch binary_to_integer(QueryBegin)) of
+		true  -> #page{% TODO POPULATE FILE FROM CONTEXT HERE
+				name=QueryTail,
+				section=binary_to_integer(QueryBegin)};
+		false -> {error, "Section prefix must be numeric!"}
+		end
+	end.
 
 update_filters(Context) ->
 	Delayed = case Context#view.flt_delayed of
@@ -254,34 +296,54 @@ update_filters(Context) ->
 	query_and_draw(Context).
 
 query_and_draw(Context) ->
-	RV = try
-	case gen_server:call(d5mantui4_db, {query,
-				Context#view.main_cur_height * 10,
-				Context#view.main_query,
-				Context#view.flt_general,
-				Context#view.flt_toplevel,
-				Context#view.flt_delayed}) of
-	{error, Error} ->
-		cecho:werase(Context#view.wnd_output),
-		cecho:mvwaddstr(Context#view.wnd_output,
-			Context#view.main_cur_idx + 1, 2,
-			io_lib:format("[FAIL] DB Query failed: ~w~n", [Error])),
-		cecho:wrefresh(Context#view.wnd_output),
+	case Context#view.mode of
+	error ->
 		Context;
+	display ->
+		query_and_draw_db(Context, {query,
+					Context#view.main_cur_height * 10,
+					Context#view.main_query,
+					Context#view.flt_general,
+					Context#view.flt_toplevel,
+					Context#view.flt_delayed});
+	new_tags ->
+		query_and_draw_db(Context, {query_tags,
+					Context#view.main_cur_height * 10,
+					Context#view.main_query});
+	new_task_type ->
+		paint_result(Context#view{main_cresult = fake_pages([
+				{1, <<"long">>},    {2, <<"short">>},
+				{3, <<"subtask">>}, {4, <<"periodic">>}
+			]), main_cur_idx = 1});
+	new_task_priority ->
+		paint_result(Context#view{main_cresult = fake_pages([
+				{1, <<"red">>},     {2, <<"green">>},
+				{3, <<"black">>},   {4, <<"white">>},
+				{5, <<"yellow">>},  {6, <<"purple">>},
+				{7, <<"delayed">>}, {8, <<"considered">>}
+			]), main_cur_idx = 1})
+	end.
+
+query_and_draw_db(Context, Query) ->
+	case gen_server:call(d5mantui4_db, Query) of
+	{error, Error} ->
+		display_error(Context,
+			io_lib:format("[FAIL] DB Query: ~w~n", [Error]));
 	Results ->
 		paint_result(Context#view{main_cresult = Results,
 							main_cur_idx = 1})
-	end
-	catch Etype:Emsg:_StackTrace ->
-		% TODO x DEBUG ONLY
-		cecho:mvwaddstr(Context#view.wnd_output,
-			Context#view.main_cur_idx + 1, 2,
-			io_lib:format("[FAIL] ~w: ~p~n", [Etype, Emsg])),
-		timer:sleep(20000),
-		cecho:wrefresh(Context#view.wnd_output),
-		Context
-	end,
-	RV.
+	end.
+
+display_error(Context, Msg) ->
+	Ctx2 = case Context#view.mode of
+		error  -> Context#view{main_cur_idx =
+					Context#view.main_cur_idx + 1};
+		_Other -> Context#view{mode = error, main_cur_idx = 0}
+		end,
+	cecho:werase(Ctx2#view.wnd_output),
+	cecho:mvwaddstr(Ctx2#view.wnd_output, Ctx2#view.main_cur_idx, 2, Msg),
+	cecho:wrefresh(Ctx2#view.wnd_output),
+	Ctx2.
 
 paint_result(Context) ->
 	cecho:werase(Context#view.wnd_output),
@@ -310,7 +372,7 @@ draw_pages_recursive(Context, [Result|Remainder], CY, PW, CW, EntryNumber) ->
 	false ->
 		cecho:attron(Context#view.wnd_output, Attrs),
 		cecho:mvwaddstr(Context#view.wnd_output, CY, PW, case IsTask of
-			true -> io_lib:format("~3w ~-14s ~-40s~n",
+			true  -> io_lib:format("~3w ~-14s ~-40s~n",
 					[Result#page.section, Result#page.name,
 					Result#page.title]);
 			false -> io_lib:format("~3w ~s~n", [Result#page.section,
@@ -345,6 +407,9 @@ toggle(all,  A, _B) -> A;
 toggle(B,   _A,  B) -> all;
 toggle(A,    A,  B) -> B.
 
+fake_pages(PageList) ->
+	[#page{name=Title, section=Section} || {Section, Title} <- PageList].
+
 update_input(Context) ->
 	Atts = ?ceA_UNDERLINE bor ?ceCOLOR_PAIR(?CPAIR_INPUT_DATA),
 	cecho:attron(Context#view.wnd_input, Atts),
@@ -364,13 +429,42 @@ delete_character(Context, Delta) ->
 		main_query_subpos = Context#view.main_query_subpos + Delta}).
 
 handle_call({getch, 16#0a}, _From, Context) ->
-	{reply, ok, case Context#view.main_cresult of
-		[]   -> Context;
-		List -> edit_page(Context, lists:nth(Context#view.main_cur_idx,
+	{reply, ok, case {Context#view.mode, Context#view.main_cresult} of
+		{error, _Any} ->
+			query_and_draw(Context#view{mode = display});
+		{_Any2, []} ->
+			Context;
+		{new_task_type, _List} ->
+			progress_new_task(Context, task_type,
+							new_task_priority);
+		{new_task_priority, _List} ->
+			progress_new_task(Context, task_priority, new_tags);
+		{new_tags, _List} ->
+			% TODO UPDATE TEMPLATE WITH TAGS LIST FROM QUERY AND THEN CREATE FILE ACCORDING TO SECTION AND TEMPLATE THEN EDIT THAT NEWLY CREATED PAGE!
+			todo;
+		{display, List} ->
+			edit_page(Context, lists:nth(Context#view.main_cur_idx,
 									List))
-	end};
+		end
+	};
 handle_call(_Query, _From, Context) ->
 	{reply, error_unknown_call, Context}.
+
+progress_new_task(Context, UpdateField, NextStep) ->
+	ResultPage = lists:nth(Context#view.main_cur_idx,
+						Context#view.main_cresult),
+	FieldValue = binary_to_list(ResultPage#page.name),
+	TPL        = Context#view.page_template,
+	query_and_draw(Context#view{
+		mode              = NextStep,
+		main_query        = "",
+		main_query_subpos = 0,
+		page_template     =
+			case UpdateField of
+			task_type     -> TPL#page{task_type     = FieldValue};
+			task_priority -> TPL#page{task_priority = FieldValue}
+			end
+	}).
 
 edit_page(Context, Page) ->
 	[Executable|Args] = Context#view.command_editor,

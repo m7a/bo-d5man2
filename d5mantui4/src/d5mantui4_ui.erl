@@ -170,7 +170,7 @@ handle_cast({getch, Character}, Context) ->
 	{noreply, case Character of
 		% -- Program Control --
 		?ceKEY_F(2) ->
-			page_new(Context);
+			page_new_start(Context);
 		?ceKEY_F(4) ->
 			update_filters(Context#view{flt_general = all,
 					flt_toplevel = all, flt_delayed = all});
@@ -250,8 +250,8 @@ handle_cast({db_loading_complete, TimeMS}, Context) ->
 handle_cast(_Cast, Context) ->
 	{ok, Context}.
 
-page_new(Context) ->
-	case query_to_page_template(Context#view.main_query) of
+page_new_start(Context) ->
+	case query_to_page_template(Context) of
 	{error, Msg} ->
 		display_error(Context, Msg);
 	Page ->
@@ -265,16 +265,26 @@ page_new(Context) ->
 		})
 	end.
 
-query_to_page_template(Query) ->
-	case string:split(erlang:list_to_binary([string:trim(Query)]),
-								" ", all) of
+query_to_page_template(Context) ->
+	case string:split(erlang:list_to_binary([string:trim(
+				Context#view.main_query)]), " ", all) of
 	[<<>>] ->
 		{error, "Section prefix required!"};
 	[QueryBegin|QueryTail] ->
 		case is_number(catch binary_to_integer(QueryBegin)) of
-		true  -> #page{% TODO POPULATE FILE FROM CONTEXT HERE
+		true ->
+			SecInt = binary_to_integer(QueryBegin),
+			#page{
+				file=filename:join([Context#view.new_page_root,
+					QueryBegin,
+					string:replace(QueryTail, "/", "_"),
+					case SecInt of
+						43     -> ".hot";
+						_Other -> ".d5i"
+					end]),
 				name=QueryTail,
-				section=binary_to_integer(QueryBegin)};
+				section=SecInt
+			};
 		false -> {error, "Section prefix must be numeric!"}
 		end
 	end.
@@ -307,7 +317,12 @@ query_and_draw(Context) ->
 					Context#view.flt_toplevel,
 					Context#view.flt_delayed});
 	new_tags ->
-		query_and_draw_db(Context, {query_tags,
+		TagList = string:split(Context#view.main_query, " ", all),
+		TPL     = Context#view.page_template,
+		% TODO X MAY NEED TO CONVERT TO BINARY HERE!
+		query_and_draw_db(Context#view{page_template = TPL#page{
+							tags = TagList}},
+			{query_tags, lists:last(TagList),
 					Context#view.main_cur_height * 10,
 					Context#view.main_query});
 	new_task_type ->
@@ -440,8 +455,16 @@ handle_call({getch, 16#0a}, _From, Context) ->
 		{new_task_priority, _List} ->
 			progress_new_task(Context, task_priority, new_tags);
 		{new_tags, _List} ->
-			% TODO UPDATE TEMPLATE WITH TAGS LIST FROM QUERY AND THEN CREATE FILE ACCORDING TO SECTION AND TEMPLATE THEN EDIT THAT NEWLY CREATED PAGE!
-			todo;
+			%TPL = Context#view.page_template,
+			% TODO UNCLEAR IF NEED TO UPDATE WITH TAGS LIST BECAUSE WE COULD ALSO DO THIS FOR EACH CHARACTER ENTERED (NEED TO DO IT FOR QUERY OF SORTS ANYWAYS...)
+			edit_new(Context#view{
+				%page_template = TPL#page{
+				%	
+				%},
+				main_query        = "",
+				main_query_subpos = 0,
+				mode              = display
+			});
 		{display, List} ->
 			edit_page(Context, lists:nth(Context#view.main_cur_idx,
 									List))
@@ -465,6 +488,82 @@ progress_new_task(Context, UpdateField, NextStep) ->
 			task_priority -> TPL#page{task_priority = FieldValue}
 			end
 	}).
+
+edit_new(Context) ->
+	TPL = Context#view.page_template,
+	% Date handling from here
+	% https://stackoverflow.com/questions/58004415/how-to-convert-erlangti
+	{{Y,M,D}, {H,I,S}} = calendar:now_to_datetime(erlang:timestamp()),
+	case file:write_file(TPL#page.file,
+		case TPL#page.section of
+		43 -> io_lib:format(
+"---
+section: 43
+x-masysma-name: \"~s\"
+title: ~s
+date: ~w/~2..0w/~2..0w ~2..0w:~2..0w:~2..0w
+lang: en-US
+keywords: ~w
+x-masysma-task-type: ~w
+x-masysma-task-priority: ~w
+---
+Task Overview
+=============
+
+This text can be upgraded as needed.
+
+x-masysma-task-type
+:   long | short | subtask | periodic
+x-masysma-task-priority
+:   red | green | black | white | yellow | purple |
+    delayed | considered
+
+~w/~2.00w/~2..0w
+==========
+
+Task Step. This text is never changed after being added.
+",
+				[TPL#page.name, TPL#page.title,
+				Y, M, D, H, I, S,
+				TPL#page.tags, TPL#page.task_type,
+				TPL#page.task_priority,
+				Y, M, D]
+			);
+		_RegularPage -> io_lib:format(
+"---
+section: ~w
+x-masysma-name: ~s
+title: ~s
+date: ~w/~2..0w/~2..0w ~2..0w:~2..0w:~2..0w
+lang: en-US
+author: [\"Linux-Fan, Ma_Sys.ma (info\@masysma.net)\"]
+keywords: ~w
+x-masysma-version: 1.0.0
+x-masysma-repository: https://www.github.com/m7a/...
+x-masysma-website: https://masysma.net/~w/~w.xhtml
+x-masysma-owned: 1
+x-masysma-copyright: (c) ~w Ma_Sys.ma <info\@masysma.net>.
+---
+Template
+========
+
+D5Man 2 Template file.
+Edit metadata, delete template, start writing.
+",
+				[TPL#page.section, TPL#page.name,
+				TPL#page.title, Y, M, D, H, I, S,
+				TPL#page.tags, TPL#page.section, Y,
+				filename:basename(TPL#page.file)]
+			)
+		end)
+	of
+	ok ->
+		edit_page(Context, TPL);
+	{error, Reason} ->
+		display_error(Context,
+				io_lib:format("Failed to create page at ~w: ~w",
+				[TPL#page.file, Reason]))
+	end.
 
 edit_page(Context, Page) ->
 	[Executable|Args] = Context#view.command_editor,

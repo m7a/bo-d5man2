@@ -23,10 +23,6 @@
 %-include_lib("cecho/include/cecho_commands.hrl"). % TODO x FOR ENDWIN!
 %-define(ceKEY_BACKSPACE, 263).  % TODO x PR THIS!
 
-% TODO x DEV Old D5Man TUI
-% /data/main/118_man_d5i/30_man_program_etc/program/mdvl-d5man-1.0.0/d5manui/view.c
-% new page handling in d5manui.c
-
 % TODO IDEA FOR NEW PAGE OPERATION
 % Store this as a state in view record and then have the lowermost functions
 % react to it s.t. cursor handling stuff can remain in place as-is. Use F10 for
@@ -70,11 +66,11 @@ init({CommandEditor, NewPageRoot}) ->
 	display_title(Width, WndSubtitle, "Loading..."),
 	{ok, #view{
 		mode              = loading,
-		command_editor    = CommandEditor, % TODO MAKE USE OF
-		new_page_root     = NewPageRoot,   % TODO MAKE USE OF
+		command_editor    = CommandEditor,
+		new_page_root     = NewPageRoot,
 		height            = Height,
 		width             = Width,
-		page_template     = #page{},       % TODO MAKE USE OF
+		page_template     = #page{},
 		flt_general       = all,
 		flt_toplevel      = all,
 		flt_delayed       = all,
@@ -255,6 +251,7 @@ page_new_start(Context) ->
 	{error, Msg} ->
 		display_error(Context, Msg);
 	Page ->
+		% TODO MAYBE CLEAR INPUT HERE...
 		query_and_draw(Context#view{
 			page_template = Page,
 			main_query = "",
@@ -319,12 +316,14 @@ query_and_draw(Context) ->
 	new_tags ->
 		TagList = string:split(Context#view.main_query, " ", all),
 		TPL     = Context#view.page_template,
-		% TODO X MAY NEED TO CONVERT TO BINARY HERE!
-		query_and_draw_db(Context#view{page_template = TPL#page{
-							tags = TagList}},
-			{query_tags, lists:last(TagList),
-					Context#view.main_cur_height * 10,
-					Context#view.main_query});
+		query_and_draw_db(
+			Context#view{page_template = TPL#page{tags = TagList}},
+			{query_tags, Context#view.main_cur_height * 10,
+				case TagList of
+				[]     -> <<>>;
+				_Other -> list_to_binary(lists:last(TagList))
+				end}
+		);
 	new_task_type ->
 		paint_result(Context#view{main_cresult = fake_pages([
 				{1, <<"long">>},    {2, <<"short">>},
@@ -432,6 +431,11 @@ update_input(Context) ->
 	cecho:attroff(Context#view.wnd_input, Atts),
 	update_cursor(Context).
 
+% TODO NEED TO ERASE INPUT FIELD CORRECTLY
+%clear_input(Context) ->
+%	cecho:werase(Context#view.wnd_input),
+%	update_input(Context).
+
 delete_character(Context, Delta) ->
 	{Prefix, [_Drop|Suffix]} = lists:split(Context#view.main_query_subpos +
 						Delta, Context#view.main_query),
@@ -455,12 +459,7 @@ handle_call({getch, 16#0a}, _From, Context) ->
 		{new_task_priority, _List} ->
 			progress_new_task(Context, task_priority, new_tags);
 		{new_tags, _List} ->
-			%TPL = Context#view.page_template,
-			% TODO UNCLEAR IF NEED TO UPDATE WITH TAGS LIST BECAUSE WE COULD ALSO DO THIS FOR EACH CHARACTER ENTERED (NEED TO DO IT FOR QUERY OF SORTS ANYWAYS...)
 			edit_new(Context#view{
-				%page_template = TPL#page{
-				%	
-				%},
 				main_query        = "",
 				main_query_subpos = 0,
 				mode              = display
@@ -573,6 +572,7 @@ edit_page(Context, Page) ->
 		Args ++ [Page#page.file]}, nouse_stdio, exit_status]),
 	receive
 	{Port, {exit_status, _RC}} ->
+		% TODO UPDATE DB AFTER EDIT! [AND DISTINGUISH QUIT AND BACK USER INTENTIONS]
 		cecho:refresh(),
 		Context
 	end.

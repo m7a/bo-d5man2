@@ -19,6 +19,7 @@ handle_cast({start_load_db, URLPrefix}, {RootList, NotifyUI}) ->
 	% id := page(section)
 	ets:new(page_metadata,  [set, named_table]), % id   -> #page
 	ets:new(index_names,    [bag, named_table]), % name -> idlist
+	ets:new(index_tags,     [set, named_table]), % tag  -> frequency
 	lists:foreach(fun(Root) ->
 		case file:list_dir(Root) of
 		{error, Emsg} ->
@@ -88,7 +89,9 @@ proc_document(URLPrefix, NotifyUI, DocFile) ->
 			Id = iolist_to_binary([Rec#page.name, <<"(">>,
 				integer_to_binary(Rec#page.section), <<")">>]),
 			ets:insert(page_metadata, {Id, Rec}),
-			ets:insert(index_names,   {Rec#page.name, Id})
+			ets:insert(index_names,   {Rec#page.name, Id}),
+			lists:foreach(fun(Tag) -> ets:update_counter(index_tags,
+					Tag, {1, 1}, 1) end, Rec#page.tags)
 		end,
 		% droplast: do not process document content part
 		% (which is often null)
@@ -233,6 +236,19 @@ handle_call({query, Limit, Query, GF, TFT, TFD}, _From, Context) ->
 		% direct match query complete
 		_Match -> DirectMatch
 	end, Context};
+handle_call({query_tags, Limit, Prefix}, _From, Context) ->
+	MatchLen = byte_size(Prefix),
+	MatchSpec = ets:fun2ms(fun({Tag, Count}) when
+				binary_part(Tag, MatchLen) =:= Prefix ->
+			{Tag, Count}
+		end),
+	{reply, lists:map(fun({Tag, Count}) ->
+				#page{section=min(99, Count), name=Tag} end,
+		lists:sort(fun({_TagA, CountA}, {_TagB, CountB}) ->
+				CountA > CountB end,
+		case ets:select(index_tags, MatchSpec, Limit) of
+			'$end_of_table' -> []; List -> List
+		end)), Context};
 % PageID format is page_name(section). this is a key into page_metadata table
 % which will point us to the file to consult. Returns io list.
 handle_call({page_post_updated, PageID}, _From, Context) ->

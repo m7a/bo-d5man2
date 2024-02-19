@@ -122,8 +122,9 @@ display_title(Width, Wnd, Msg) ->
 	end.
 
 window_create_input(Width, CY) ->
-	{Y1, Wnd} = window_create_default(Width, 1, CY),
+	window_draw_input(Width, window_create_default(Width, 1, CY)).
 
+window_draw_input(Width, {Y1, Wnd}) ->
 	Attrs = ?ceA_BOLD bor ?ceCOLOR_PAIR(?CPAIR_INPUT_BRACK),
 	cecho:attron(Wnd, Attrs),
 	cecho:mvwaddch(Wnd, 0, 1, $[),
@@ -251,16 +252,19 @@ page_new_start(Context) ->
 	{error, Msg} ->
 		display_error(Context, Msg);
 	Page ->
-		% TODO MAYBE CLEAR INPUT HERE...
-		query_and_draw(Context#view{
+		query_and_draw(clear_input(Context#view{
 			page_template = Page,
-			main_query = "",
-			main_query_subpos = 0,
 			mode = case Page#page.section of
 				43 -> new_task_type; _Other -> new_tags
 				end
-		})
+		}))
 	end.
+
+clear_input(Context) ->
+	cecho:werase(Context#view.wnd_input),
+	window_draw_input(Context#view.width, {2, Context#view.wnd_input}),
+	cecho:wrefresh(Context#view.wnd_input),
+	Context#view{main_query = "", main_query_subpos = 0}.
 
 query_to_page_template(Context) ->
 	case string:split(erlang:list_to_binary([string:trim(
@@ -274,10 +278,10 @@ query_to_page_template(Context) ->
 			#page{
 				file=filename:join([Context#view.new_page_root,
 					QueryBegin,
-					string:replace(QueryTail, "/", "_"),
+					string:replace(QueryTail, "/", "_") ++
 					case SecInt of
 						43     -> ".hot";
-						_Other -> ".d5i"
+						_Other -> ".md"
 					end]),
 				name=QueryTail,
 				section=SecInt
@@ -315,15 +319,12 @@ query_and_draw(Context) ->
 					Context#view.flt_delayed});
 	new_tags ->
 		TagList = string:split(Context#view.main_query, " ", all),
-		TPL     = Context#view.page_template,
-		query_and_draw_db(
-			Context#view{page_template = TPL#page{tags = TagList}},
-			{query_tags, Context#view.main_cur_height * 10,
+		query_and_draw_db(Context, {query_tags,
+					Context#view.main_cur_height * 10,
 				case TagList of
 				[]     -> <<>>;
 				_Other -> list_to_binary(lists:last(TagList))
-				end}
-		);
+				end});
 	new_task_type ->
 		paint_result(Context#view{main_cresult = fake_pages([
 				{1, <<"long">>},    {2, <<"short">>},
@@ -431,11 +432,6 @@ update_input(Context) ->
 	cecho:attroff(Context#view.wnd_input, Atts),
 	update_cursor(Context).
 
-% TODO NEED TO ERASE INPUT FIELD CORRECTLY
-%clear_input(Context) ->
-%	cecho:werase(Context#view.wnd_input),
-%	update_input(Context).
-
 delete_character(Context, Delta) ->
 	{Prefix, [_Drop|Suffix]} = lists:split(Context#view.main_query_subpos +
 						Delta, Context#view.main_query),
@@ -451,6 +447,13 @@ handle_call({getch, 16#0a}, _From, Context) ->
 	{reply, ok, case {Context#view.mode, Context#view.main_cresult} of
 		{error, _Any} ->
 			query_and_draw(Context#view{mode = display});
+		{new_tags, _List} ->
+			TPL = Context#view.page_template,
+			edit_new(clear_input(Context#view{
+				page_template = TPL#page{tags = string:split(
+					Context#view.main_query, " ", all)},
+				mode = display
+			}));
 		{_Any2, []} ->
 			Context;
 		{new_task_type, _List} ->
@@ -458,12 +461,6 @@ handle_call({getch, 16#0a}, _From, Context) ->
 							new_task_priority);
 		{new_task_priority, _List} ->
 			progress_new_task(Context, task_priority, new_tags);
-		{new_tags, _List} ->
-			edit_new(Context#view{
-				main_query        = "",
-				main_query_subpos = 0,
-				mode              = display
-			});
 		{display, List} ->
 			edit_page(Context, lists:nth(Context#view.main_cur_idx,
 									List))
@@ -477,22 +474,20 @@ progress_new_task(Context, UpdateField, NextStep) ->
 						Context#view.main_cresult),
 	FieldValue = binary_to_list(ResultPage#page.name),
 	TPL        = Context#view.page_template,
-	query_and_draw(Context#view{
-		mode              = NextStep,
-		main_query        = "",
-		main_query_subpos = 0,
-		page_template     =
+	query_and_draw(clear_input(Context#view{mode = NextStep,
+			page_template =
 			case UpdateField of
 			task_type     -> TPL#page{task_type     = FieldValue};
 			task_priority -> TPL#page{task_priority = FieldValue}
 			end
-	}).
+	})).
 
 edit_new(Context) ->
 	TPL = Context#view.page_template,
 	% Date handling from here
 	% https://stackoverflow.com/questions/58004415/how-to-convert-erlangti
 	{{Y,M,D}, {H,I,S}} = calendar:now_to_datetime(erlang:timestamp()),
+	Tags = lists:join("\", \"", TPL#page.tags),
 	case file:write_file(TPL#page.file,
 		case TPL#page.section of
 		43 -> io_lib:format(
@@ -502,7 +497,7 @@ x-masysma-name: \"~s\"
 title: ~s
 date: ~w/~2..0w/~2..0w ~2..0w:~2..0w:~2..0w
 lang: en-US
-keywords: ~w
+keywords: [\"~s\", \"task\"]
 x-masysma-task-type: ~w
 x-masysma-task-priority: ~w
 ---
@@ -520,11 +515,10 @@ x-masysma-task-priority
 ~w/~2.00w/~2..0w
 ==========
 
-Task Step. This text is never changed after being added.
+Task Step. Text intended to show the history and not be changed after addition.
 ",
 				[TPL#page.name, TPL#page.title,
-				Y, M, D, H, I, S,
-				TPL#page.tags, TPL#page.task_type,
+				Y, M, D, H, I, S, Tags, TPL#page.task_type,
 				TPL#page.task_priority,
 				Y, M, D]
 			);
@@ -532,14 +526,14 @@ Task Step. This text is never changed after being added.
 "---
 section: ~w
 x-masysma-name: ~s
-title: ~s
+title: Untitled
 date: ~w/~2..0w/~2..0w ~2..0w:~2..0w:~2..0w
 lang: en-US
 author: [\"Linux-Fan, Ma_Sys.ma (info\@masysma.net)\"]
-keywords: ~w
+keywords: [\"~s\"]
 x-masysma-version: 1.0.0
 x-masysma-repository: https://www.github.com/m7a/...
-x-masysma-website: https://masysma.net/~w/~w.xhtml
+x-masysma-website: https://masysma.net/~w/~s.xhtml
 x-masysma-owned: 1
 x-masysma-copyright: (c) ~w Ma_Sys.ma <info\@masysma.net>.
 ---
@@ -550,9 +544,8 @@ D5Man 2 Template file.
 Edit metadata, delete template, start writing.
 ",
 				[TPL#page.section, TPL#page.name,
-				TPL#page.title, Y, M, D, H, I, S,
-				TPL#page.tags, TPL#page.section, Y,
-				filename:basename(TPL#page.file)]
+				Y, M, D, H, I, S, Tags, TPL#page.section,
+				filename:basename(TPL#page.file, ".md"), Y]
 			)
 		end)
 	of
@@ -560,7 +553,7 @@ Edit metadata, delete template, start writing.
 		edit_page(Context, TPL);
 	{error, Reason} ->
 		display_error(Context,
-				io_lib:format("Failed to create page at ~w: ~w",
+				io_lib:format("Failed to create page at ~s: ~w",
 				[TPL#page.file, Reason]))
 	end.
 

@@ -20,15 +20,13 @@
 -define(CPAIR_TSK_PURPLE,  13).
 -define(CPAIR_TSK_DELAYED, 14).
 
-%-include_lib("cecho/include/cecho_commands.hrl"). % TODO x FOR ENDWIN!
-%-define(ceKEY_BACKSPACE, 263).  % TODO x PR THIS!
-
-% TODO IDEA FOR NEW PAGE OPERATION
+% Idea for new page operation
+% ---------------------------
 % Store this as a state in view record and then have the lowermost functions
 % react to it s.t. cursor handling stuff can remain in place as-is. Use F10 for
 % “exit” and maybe assign a key for “back” key. Also create a page under
-% construction state record in the view?
-
+% construction state record in the view.
+%
 % struct d5manui_view
 % mode transitions
 %  error                               -- Displaying an error message

@@ -239,7 +239,7 @@ handle_call({query, Limit, Query, GF, TFT, TFD}, _From, Context) ->
 handle_call({query_tags, Limit, Prefix}, _From, Context) ->
 	MatchLen = byte_size(Prefix),
 	MatchSpec = ets:fun2ms(fun({Tag, Count}) when
-				binary_part(Tag, MatchLen) =:= Prefix ->
+				binary_part(Tag, {0, MatchLen}) =:= Prefix ->
 			{Tag, Count}
 		end),
 	{reply, lists:map(fun({Tag, Count}) ->

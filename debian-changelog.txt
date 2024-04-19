@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.66) stable; urgency=medium
+
+  * Upgrade d5mantui3 to d5mantui4 (new TUI)
+
+ -- Ma_Sys.ma Linux-Fan <info@masysma.net>  Fri, 19 Apr 2024 22:11:03 +0200
+
 mdvl-d5man2 (1.0.65) stable; urgency=medium
 
   * Add support for news feed stylesheet.

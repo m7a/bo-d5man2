@@ -6,6 +6,7 @@
 <property name="mdpc.section" value="misc"/>
 <property name="mdpc.descrs"  value="D5Man 2"/>
 <property name="mdpc.arch"    value="all"/>
+<property name="mdpc.bdep"    value="rebar3, mdvl-cecho"/>
 <property name="mdpc.depends">erlang-base, libyaml-tiny-perl,
 	libfile-copy-recursive-perl, libdatetime-perl, libfile-homedir-perl,
 	libxml-rss-perl, libdatetime-format-strptime-perl</property>

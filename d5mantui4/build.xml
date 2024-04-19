@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="build">
+
+	<target name="build">
+		<exec executable="rebar3" failonerror="true">
+			<arg value="release"/>
+		</exec>
+		<!-- hacks to work around architecture-specific code being incldued in package... -->
+		<delete dir="_build/default/rel/d5mantui/lib/cecho-0.5.2"
+				followSymlinks="false"
+				removeNotFollowedSymlinks="true"/>
+		<delete dir="_build/default/rel/d5mantui/lib/cecho-0.5.2"/>
+		<symlink link="${basedir}/_build/default/rel/d5mantui/lib/cecho-0.5.2"
+				resource="/usr/lib/erlang/lib/cecho-0.6.0"/>
+	</target>
+
+	<target name="clean">
+		<exec executable="rebar3" failonerror="true">
+			<arg value="clean"/>
+		</exec>
+	</target>
+
+	<target name="run" depends="build">
+		<exec executable="/bin/sh" failonerror="false">
+			<arg value="-ec"/>
+			<arg value="./_build/default/rel/d5mantui/bin/d5mantui foreground &lt; /dev/tty &gt; /dev/tty 2&gt; /dev/tty"/>
+		</exec>
+	</target>
+
+	<target name="dist-clean">
+		<delete dir="_build" followSymlinks="false"
+					removeNotFollowedSymlinks="true"/>
+		<delete dir="_build"/>
+	</target>
+
+</project>

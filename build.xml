@@ -6,33 +6,19 @@
 <property name="mdpc.section" value="misc"/>
 <property name="mdpc.descrs"  value="D5Man 2"/>
 <property name="mdpc.arch"    value="all"/>
-<!-- bdep devscripts, erlang, ant, pkg-config-dev ? -->
 <property name="mdpc.depends">erlang-base, libyaml-tiny-perl,
-	libfile-copy-recursive-perl, librest-client-perl, liburi-encode-perl,
-	libxml-dom-perl, libcurses-ui-perl, libdatetime-perl,
-	libfile-homedir-perl, libxml-rss-perl,
-	libdatetime-format-strptime-perl</property>
+	libfile-copy-recursive-perl, libdatetime-perl, libfile-homedir-perl,
+	libxml-rss-perl, libdatetime-format-strptime-perl</property>
 <property name="mdpc.descrl">
  Ma_Sys.ma D5Man is a locally run knowledge base consisting of:
- d5manapi        -- a server to provide metadata access
  d5mantui        -- a client to interactively query the server
  d5manexportpdf  -- a script to export D5Man pages to PDF
  d5manexporthtml -- a script to export D5Man trees to HTML pages
 </property>
 
 <property name="mdpc.file.install">
-d5manapi/ebin/d5manapi.app /usr/share/mdvl-d5man2/d5manapi
-d5manapi/deps/cowboy/ebin/cowboy.app /usr/share/mdvl-d5man2/d5manapi
-d5manapi/deps/cowlib/ebin/cowlib.app /usr/share/mdvl-d5man2/d5manapi
-d5manapi/deps/ranch/ebin/ranch.app /usr/share/mdvl-d5man2/d5manapi
-d5manapi/deps/yamerl/ebin/yamerl.app /usr/share/mdvl-d5man2/d5manapi
-d5manapi/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
-d5manapi/deps/cowboy/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
-d5manapi/deps/cowlib/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
-d5manapi/deps/ranch/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
-d5manapi/deps/yamerl/ebin/*.beam /usr/share/mdvl-d5man2/d5manapi
-d5manapi/aux/d5manapi /usr/bin
-d5mantui/d5mantui /usr/bin
+d5mantui4/d5mantui /usr/bin
+d5mantui4/_build/default/rel/d5mantui /usr/share/mdvl-d5man2
 d5manexportpdf/d5manexportpdf /usr/bin
 d5manexportpdf/d5manexportpdfcheckerr /usr/bin
 d5manexportpdf/d5manexporttex /usr/bin
@@ -58,49 +44,6 @@ License: GPL-3+
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 License-Reference: /usr/share/common-licenses/GPL-3
 
-License: Expat
- Permission to use, copy, modify, and/or distribute this software for any
- purpose with or without fee is hereby granted, provided that the above
- copyright notice and this permission notice appear in all copies.
- .
- THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-Files: README.md build.xml d5man2.md markdown.vim d5manexporthtml/* ial/* d5manexportpdf/d5manexportpdf d5manexportpdf/tplpdf/*.pdf d5mantui/* debian/* d5manapi/aux/* d5manapi/rel/* d5manapi/src/* d5manapi/ebin/* d5manapi/relx.config d5manapi/build.xml d5manapi/Makefile d5manapi/_rel/d5manapi_release/releases/* d5manapi/_rel/d5manapi_release/lib/d5manapi-2.0.0/* d5manapi/_rel/d5manapi_release/bin/* d5manapi/_rel/d5manapi_release/d5manapi_release-1.tar.gz xdev/*
-Copyright: Copyright (c) 2019, 2020 Ma_Sys.ma <Ma_Sys.ma@web.de>
-License: GPL-3+
-
-Files: d5manexportpdf/tplpdf/masysma_d5man.tex
-Copyright:
- Copyright (c) 2014--2017, John MacFarlane
- Copyright (c) 2019 Ma_Sys.ma <Ma_Sys.ma@web.de>
-License: GPL-3+
-
-Files: d5manapi/erlang.mk d5manapi/.erlang.mk/*
-Copyright: Copyright (c) 2013-2016, Loïc Hoguin <essen@ninenines.eu>
-License: Expat
-
-Files: d5manapi/deps/cowboy/*
-Copyright: Copyright (c) 2011-2017, Loïc Hoguin <essen@ninenines.eu>
-License: Expat
-
-Files: d5manapi/deps/cowlib/*
-Copyright: Copyright (c) 2013-2018, Loïc Hoguin <essen@ninenines.eu>
-License: Expat
-
-Files: d5manapi/deps/ranch/*
-Copyright: Copyright (c) 2011-2018, Loïc Hoguin <essen@ninenines.eu>
-License: Expat
-
-Files: d5manapi/deps/yamerl/*
-Copyright:
- Copyright (c) 2012-2014 Yakaz
- Copyright (c) 2016-2018 Jean-Sébastien Pédron <jean-sebastien.pedron@dumbbell.fr>
 License: BSD-2-Clause
  All rights reserved.
  .
@@ -124,6 +67,22 @@ License: BSD-2-Clause
  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  SUCH DAMAGE.
+
+Files: README.md build.xml d5man2.md markdown.vim d5manexporthtml/* d5manexportpdf/d5manexportpdf d5manexportpdf/tplpdf/*.pdf d5mantui4/src/* d5mantui4/*.* d5mantui4/d5mantui debian/*
+Copyright: Copyright (c) 2019, 2020, 2024 Ma_Sys.ma <info@masysma.net>
+License: GPL-3+
+
+Files: d5manexportpdf/tplpdf/masysma_d5man.tex
+Copyright:
+ Copyright (c) 2014--2017, John MacFarlane
+ Copyright (c) 2019 Ma_Sys.ma <Ma_Sys.ma@web.de>
+License: GPL-3+
+
+Files: d5mantui4/_build/default/rel/d5mantui/lib/yamerl-0.10.0/*
+Copyright:
+ Copyright (c) 2012-2014 Yakaz
+ Copyright (c) 2016-2018 Jean-Sébastien Pédron <jean-sebastien.pedron@dumbbell.fr>
+License: BSD-2-Clause
 ]]></property>
 
 <!-- CI INTEGRATION -->

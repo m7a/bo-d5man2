@@ -1,0 +1,3 @@
+#!/bin/sh -e
+# Wrapper for D5Man TUI 4, (c) 2024 Ma_Sys.ma <info@masysma.net>
+exec /usr/share/mdvl-d5man2/d5mantui/bin/d5mantui foreground "$@"

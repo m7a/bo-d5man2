@@ -91,7 +91,7 @@ proc_document(URLPrefix, NotifyUI, DocFile) ->
 			ets:insert(page_metadata, {Id, Rec}),
 			ets:insert(index_names,   {Rec#page.name, Id}),
 			lists:foreach(fun(Tag) -> ets:update_counter(index_tags,
-					Tag, {1, 1}, 1) end, Rec#page.tags)
+				Tag, {2, 1}, {Tag, 1}) end, Rec#page.tags)
 		end,
 		% droplast: do not process document content part
 		% (which is often null)
@@ -247,7 +247,8 @@ handle_call({query_tags, Limit, Prefix}, _From, Context) ->
 		lists:sort(fun({_TagA, CountA}, {_TagB, CountB}) ->
 				CountA > CountB end,
 		case ets:select(index_tags, MatchSpec, Limit) of
-			'$end_of_table' -> []; List -> List
+			'$end_of_table' -> [];
+			{List, _Continuation} -> List
 		end)), Context};
 % PageID format is page_name(section). this is a key into page_metadata table
 % which will point us to the file to consult. Returns io list.

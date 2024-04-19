@@ -557,7 +557,6 @@ Edit metadata, delete template, start writing.
 
 edit_page(Context, Page) ->
 	[Executable|Args] = Context#view.command_editor,
-	%ok = cecho_srv:call(?ENDWIN, undefined),
 	ok = cecho:endwin(),
 	Port = open_port({spawn_executable, Executable}, [{args,
 		Args ++ [Page#page.file]}, nouse_stdio, exit_status]),
@@ -565,7 +564,7 @@ edit_page(Context, Page) ->
 	{Port, {exit_status, _RC}} ->
 		% TODO UPDATE DB AFTER EDIT! [AND DISTINGUISH QUIT AND BACK USER INTENTIONS]
 		cecho:refresh(),
-		Context
+		query_and_draw(Context#view{mode=display})
 	end.
 
 handle_info(_Message,    Context)         -> {noreply, Context}.

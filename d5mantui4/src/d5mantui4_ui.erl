@@ -191,7 +191,7 @@ handle_cast({getch, Character}, Context) ->
 			paint_result(Context#view{main_cur_idx = max(1,
 					Context#view.main_cur_idx - 1)});
 		?ceKEY_DOWN ->
-			% TODO x LIMIT CALCULATION WRONG. BOUND BY NUM OF ITEMS DRAWN!
+			% TODO LIMIT CALCULATION WRONG. BOUND BY NUM OF ITEMS DRAWN! / THIS BUG IS FOR REAL. QUERY SOME TAGS AND THEN SCROLL ALL THE WAY DOWN TO OBSERVE THE CURSOR GOING OFF LIMITS
 			paint_result(Context#view{main_cur_idx = min(
 					length(Context#view.main_cresult),
 					Context#view.main_cur_idx + 1)});
@@ -470,7 +470,7 @@ handle_call(_Query, _From, Context) ->
 progress_new_task(Context, UpdateField, NextStep) ->
 	ResultPage = lists:nth(Context#view.main_cur_idx,
 						Context#view.main_cresult),
-	FieldValue = binary_to_list(ResultPage#page.name),
+	FieldValue = binary_to_atom(ResultPage#page.name),
 	TPL        = Context#view.page_template,
 	query_and_draw(clear_input(Context#view{mode = NextStep,
 			page_template =
@@ -510,7 +510,7 @@ x-masysma-task-priority
 :   red | green | black | white | yellow | purple |
     delayed | considered
 
-~w/~2.00w/~2..0w
+~w/~2..0w/~2..0w
 ==========
 
 Task Step. Text intended to show the history and not be changed after addition.

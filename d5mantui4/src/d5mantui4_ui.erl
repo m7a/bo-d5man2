@@ -20,6 +20,8 @@
 -define(CPAIR_TSK_PURPLE,  13).
 -define(CPAIR_TSK_DELAYED, 14).
 
+%-define(ceKEY_RESIZE, 410).
+
 % Idea for new page operation
 % ---------------------------
 % Store this as a state in view record and then have the lowermost functions
@@ -36,7 +38,7 @@
 %  new_tags                            -- Keywords entering step
 % end mode transitions
 -record(view, {mode, height, width, page_template,
-		command_editor, new_page_root,
+		command_editor, new_page_root, subtitle,
 		flt_general, flt_toplevel, flt_delayed,
 		main_query, main_query_subpos, main_query_max,
 		wnd_title, wnd_input, wnd_subtitle, wnd_output, wnd_descr,
@@ -51,39 +53,20 @@ init({CommandEditor, NewPageRoot}) ->
 	% used which is not exposed by cecho. Hence read from and configure
 	% STDSCR.
 	cecho:keypad(?ceSTDSCR, true),
-	% Unfortunately, it does not really seem possible to handle SIGWINCH in
-	% Erlang. See `erl_signal_server`
-	{Height, Width}      = cecho:getmaxyx(),
-	{Y1, WndTitle}       = window_create_default(Width, 2, 0),
-	{Y2, WndInput}       = window_create_input(Width, Y1),
-	{Y3, WndSubtitle}    = window_create_default(Width, 2, Y2 + 1),
-	{Y4, WndOutput}      = window_create_default(Width, Height - 7, Y3),
-	{_Y, WndDescription} = window_create_description(Width, Y4),
-	display_title(Width, WndTitle,
-			"Ma_Sys.ma D5Man Terminal User Interface 4.0.0"),
-	display_title(Width, WndSubtitle, "Loading..."),
-	{ok, #view{
+	{ok, init_size_dependent_parts(#view{
 		mode              = loading,
 		command_editor    = CommandEditor,
 		new_page_root     = NewPageRoot,
-		height            = Height,
-		width             = Width,
 		page_template     = #page{},
+		subtitle          = "Loading...",
 		flt_general       = all,
 		flt_toplevel      = all,
 		flt_delayed       = all,
 		main_query        = "",
-		main_query_max    = Width - 4,
 		main_query_subpos = 0,
-		wnd_title         = WndTitle,
-		wnd_input         = WndInput,
-		wnd_subtitle      = WndSubtitle,
-		wnd_output        = WndOutput,
-		wnd_descr         = WndDescription,
 		main_cresult      = [],
-		main_cur_idx      = 0,
-		main_cur_height   = Height - 8
-	}}.
+		main_cur_idx      = 0
+	})}.
 
 init_color_pairs() ->
 	cecho:init_pair(?CPAIR_HEADING,     ?ceCOLOR_RED,    ?ceCOLOR_BLACK),
@@ -100,6 +83,28 @@ init_color_pairs() ->
 	cecho:init_pair(?CPAIR_TSK_YELLOW,  ?ceCOLOR_BLACK,  ?ceCOLOR_YELLOW),
 	cecho:init_pair(?CPAIR_TSK_PURPLE,  ?ceCOLOR_WHITE,  ?ceCOLOR_MAGENTA),
 	cecho:init_pair(?CPAIR_TSK_DELAYED, ?ceCOLOR_BLUE,   ?ceCOLOR_BLACK).
+
+init_size_dependent_parts(Context) ->
+	{Height, Width}      = cecho:getmaxyx(),
+	{Y1, WndTitle}       = window_create_default(Width, 2, 0),
+	{Y2, WndInput}       = window_create_input(Width, Y1),
+	{Y3, WndSubtitle}    = window_create_default(Width, 2, Y2 + 1),
+	{Y4, WndOutput}      = window_create_default(Width, Height - 7, Y3),
+	{_Y, WndDescription} = window_create_description(Width, Y4),
+	display_title(Width, WndTitle,
+			"Ma_Sys.ma D5Man Terminal User Interface 4.0.0"),
+	display_title(Width, WndSubtitle, Context#view.subtitle),
+	Context#view{
+		main_query_max    = Width - 4,
+		height            = Height,
+		width             = Width,
+		wnd_title         = WndTitle,
+		wnd_input         = WndInput,
+		wnd_subtitle      = WndSubtitle,
+		wnd_output        = WndOutput,
+		wnd_descr         = WndDescription,
+		main_cur_height   = Height - 8
+	}.
 
 window_create_default(Width, H, CY) ->
 	{CY + H, cecho:newwin(H, Width, CY, 0)}.
@@ -217,8 +222,11 @@ handle_cast({getch, Character}, Context) ->
 			query_and_draw(delete_character(Context, -1));
 		?ceKEY_BACKSPACE ->
 			Context;
+		?ceKEY_RESIZE ->
+			query_and_draw(init_size_dependent_parts(
+					delete_size_dependent_parts(Context)));
 		% -- Character Input --
-		_Any ->
+		Char when Char < 256 ->
 			{Prefix, Suffix} = lists:split(
 					Context#view.main_query_subpos,
 					Context#view.main_query),
@@ -227,7 +235,10 @@ handle_cast({getch, Character}, Context) ->
 			query_and_draw(update_input(Context#view{
 				main_query = NewQuery,
 				main_query_subpos =
-					Context#view.main_query_subpos + 1}))
+					Context#view.main_query_subpos + 1}));
+		Other ->
+			display_error(Context, io_lib:format(
+					"Character out of range: ~w", [Other]))
 		end};
 handle_cast({log, Level, Message}, Context) ->
 	% TODO x MULTILINE, LINE WRAP, MAX HEIGHT ETC?
@@ -241,7 +252,8 @@ handle_cast({db_loading_complete, TimeMS}, Context) ->
 			[TimeMS])),
 	display_title(Context#view.width, Context#view.wnd_subtitle,
 							"Query Results"),
-	{noreply, query_and_draw(Context#view{mode = display})};
+	{noreply, query_and_draw(Context#view{mode = display,
+					subtitle = "Query Results"})};
 handle_cast(_Cast, Context) ->
 	{ok, Context}.
 
@@ -566,6 +578,17 @@ edit_page(Context, Page) ->
 		cecho:refresh(),
 		query_and_draw(Context#view{mode=display})
 	end.
+
+delete_size_dependent_parts(Context) ->
+	cecho:endwin(),
+	cecho:refresh(),
+	lists:foreach(fun(Window) ->
+			cecho:werase(Window),
+			cecho:delwin(Window)
+		end, [Context#view.wnd_title, Context#view.wnd_input,
+			Context#view.wnd_subtitle, Context#view.wnd_output,
+			Context#view.wnd_descr]),
+	Context.
 
 handle_info(_Message,    Context)         -> {noreply, Context}.
 code_change(_OldVersion, Context, _Extra) -> {ok,      Context}.

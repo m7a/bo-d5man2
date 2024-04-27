@@ -1,3 +1,6 @@
 #!/bin/sh -e
 # Wrapper for D5Man TUI 4, (c) 2024 Ma_Sys.ma <info@masysma.net>
+# Remove LINES/COLUMNS from environment for resize to work!
+unset -v LINES
+unset -v COLUMNS
 exec /usr/share/mdvl-d5man2/d5mantui/bin/d5mantui foreground "$@"

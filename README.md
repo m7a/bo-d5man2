@@ -10,7 +10,7 @@ x-masysma-version: 2.1.0
 x-masysma-repository: https://www.github.com/m7a/bo-d5man2
 x-masysma-website: https://masysma.net/32/d5man2.xhtml
 x-masysma-owned: 1
-x-masysma-copyright: (c) 2019--2023 Ma_Sys.ma <info@masysma.net>.
+x-masysma-copyright: (c) 2019--2024 Ma_Sys.ma <info@masysma.net>.
 ---
 Overview
 ========
@@ -19,10 +19,6 @@ Ma_Sys.ma D5Man 2 is a set of programs and auxiliary resources intended to build
 a locally run knowledge base. It consists of the following individual
 components:
 
-`d5manapi`
-:   _Application Programming Interface_ providing access to page metadata by
-    means of a REST (Representional State Transfer) interface.
-    See `d5manapi` for details.
 `d5mantui`
 :   _Terminal User Interface_ as an interactive means to query for D5Man pages.
     See `d5mantui` for details.
@@ -65,23 +61,25 @@ A third option is _detached_, that is a directory unknown to the D5Man programs
 which contains one or more pages. Such files are not found by the D5Man API
 Server but can still be converted to PDF.
 
-### Example for a Document-Root Structure: IAL
+### Example for a Document-Root Structure: Ma_Sys.ma Website
 
 	/rr
 	 |
-	 +-- 21/
+	 +-- 31/
 	 |    |
-	 |    +-- ada_att/
+	 |    +-- web_about_att/
 	 |    |    |
 	 |    |    +-- ...
 	 |    |
-	 |    +-- ant_att/
+	 |    +-- web_news_att/
 	 |    |    |
 	 |    |    +-- ...
 	 |    |
-	 |    +-- ada.yml
+	 |    +-- ...
 	 |    |
-	 |    +-- ant.yml
+	 |    +-- web_about.md
+	 |    |
+	 |    +-- web_news.md
 	 |    |
 	 |    +-- ...
 	 |
@@ -527,215 +525,96 @@ D5Man 2 requires an Erlang OTP runtime and a suitable Perl interpreter as well
 as a selection of Perl modules. A declaration of all dependencies for an
 installation on a Debian stable system can be found in file `build.xml`.
 
-Only the Erlang-based `d5manapi` requires external dependencies and needs to be
+Only the Erlang-based `d5mantui` requires external dependencies and needs to be
 compiled, all other D5Man 2 components are scripts and run without compilation
-or further processing. By providing `erlang.mk` along with `d5manapi`,
-compilation should automatically download all dependencies if a working
-Erlang OTP runtime can be found.
+or further processing.
+
+Prior to attempting to run D5Man TUI, adjust its config file at
+`d5mantui4/config/sys.config` to refer to your local paths!
 
 To compile the individual parts, it might be sufficient to call `make`
-in directory `d5manapi`. If this succeeds, all components are already on disk.
+in directory `d5mantui4`. After this has succeeded, all components are on disk.
 To generate an installable Debian package, `ant` and the usual build tools for
 Debian packages are required. One can then build the package by invoking
 `ant package` in the repository's top-level directory.
 
-`d5manapi`
+`d5mantui`
 ==========
 
-The D5Man API server loads metadata for all pages into RAM and provides a
-REST API to query the respective metadata.
+The D5Man Terminal User Interface (TUI) displays query results interactively in
+the terminal while typing the query. Additionally, it contains functions to
+build a basic _Task Management_ system on top of D5Man.
+
+## Synopsis
+
+	d5mantui [query]
 
 ## Configuration
 
-`erlang.mk` builds a script `d5manapi_release` to run the server which can be
-invoked as follows:
-
-	bin/d5manapi_release foreground [-config CONFIG]
-
-Here, `CONFIG` refers to an optional configuration file. Default values for
-the configuration can be found in `d5manapi/rel/sys.config` and are as follows:
+D5Man TUI can be configured through the `sys.config` file. The default
+configuration looks as follows:
 
 ~~~{.erlang}
-[{d5manapi, [
-	{ip, {127, 0, 0, 1}},
-	{port, 7450},
-	{redirect_url_prefix, "http://127.0.0.1:7450/rrman/"},
-	{fs, #{
-		rrman => "/data/main/119_man_rr",
-		ial   => "/data/main/120_mdvl_rr/bo-d5man2/ial/home",
-		local => "/data/main/120_mdvl_rr/br-ial-local"
-	}},
-	{db_roots, [
-		"/data/main/119_man_rr",
-		"/data/main/120_mdvl_rr"
-	]}
-]}].
+[{d5mantui4, [
+	{db_roots,       ["/data/main/119_man_rr", "/data/main/120_mdvl_rr"]},
+	{command_editor, ["/usr/bin/vim"]},
+	{newpage_root,   "/data/main/119_man_rr"}
+]},
+{kernel, [{error_logger, {file, "/tmp/d5mantui4.log"}}]}
+].
 ~~~
 
-The lines with `ip`, `port` and `redirect_url_prefix` configure the server's
-address. For local usage, it is highly recommended to set `ip` to the defined
-`127.0.0.1`.
+_Users must change this config prior to using D5man TUI_!
 
-The other parts of the configuration most likely require changes for local
-use. They are dividied into `fs` and `db_roots` which can be described as
-follows:
+The meaning of the properties is as follows:
 
-`fs`
-:   Provides an association of server paths to local paths. This essentially
-    makes the D5Man API server serve static files. For instance in this
-    configuration, file `/data/main/300t399_man_rr/21/ada_att/rm-0-1.html` is
-    available thorugh the server at
-    `http://127.0.0.1:7450/rrman/21/ada_att/rm-0-1.html`.
 `db_roots`
 :   Declares a list of directories to consult for D5Man pages. They can be
     either in _Document-Root_ or _Program-Root_ organization. All the pages
     found below the respective roots will be available for querying.
-
-Note that for Linux usage, script `d5manapi/aux/d5manapi` is provided. It
-invokes the server automatically detecting the presence of a configuration file
-in `$HOME/.mdvl/d5man/d5manapi.conf`. Additionally, a systemd unit
-`d5manapi.service` is provided. It is intended to be installed as a
-user-service. See `d5manapi.service` for details.
-
-## Usage
-
-Once configured, `d5manapi` can be started and awaits connections from other
-D5Man components (i.e. `d5mantui` or IAL).
-
-The API currently exposes a single endpoint called `query`. It can be invoked
-as follows:
-
-	curl http://127.0.0.1:7450/query/
-
-Without any actual query string, this will return all elements in the database
-up to the default limit of 100. To configure a different limit, use query
-parameter `limit` e.g. as follows:
-
-	curl http://127.0.0.1:7450/query/?limit=4
-
-This query returns four elements from the database..
-
-To send a query string, use it as path:
-
-	curl http://127.0.0.1:7450/query/31%20web
-
-This sends query `31 web` to the server which returns all pages in section
-`31` which match query string `web`.
-
-Currently, the API always outputs XML. An example output from the API can look
-as follows:
-
-~~~{.xml}
-<?xml version="1.0" encoding="UTF-8"?>
-<d5man>
-	<page>
-		<meta>
-			<kv k="file" v="/data/main/300t399_man_rr/21/erlang.yml"/>
-			<kv k="section" v="21"/>
-			<kv k="name" v="erlang/snmp_user_based_sm_mib:delete_user/1"/>
-			<kv k="tags" v="erlang snmp_user_based_sm_mib:delete_user/1 snmp_user_based_sm_mib delete_user/1"/>
-			<kv k="redirect" v="http://127.0.0.1:7450/rrman/21/erlang_att/lib/snmp-5.2.12/doc/html/snmp_user_based_sm_mib.html#delete_user-1"/>
-		</meta>
-	</page>
-	<page>
-		<meta>
-			<kv k="file" v="/data/main/300t399_man_rr/21/erlang.yml"/>
-			<kv k="section" v="21"/>
-			<kv k="name" v="erlang/snmp_user_based_sm_mib:delete_user/1"/>
-			<kv k="tags" v="erlang snmp_user_based_sm_mib:delete_user/1 snmp_user_based_sm_mib delete_user/1"/>
-			<kv k="redirect" v="http://127.0.0.1:7450/rrman/21/erlang_att/lib/snmp-5.2.12/doc/html/snmp_user_based_sm_mib.html#delete_user-1"/>
-		</meta>
-	</page>
-</d5man>
-~~~
-
-The format is a little “complicated” for being mostly compatible with D5Man
-Legacy page files. It consists of a single `d5man` element which contains
-separate `page` elements for each page. In case of this API, each `page`
-contains exactly (and only) one `meta` element which in turn contains the
-actual metadata in form of `kv` (key-value) elements. Metadata `file`, `section`
-and `name` are expected to be always present. `tags` contains a space-separated
-list of tags obtained from `keywords` declarations in the files. In case a
-page is not expected to be opened directly, `redirect` indicates the page to
-open instead.
-
-The example XML from above shows metadata as can be generated by script
-`ial/pgen/pages_erlang.sh` for the Erlang documentation.
-
-`d5mantui`
-==========
-
-The D5Man Terminal User Interface (TUI) is a special-purpose client for the
-D5Man API. It displays query results interactively in the terminal while
-typing the query.
-
-## Synopsis
-
-	d5mantui [--documents-only|--board|--delayed|--subtask] [query]
-
-## Configuration
-
-D5Man TUI can be configured by providing a suitable XML property file. In the
-XML format, the default configuration looks as follows:
-
-~~~{.xml}
-<?xml version="1.0" encoding="UTF-8"?>
-<properties>
-	<entry key="d5man.ui.command.editor"
-		>vim -c "let g:d5man_api_url=\"${d5man.api.url}\""</entry>
-	<entry key="d5man.ui.command.browser">firefox</entry>
-	<entry key="d5man.ui.newpage.root">/data/main/119_man_rr</entry>
-	<entry key="d5man.api.url">http://127.0.0.1:7450/</entry>
-</properties>
-~~~
-
-The syntax is a subset of Java's XML properties (initially, `d5mantui` was
-intended to be a Java client).
-
-For very simple installations (where no new pages are going to be created, e.g.
-when using IAL only), the defaults may be sufficient. In other cases, the
-`d5man.ui.newpage.root` needs to be changed to point to the Document-Root
-to place newly created pages in.
-
-Syntax `${variable.name}` can be used to refer to any of the other properties
-from inside a given entry. It is currently not possible to escape the `$` to
-not expand the variable substition.
-
-To find the XML file, D5Man TUI looks in environment variable `$D5MAN_CONF_UI`
-and if that is absent, attempts to load file
-`$HOME/.mdvl/d5man/d5mantui_properties.xml`.
+`newpage_root`
+:   Specifies the directory in which new pages are created.
+`command_editor`
+:   Configures the Editor to use. It is recommended to use a terminal-based
+    editor which creates a new instance upon invocation of this command.
+`error_logger` file
+:   Configures a log to write errors to. In event of a D5Man TUI crash, please
+    delete this file, reproduce the issue and then send the contents of this
+    log file to the Ma_Sys.ma for analysis.
 
 ## Usage
 
 The screen could e.g. look as follows:
 
-	> erlan
-	<o> 21 erlang/array:to_list/1
-	< > 21 erlang/base64:encode_to_string/1
-	< > 21 erlang/binary:matches/3
-	< > 21 erlang/code:load_abs/1
-	< > 21 erlang/common_test:Module:suite/0
-	< > 21 erlang/ct_snmp:set_values/4
-	< > 21 erlang/ct_snmp:unregister_users/1
-	< > 21 erlang/dbg:get_tracer/1
-	< > 21 erlang/dict:fetch_keys/1
-	< > 21 erlang/dict:merge/3
-	< > 21 erlang/digraph:info/1
-	< > 21 erlang/disk_log:block/1
-	< > 21 erlang/erl_syntax:receive_expr_action/1
-	< > 21 erlang/erl_syntax:record_type_field_type/1
-	< > 21 erlang/erlang:fun_info/2
-	< > 21 erlang/ets:match_object/3
-	< > 21 erlang/ets:to_dets/2
-	< > 21 erlang/gl:bindVertexArray/1
-	< > 21 erlang/gl:clear/1
-	< > 21 erlang/gl:createShaderObjectARB/1
-	< > 21 erlang/gl:deleteBuffers/1
-	< > 21 erlang/gl:getHandleARB/1
-		2 New           4 All           6 Docs  7 Board 8 W+1   9 Tasks
+~~~
+─────────────────────────────[ Ma_Sys.ma D5Man Terminal User Interface 4.0.0 ]──
 
-The first line is a prompt where the user can enter any query that will be sent
-to D5Man API. The list below displays the search results and can be scrolled
+ [                                                                            ]
+
+─────────────────────────────────────────────────────────────[ Query Results ]──
+
+   11 adler32         31 web/news                32 kbdcheck
+   11 bin2bmp         31 web/programs            32 lz4_ada
+   11 ma_capsblinker  32 big4                    32 ma_inventory
+   11 ma_open_cl_info 32 blake3_ada              32 masysmaci/build
+   11 ma_sitecopy     32 bruteforce3             32 masysmaci/main
+   11 maartifact      32 conf-cli                32 masysmaci/pkgsync
+   11 maerct          32 conf-gui                32 matrix_screensaver
+   11 mahalt          32 d5man/legacy            32 maxbupst
+   11 maloadmon       32 decode_girocode         32 megasync
+   11 syssheet        32 gamuhr                  32 pressed_keys
+   31 keysigning      32 i3bar                   32 progress
+   31 web/about       32 ial                     32 scanning
+   31 web/creative    32 image_viewer            32 screenindex
+   31 web/gpl         32 internet-enable-disable 32 shellscripts
+   31 web/knowledge   32 java-nostalgic-tools    32 ssd-optimization
+   31 web/main        32 jmbb                    32 tar_ada
+
+ 1       2New    3       4All    5       6Docs   7Tasks  8-DLY   9-Sub   0Quit 
+~~~
+
+The first line is a prompt where the user can enter any query that will be used
+to find pages. The list below displays the search results and can be scrolled
 with [UP] and [DOWN] arrows on the keyboard. Upon pressing [ENTER], the selected
 page is opened.
 
@@ -750,12 +629,29 @@ Function keys can be used as described in the following subsections.
 
 One can press [F2] to create a new page. To do this, the input at the prompt
 needs to be in format `SECTION NAME` i.e. the new page's section followed by its
-name. [F2] will then copy a predefined template to a new file and open it in the
-configured editor. Note that this function only supports Document-Root
-organization for creating new files. If SECTION is set to 43 then a task rather
-than a page will be created.
+name. D5Man TUI then clears the prompt.
 
-## D5Man TUI Task Management
+In case of a regular page, it directly asks for a space-separated list of
+tags to assign to the page. Common tags are displayed in the _Query Results_
+while this mode is active. After pressing [ENTER], a predefined template is
+copied to a new file and opened it in the configured editor.
+
+If SECTION is set to 43 then metadata about the task is also queried from the
+prompt (press [ENTER] to continue) and afterwards a task rather than a page is
+be created.
+
+This function only supports Document-Root organization for creating new files.
+
+### [F4] -- All
+
+Displays all results for the given query (default). Queries will return tasks
+as well as documents depending on which matches the input string.
+
+### [F6] -- Docs
+
+Hides tasks from the result list.
+
+## [F7], [F8], [F9] -- D5Man TUI Task Management
 
 Since package version 1.0.54, D5Man provides some basic means to manage
 “tasks”, i.e. TODO lists or issues or the like. The idea behind this scheme is
@@ -763,15 +659,14 @@ to leverage the Markdown format and D5Man's querying capabilities for management
 of tasks. Two distinct dimensions are considered to organize tasks:
 
  1. The _task type_ specifies if this task is long, short, periodic or a
-    subtask. The order of display is: periodic, then long, then short. Subtasks
-    are hidden by default and provided on a separate “tasks” screen.
+    subtask. The order of display is: periodic, then long, then short.
  2. The _task priority_ specifies how important a task is by assinging colors
     (purple, red, yellow, green, black, white). The use of the colors is up to
     the user. Instead of a color a task can also be in state _considered_ or
     _delayed_: Considered means that it should be kept in mind but is not
     assigned any priority (think: very low priority) and _delayed_ means that it
-    should be hidden by default because it is not expected to be worked on any
-    time soon (e.g. not in the current week).
+    may be hidden because it is not expected to be worked on any time soon
+    (e.g. not in the current week).
 
 D5Man assings the file extension `.hot` to task files to distinguish them from
 documents and all tasks are placed and expected to be in section 43. D5Man
@@ -781,34 +676,40 @@ them to the tasks to consider.
 
 The `x-masysma-name` field is expected to be set to a short identifier (e.g.
 code and number or similar) whereas the `title` is expected to summarize the
-matter of the issue.
+matter of the task.
 
-### [F4] -- All
+### [F8] -- DLY
 
-Displays all results for the given query (default). Queries will return tasks
-as well as documents depending on which matches the input string.
+By default, tasks of priority _delayed_ are displayed. [F8] is a tristate toggle
+that displays the action that is going to happen when pressing it:
 
-### [F6] -- Docs
+ 1. `8-DLY` -- First press [F8] to hide (-) the delayed tasks from the view
+    and display only non-delayed tasks.
+ 2. `8=DLY` -- Press [F8] again to display only (=) delayed tasks
+ 3. `8+DLY` -- Press [F8] again to add non-delayed tasks (+) to the view again
+    (returns to the initial state).
 
-Hides tasks from the result list. This is equivalent to invoking `d5mantui` with
-argument `--documents-only`.
+### [F9] -- Subtasks
 
-### [F7] -- Board
+By default, tasks of type _subtask_  are displayed. [F9] is a tristate toggle
+that displays the action that is going to happen when pressing it:
 
-Filters the results for large tasks that are currently considered. This is all
-tasks that have a priority not equals to `delayed` and which are also not of
-type `subtask`. This is equivalent to invoking `d5mantui` with argument
-`--board`.
+ 1. `9-Sub` -- First press [F9] to hide (-) the subtasks from the view and
+    display only long/short/periodic ones.
+ 2. `9=Sub` -- Press [F9] again to display only (=) subtasks.
+ 3. `9+Sub` -- Press [F9] again to add non-subtasks (+) to the view again
+    (returns to the initial state).
 
-### [F8] -- Week + 1
+## Change History
 
-Filters the results for tasks that are currently delayed. This is equivalent
-to invoking `d5mantui` with argument `--delayed`.
+Before the current revision (D5Man TUI 4), there was an implementation
+consisting of a daemon (`d5manapi`) and a client (`d5mantui` perl script / v.3).
+This had some advantages but was mostly much more complex than the current
+implementation.
 
-### [F9] -- Tasks
-
-Specifically filters for all subtasks. This is equivalent to invoking `d5mantui`
-with argument `--subtask`.
+The new D5Man TUI 4 is close to a rewrite of the old functionality and thus
+doesn't run fully stable yet. See `xdev/d5mantui3.pl` and `xdev/d5manapi` for
+the old variants of these components.
 
 `d5manexportpdf`
 ================

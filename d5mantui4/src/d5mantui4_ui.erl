@@ -20,7 +20,7 @@
 -define(CPAIR_TSK_PURPLE,  13).
 -define(CPAIR_TSK_DELAYED, 14).
 
-%-define(ceKEY_RESIZE, 410).
+-define(ceKEY_RESIZE, 410).
 
 % Idea for new page operation
 % ---------------------------

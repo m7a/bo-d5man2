@@ -527,7 +527,10 @@ installation on a Debian stable system can be found in file `build.xml`.
 
 Only the Erlang-based `d5mantui` requires external dependencies and needs to be
 compiled, all other D5Man 2 components are scripts and run without compilation
-or further processing.
+or further processing. As a build dependency, `mdvl-cecho` (or alternatively
+`cecho` as commented-out in `rebar.config`) is required. You can get
+the build instructions for package `mdvl-cecho` here:
+<https://github.com/m7a/lp-cecho>.
 
 Prior to attempting to run D5Man TUI, adjust its config file at
 `d5mantui4/config/sys.config` to refer to your local paths!

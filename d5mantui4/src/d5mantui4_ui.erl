@@ -20,7 +20,7 @@
 -define(CPAIR_TSK_PURPLE,  13).
 -define(CPAIR_TSK_DELAYED, 14).
 
--define(ceKEY_RESIZE, 410).
+%-define(ceKEY_RESIZE, 410).
 
 % Idea for new page operation
 % ---------------------------
@@ -44,7 +44,7 @@
 		wnd_title, wnd_input, wnd_subtitle, wnd_output, wnd_descr,
 		main_cresult, main_cur_idx, main_cur_height}).
 
-init({CommandEditor, NewPageRoot}) ->
+init({CommandEditor, NewPageRoot, Query0}) ->
 	cecho:start_color(),
 	init_color_pairs(),
 	cecho:cbreak(),
@@ -53,7 +53,8 @@ init({CommandEditor, NewPageRoot}) ->
 	% used which is not exposed by cecho. Hence read from and configure
 	% STDSCR.
 	cecho:keypad(?ceSTDSCR, true),
-	{ok, init_size_dependent_parts(#view{
+	QueryStr = lists:flatten(io_lib:format("~s", [Query0])),
+	{ok, update_input(init_size_dependent_parts(#view{
 		mode              = loading,
 		command_editor    = CommandEditor,
 		new_page_root     = NewPageRoot,
@@ -62,11 +63,11 @@ init({CommandEditor, NewPageRoot}) ->
 		flt_general       = all,
 		flt_toplevel      = all,
 		flt_delayed       = all,
-		main_query        = "",
-		main_query_subpos = 0,
+		main_query        = QueryStr,
+		main_query_subpos = length(QueryStr),
 		main_cresult      = [],
 		main_cur_idx      = 0
-	})}.
+	}))}.
 
 init_color_pairs() ->
 	cecho:init_pair(?CPAIR_HEADING,     ?ceCOLOR_RED,    ?ceCOLOR_BLACK),

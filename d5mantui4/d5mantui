@@ -3,4 +3,4 @@
 # Remove LINES/COLUMNS from environment for resize to work!
 unset -v LINES
 unset -v COLUMNS
-exec /usr/share/mdvl-d5man2/d5mantui/bin/d5mantui foreground "$@"
+exec /usr/share/mdvl-d5man2/d5mantui/bin/d5mantui foreground -query "$*"

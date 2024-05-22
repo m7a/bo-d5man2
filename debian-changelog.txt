@@ -1,3 +1,9 @@
+mdvl-d5man2 (1.0.68) stable; urgency=medium
+
+  * Allow passing a query by command line
+
+ -- Ma_Sys.ma Linux-Fan <info@masysma.net>  Wed, 22 May 2024 20:02:02 +0200
+
 mdvl-d5man2 (1.0.67) stable; urgency=medium
 
   * Build a version with window resize support

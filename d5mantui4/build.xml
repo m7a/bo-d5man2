@@ -5,13 +5,12 @@
 		<exec executable="rebar3" failonerror="true">
 			<arg value="release"/>
 		</exec>
-		<!-- hacks to work around architecture-specific code being incldued in package... -->
-		<delete dir="_build/default/rel/d5mantui/lib/cecho-0.5.2"
-				followSymlinks="false"
-				removeNotFollowedSymlinks="true"/>
-		<delete dir="_build/default/rel/d5mantui/lib/cecho-0.5.2"/>
-		<symlink link="${basedir}/_build/default/rel/d5mantui/lib/cecho-0.5.2"
-				resource="/usr/lib/erlang/lib/cecho-0.6.0"/>
+		<delete dir="_build/default/rel/d5mantui/lib/yamerl-0.10.0"
+			followSymlinks="false" removeNotFollowedSymlinks="true"/>
+		<delete dir="_build/default/rel/d5mantui/lib/d5mantui4-4.0.0"
+			followSymlinks="false" removeNotFollowedSymlinks="true"/>
+		<delete file="_build/default/rel/d5mantui/releases/4.0.0/sys.config"
+			followSymlinks="false" removeNotFollowedSymlinks="true"/>
 	</target>
 
 	<target name="clean">

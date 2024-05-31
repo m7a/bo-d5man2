@@ -6,7 +6,8 @@
 <property name="mdpc.section" value="misc"/>
 <property name="mdpc.descrs"  value="D5Man 2"/>
 <property name="mdpc.arch"    value="all"/>
-<property name="mdpc.bdep"    value="rebar3, mdvl-cecho"/>
+<property name="mdpc.bdep">rebar3, mdvl-cecho,
+	config-package-dev, debhelper-compat (= 13)</property>
 <property name="mdpc.depends">erlang-base, libyaml-tiny-perl,
 	libfile-copy-recursive-perl, libdatetime-perl, libfile-homedir-perl,
 	libxml-rss-perl, libdatetime-format-strptime-perl</property>
@@ -20,6 +21,12 @@
 <property name="mdpc.file.install">
 d5mantui4/d5mantui /usr/bin
 d5mantui4/_build/default/rel/d5mantui /usr/share/mdvl-d5man2
+d5mantui4/src /usr/share/mdvl-d5man2/d5mantui/lib/d5mantui4-4.0.0
+d5mantui4/_build/default/lib/d5mantui4/ebin /usr/share/mdvl-d5man2/d5mantui/lib/d5mantui4-4.0.0
+d5mantui4/_build/default/lib/yamerl/ebin /usr/share/mdvl-d5man2/d5mantui/lib/yamerl-0.10.0
+d5mantui4/_build/default/lib/yamerl/include /usr/share/mdvl-d5man2/d5mantui/lib/yamerl-0.10.0
+d5mantui4/_build/default/lib/yamerl/src /usr/share/mdvl-d5man2/d5mantui/lib/yamerl-0.10.0
+d5mantui4/config/sys.config /usr/share/mdvl-d5man2/d5mantui/releases/4.0.0
 d5manexportpdf/d5manexportpdf /usr/bin
 d5manexportpdf/d5manexportpdfcheckerr /usr/bin
 d5manexportpdf/d5manexporttex /usr/bin
